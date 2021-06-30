@@ -41,7 +41,7 @@ def getNames(lineup):
 #main
 
 #draftkings csv
-df = pd.read_csv('DKSalaries.csv')
+df = pd.read_csv('DKSalaries-RMC.csv')
 df.drop(['Position','Name + ID','ID','Roster Position','Game Info', 'TeamAbbrev'],axis=1,inplace=True)
 
 
