@@ -1,28 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[172]:
-
-
-#import numpy as np
+import numpy as np
 import pandas as pd
-import random
 
+#user input
+iterations = 100
 
-# In[173]:
-
-
-df = pd.read_csv('DKSalaries.csv')
-
-
-# In[174]:
-
-
-df.head()
-
-
-# In[190]:
-
+#function definitions
 
 def objective(x):
     p0 = []
@@ -50,19 +35,15 @@ def getNames(lineup):
         n0.append(df.loc[int(iden)]['Name'])
     return n0
 
+#main
 
-# In[191]:
-
+df = pd.read_csv('DKSalaries.csv')
 
 maxIter = 0
 i = 0
-print(genIter())
 
 
-# In[192]:
-
-
-while i < 100:
+while i < iterations:
     lineup = genIter()
     currentIter = objective(lineup)
     if currentIter > maxIter and constraint(lineup) > 0:
@@ -70,16 +51,7 @@ while i < 100:
         maxLineup = lineup
     i = i + 1    
 
-
-# In[193]:
-
-
 print(maxIter)
 print(getNames(maxLineup))
-
-
-# In[ ]:
-
-
 
 
