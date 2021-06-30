@@ -1,1 +1,1 @@
-An optimization program to maximize 'AvgPointsPerGame' of a DraftKings lineup, specifically for PGA tournaments. Will need to download roster from DraftKings website
+An optimization program to maximize 'AvgPointsPerGame' of a DraftKings lineup, specifically for PGA tournaments. In order to execute script, you will need to download roster csv from DraftKings website for the specific tournament.
