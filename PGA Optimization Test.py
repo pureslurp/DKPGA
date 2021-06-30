@@ -19,7 +19,10 @@ def constraint(x):
     s0 = []
     for iden in x:
         s0.append(float(df.loc[int(iden)]['Salary']))
-    return 50000 - sum(s0)
+    if (50000 - sum(s0)) > 0:
+        return True
+    else:
+        return False
 
 def genIter():
     r0 = []
@@ -46,7 +49,7 @@ i = 0
 while i < iterations:
     lineup = genIter()
     currentIter = objective(lineup)
-    if currentIter > maxIter and constraint(lineup) > 0:
+    if currentIter > maxIter and constraint(lineup):
         maxIter = currentIter
         maxLineup = lineup
     i = i + 1    
