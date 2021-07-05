@@ -6,7 +6,7 @@ import pandas as pd
 
 
 #user input
-iterations = 100000
+iterations = 10000
 
 #function definitions
 
@@ -97,7 +97,8 @@ dk_merge = pd.merge(dk_merge, dk_pastResults,how='left',on='Name')
 
 maxIter = 0
 i = 0
-master = []
+j = 0
+topTier = pd.DataFrame(columns=['Player'])
 
 base = np.zeros(len(dk_merge))
 
@@ -122,6 +123,7 @@ dk_merge['Par3Eff_150-175'] = dk_merge['Par3Eff_150-175'].fillna(5)
 dk_merge['Par4Eff_350-400'] = dk_merge['Par4Eff_350-400'].fillna(6)
 dk_merge['Par4Eff_450-500'] = dk_merge['Par4Eff_450-500'].fillna(6)
 dk_merge['Par5Eff_550-600'] = dk_merge['Par5Eff_550-600'].fillna(7)
+dk_merge.to_csv('DKRMC_IS.csv', index = False)
 
 
 
@@ -165,23 +167,31 @@ dk_merge.drop(column_list,axis=1,inplace=True)
 #dk_merge.dropna(inplace=True)
 #dk_merge.to_csv('DKTest.csv', index = False)
 
+
+mean = dk_merge['Total'].mean()*6
+sigma = dk_merge['Total'].std()*6
+
 print(dk_merge.head())
 
 while i < iterations:
     lineup = genIter()
     lineup.sort()
-    if lineup not in master:
-        currentIter = objective(lineup)
-        if currentIter > maxIter and constraint(lineup):
-            maxIter = currentIter
-            maxLineup = lineup
-        if constraint(lineup):
-            master.append(lineup)
-            i = i + 1
-        if i % 1000 == 0:
-            print(i)
+    currentIter = objective(lineup)
+    if currentIter > maxIter and constraint(lineup):
+        maxIter = currentIter
+        maxLineup = lineup
+    if currentIter > (mean+sigma):
+        for x in lineup:
+            topTier.loc[j] = dk_merge.loc[x]['Name']
+            j = j + 1
+    if constraint(lineup):
+        i = i + 1
+    if i % 1000 == 0:
+        print(i)
 
-print(len(master))
+#topTier = topTier.loc[topTier.duplicated(keep=False),:]
+topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 5]
+print(topTier['Player'].value_counts())
 print(maxIter)
 print(getNames(maxLineup))
 
