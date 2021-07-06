@@ -6,7 +6,7 @@ import pandas as pd
 
 
 #user input
-iterations = 10000
+iterations = 100000
 
 #function definitions
 
@@ -39,6 +39,13 @@ def getNames(lineup):
         n0.append(dk_merge.loc[int(iden)]['Name'])
     return n0
 
+def date(data):
+    data = data.split("'")
+    data[1] = data[1][:-1]
+    x = int(data[0])+(int(data[1])/12)
+    return x
+    
+
 #main
 
 #draftkings csv
@@ -64,7 +71,9 @@ dk_proximity = pd.read_html('https://www.pgatour.com/stats/stat.339.html')
 dk_proximity = dk_proximity[1]
 dk_proximity.drop(['RANK LAST WEEK','ROUNDS','TOTAL DISTANCE (FEET)','# OF ATTEMPTS','RELATIVE TO PAR'], axis=1, inplace=True)
 dk_proximity.drop(dk_proximity.columns[0],axis=1,inplace=True)
-dk_proximity.rename(columns={'PLAYER NAME':'Name','AVG':'Proximity'}, inplace=True)
+dk_proximity['Proxy'] = dk_proximity["AVG"].apply(lambda x: date(x))
+dk_proximity.drop(['AVG'],axis=1,inplace=True)
+dk_proximity.rename(columns={'PLAYER NAME':'Name','Proxy':'Proximity'}, inplace=True)
 
 #strokes gained putting
 dk_putting = pd.read_html('https://www.pgatour.com/stats/stat.02564.html')
@@ -165,14 +174,14 @@ dk_merge['PR'] = pastResultsScale
 #reshape
 dk_merge.sort_values(by='Salary',ascending=False,inplace=True)
 #dk_merge.to_csv('DKTest.csv', index = False)
-dk_merge.to_csv('DKRMC_IS.csv', index = False)
+#dk_merge.to_csv('DKRMC_IS.csv', index = False)
 
 dk_merge.drop(['AvgPointsPerGame','Par3Eff_200-225','Par4Eff_400-450','Putting','Birdies','Proximity','FEDEX PTS'],axis=1,inplace=True)
 column_list = ['APPG','P3E','P4E','Prox','Putt','Bird','PR']
 dk_merge['Total'] = dk_merge[column_list].sum(axis=1)
 dk_merge.drop(column_list,axis=1,inplace=True)
 #dk_merge.dropna(inplace=True)
-#dk_merge.to_csv('DKTest.csv', index = False)
+dk_merge.to_csv('DKTest.csv', index = False)
 
 
 mean = dk_merge['Total'].mean()*6
@@ -197,7 +206,7 @@ while i < iterations:
         print(i)
 
 #topTier = topTier.loc[topTier.duplicated(keep=False),:]
-topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 5]
+topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 10]
 print(topTier['Player'].value_counts())
 print(maxIter)
 print(getNames(maxLineup))
