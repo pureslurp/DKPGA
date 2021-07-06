@@ -46,53 +46,53 @@ df = pd.read_csv('DKSalaries-TPC-DR.csv')
 df.drop(['Position','Name + ID','ID','Roster Position','Game Info', 'TeamAbbrev'],axis=1,inplace=True)
 
 #par3efficiency 200-225
-dk_par4efficiency = pd.read_html('https://www.pgatour.com/content/pgatour/stats/stat.02528.y2021.html')
-dk_par4efficiency = dk_par4efficiency[1]
-dk_par4efficiency.drop(['RANK LAST WEEK','ROUNDS','TOTAL STROKES','TOTAL ATTEMPTS'], axis=1, inplace=True)
-dk_par4efficiency.drop(dk_par4efficiency.columns[0],axis=1,inplace=True)
-dk_par4efficiency.rename(columns={'PLAYER NAME':'Name','AVG':'Par4Eff_350-400'}, inplace=True)
-
-#par4efficiency 400-450
-dk_par4efficiency1 = pd.read_html('https://www.pgatour.com/stats/stat.02530.html')
-dk_par4efficiency1 = dk_par4efficiency1[1]
-dk_par4efficiency1.drop(['RANK LAST WEEK','ROUNDS','TOTAL STROKES','TOTAL ATTEMPTS'], axis=1, inplace=True)
-dk_par4efficiency1.drop(dk_par4efficiency1.columns[0],axis=1,inplace=True)
-dk_par4efficiency1.rename(columns={'PLAYER NAME':'Name','AVG':'Par4Eff_450-500'}, inplace=True)
-
-#proximity 125-150
-dk_par5efficiency = pd.read_html('https://www.pgatour.com/stats/stat.02534.html')
-dk_par5efficiency = dk_par5efficiency[1]
-dk_par5efficiency.drop(['RANK LAST WEEK','ROUNDS','TOTAL STROKES','TOTAL ATTEMPTS'], axis=1, inplace=True)
-dk_par5efficiency.drop(dk_par5efficiency.columns[0],axis=1,inplace=True)
-dk_par5efficiency.rename(columns={'PLAYER NAME':'Name','AVG':'Par5Eff_550-600'}, inplace=True)
-
-#strokes gained putting
-dk_drivingAcc = pd.read_html('https://www.pgatour.com/stats/stat.102.html')
-dk_drivingAcc = dk_drivingAcc[1]
-dk_drivingAcc.drop(['RANK LAST WEEK','ROUNDS','FAIRWAYS HIT','POSSIBLE FAIRWAYS'], axis=1, inplace=True)
-dk_drivingAcc.drop(dk_drivingAcc.columns[0],axis=1,inplace=True)
-dk_drivingAcc.rename(columns={'PLAYER NAME':'Name','%':'DriveAcc'}, inplace=True)
-
-#birdie or better%
-dk_par3efficiency = pd.read_html('https://www.pgatour.com/stats/stat.02520.html')
+dk_par3efficiency = pd.read_html('https://www.pgatour.com/stats/stat.02522.html')
 dk_par3efficiency = dk_par3efficiency[1]
 dk_par3efficiency.drop(['RANK LAST WEEK','ROUNDS','TOTAL STROKES','TOTAL ATTEMPTS'], axis=1, inplace=True)
 dk_par3efficiency.drop(dk_par3efficiency.columns[0],axis=1,inplace=True)
-dk_par3efficiency.rename(columns={'PLAYER NAME':'Name','AVG':'Par3Eff_150-175'}, inplace=True)
+dk_par3efficiency.rename(columns={'PLAYER NAME':'Name','AVG':'Par3Eff_200-225'}, inplace=True)
+
+#par4efficiency 400-450
+dk_par4efficiency = pd.read_html('https://www.pgatour.com/stats/stat.02529.html')
+dk_par4efficiency = dk_par4efficiency[1]
+dk_par4efficiency.drop(['RANK LAST WEEK','ROUNDS','TOTAL STROKES','TOTAL ATTEMPTS'], axis=1, inplace=True)
+dk_par4efficiency.drop(dk_par4efficiency.columns[0],axis=1,inplace=True)
+dk_par4efficiency.rename(columns={'PLAYER NAME':'Name','AVG':'Par4Eff_400-450'}, inplace=True)
+
+#proximity 125-150
+dk_proximity = pd.read_html('https://www.pgatour.com/stats/stat.339.html')
+dk_proximity = dk_proximity[1]
+dk_proximity.drop(['RANK LAST WEEK','ROUNDS','TOTAL DISTANCE (FEET)','# OF ATTEMPTS','RELATIVE TO PAR'], axis=1, inplace=True)
+dk_proximity.drop(dk_proximity.columns[0],axis=1,inplace=True)
+dk_proximity.rename(columns={'PLAYER NAME':'Name','AVG':'Proximity'}, inplace=True)
+
+#strokes gained putting
+dk_putting = pd.read_html('https://www.pgatour.com/stats/stat.02564.html')
+dk_putting = dk_putting[1]
+dk_putting.drop(['RANK LAST WEEK','ROUNDS','TOTAL SG:PUTTING','MEASURED ROUNDS'], axis=1, inplace=True)
+dk_putting.drop(dk_putting.columns[0],axis=1,inplace=True)
+dk_putting.rename(columns={'PLAYER NAME':'Name','AVERAGE':'Putting'}, inplace=True)
+
+#birdie or better%
+dk_birdies = pd.read_html('https://www.pgatour.com/stats/stat.352.html')
+dk_birdies = dk_birdies[1]
+dk_birdies.drop(['RANK LAST WEEK','ROUNDS','TOTAL BIRDIES','TOTAL HOLES','GIR RANK'], axis=1, inplace=True)
+dk_birdies.drop(dk_birdies.columns[0],axis=1,inplace=True)
+dk_birdies.rename(columns={'PLAYER NAME':'Name','%':'Birdies'}, inplace=True)
 
 #past results
-dk_pastResults = pd.read_html('https://www.espn.com/golf/leaderboard/_/tournamentId/401155460')
+dk_pastResults = pd.read_html('https://www.espn.com/golf/leaderboard/_/tournamentId/401056548')
 dk_pastResults = dk_pastResults[0]
 dk_pastResults.drop(['POS','TO PAR','R1','R2','R3','R4','TOT','EARNINGS'],axis=1,inplace=True)
 dk_pastResults.drop(dk_pastResults[dk_pastResults['FEDEX PTS'] == 0].index,inplace=True)
 dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
 
 #merge
-dk_merge = pd.merge(df,dk_par4efficiency, how='left', on='Name')
-dk_merge = pd.merge(dk_merge, dk_par4efficiency1 ,how='left',on='Name')
-dk_merge = pd.merge(dk_merge, dk_par5efficiency, how='left',on='Name')
-dk_merge = pd.merge(dk_merge, dk_drivingAcc, how='left',on='Name')
-dk_merge = pd.merge(dk_merge, dk_par3efficiency, how='left',on='Name')
+dk_merge = pd.merge(df,dk_par3efficiency, how='left', on='Name')
+dk_merge = pd.merge(dk_merge, dk_par4efficiency ,how='left',on='Name')
+dk_merge = pd.merge(dk_merge, dk_proximity, how='left',on='Name')
+dk_merge = pd.merge(dk_merge, dk_putting, how='left',on='Name')
+dk_merge = pd.merge(dk_merge, dk_birdies, how='left',on='Name')
 dk_merge = pd.merge(dk_merge, dk_pastResults,how='left',on='Name')
 
 maxIter = 0
@@ -107,10 +107,16 @@ base = np.zeros(len(dk_merge))
 avgPointsScale = np.linspace(10,30,len(dk_merge['AvgPointsPerGame'].dropna()))
 
 #scale for to par efficiency 0 - 10 uniform
-parEfficiencyScale = np.concatenate((np.linspace(10,0,len(dk_merge['Par4Eff_350-400'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Par4Eff_350-400'].dropna()))))
+parEfficiencyScale = np.concatenate((np.linspace(10,0,len(dk_merge['Par3Eff_200-225'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Par3Eff_200-225'].dropna()))))
 
-#drive accuracy scale
-driveAccScale = np.concatenate((np.linspace(10,0,len(dk_merge['DriveAcc'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['DriveAcc'].dropna()))))
+#putting scale
+puttingScale = np.concatenate((np.linspace(10,0,len(dk_merge['Putting'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Putting'].dropna()))))
+
+#proximity scale
+proximityScale = np.concatenate((np.linspace(10,0,len(dk_merge['Proximity'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Proximity'].dropna()))))
+
+#birdies scale
+birdiesScale = np.concatenate((np.linspace(10,0,len(dk_merge['Birdies'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Birdies'].dropna()))))
 
 #pastresults scale
 pastResultsScale = np.concatenate((np.linspace(10,0,len(dk_merge['FEDEX PTS'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['FEDEX PTS'].dropna()))))
@@ -118,12 +124,12 @@ pastResultsScale = np.concatenate((np.linspace(10,0,len(dk_merge['FEDEX PTS'].dr
 
 #fill NaN
 dk_merge['FEDEX PTS'] = dk_merge['FEDEX PTS'].fillna(0)
-dk_merge['DriveAcc'] = dk_merge['DriveAcc'].fillna(0)
-dk_merge['Par3Eff_150-175'] = dk_merge['Par3Eff_150-175'].fillna(5)
-dk_merge['Par4Eff_350-400'] = dk_merge['Par4Eff_350-400'].fillna(6)
-dk_merge['Par4Eff_450-500'] = dk_merge['Par4Eff_450-500'].fillna(6)
-dk_merge['Par5Eff_550-600'] = dk_merge['Par5Eff_550-600'].fillna(7)
-dk_merge.to_csv('DKRMC_IS.csv', index = False)
+dk_merge['Birdies'] = dk_merge['Birdies'].fillna(0)
+dk_merge['Par3Eff_200-225'] = dk_merge['Par3Eff_200-225'].fillna(5)
+dk_merge['Putting'] = dk_merge['Putting'].fillna(-2)
+dk_merge['Proximity'] = dk_merge['Proximity'].fillna(100)
+dk_merge['Par4Eff_400-450'] = dk_merge['Par4Eff_400-450'].fillna(7)
+
 
 
 
@@ -131,25 +137,25 @@ dk_merge.to_csv('DKRMC_IS.csv', index = False)
 dk_merge.sort_values(by=['AvgPointsPerGame'],inplace=True)
 dk_merge['APPG'] = avgPointsScale
 
-#add par4efficiency scale
-dk_merge.sort_values(by='Par4Eff_350-400',ascending=True,inplace=True)
-dk_merge['P4E'] = parEfficiencyScale
-
-#add par4efficiency1 scale
-dk_merge.sort_values(by='Par4Eff_450-500',ascending=True,inplace=True)
-dk_merge['P4E1'] = parEfficiencyScale
-
-#add par5efficiency scale
-dk_merge.sort_values(by='Par5Eff_550-600',ascending=True,inplace=True)
-dk_merge['P5E'] = parEfficiencyScale
-
 #add par3efficiency scale
-dk_merge.sort_values(by='Par3Eff_150-175',ascending=True,inplace=True)
+dk_merge.sort_values(by='Par3Eff_200-225',ascending=True,inplace=True)
 dk_merge['P3E'] = parEfficiencyScale
 
+#add par4efficiency scale
+dk_merge.sort_values(by='Par4Eff_400-450',ascending=True,inplace=True)
+dk_merge['P4E'] = parEfficiencyScale
+
+#add proximity scale
+dk_merge.sort_values(by='Proximity',ascending=True,inplace=True)
+dk_merge['Prox'] = proximityScale
+
+#add putting scale
+dk_merge.sort_values(by='Putting',ascending=False,inplace=True)
+dk_merge['Putt'] = puttingScale
+
 #add par5efficiency scale
-dk_merge.sort_values(by='DriveAcc',ascending=False,inplace=True)
-dk_merge['DA'] = driveAccScale
+dk_merge.sort_values(by='Birdies',ascending=False,inplace=True)
+dk_merge['Bird'] = birdiesScale
 #print(dk_merge.head())
 
 #add past results
@@ -159,9 +165,10 @@ dk_merge['PR'] = pastResultsScale
 #reshape
 dk_merge.sort_values(by='Salary',ascending=False,inplace=True)
 #dk_merge.to_csv('DKTest.csv', index = False)
+dk_merge.to_csv('DKRMC_IS.csv', index = False)
 
-dk_merge.drop(['AvgPointsPerGame','Par4Eff_350-400','Par4Eff_450-500','DriveAcc','Par5Eff_550-600','Par3Eff_150-175','FEDEX PTS'],axis=1,inplace=True)
-column_list = ['APPG','P3E','P4E','P4E1','P5E','DA','PR']
+dk_merge.drop(['AvgPointsPerGame','Par3Eff_200-225','Par4Eff_400-450','Putting','Birdies','Proximity','FEDEX PTS'],axis=1,inplace=True)
+column_list = ['APPG','P3E','P4E','Prox','Putt','Bird','PR']
 dk_merge['Total'] = dk_merge[column_list].sum(axis=1)
 dk_merge.drop(column_list,axis=1,inplace=True)
 #dk_merge.dropna(inplace=True)
