@@ -1,21 +1,24 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+##libraries
 import numpy as np
 import pandas as pd
 
 
-#user input
-iterations = 100000
+##user input
+iterations = 200000
 
-#function definitions
+##function definitions
 
+#Calculate total points of a lineup
 def objective(x):
     p0 = []
     for iden in x:
         p0.append(float(dk_merge.loc[int(iden)]['Total']))
     return sum(p0)
 
+#Check if a lineup is within the Dk Salary range
 def constraint(x):
     s0 = []
     for iden in x:
@@ -25,6 +28,7 @@ def constraint(x):
     else:
         return False
 
+#Gneerate a random lineup
 def genIter():
     r0 = []
     while len(r0) < 6:
@@ -33,23 +37,26 @@ def genIter():
             r0.append(r)
     return r0
 
+#Convert IDs into Names
 def getNames(lineup):
     n0 = []
     for iden in lineup:
         n0.append(dk_merge.loc[int(iden)]['Name'])
     return n0
 
-def date(data):
+#Convert feet inches into float (e.g. 12'6" = 12.5)
+def distance(data):
     data = data.split("'")
     data[1] = data[1][:-1]
     x = int(data[0])+(int(data[1])/12)
     return x
 
+#Calculate eagle percentage (i.e. total eagles/total par 5s)
 def eaglePerc(data):
     return data[1]/data[2]
     
 
-#main
+##main
 
 #draftkings csv
 df = pd.read_csv('DKSalaries-RStG.csv')
@@ -81,7 +88,7 @@ dk_proximity = pd.read_html('https://www.pgatour.com/stats/stat.339.html')
 dk_proximity = dk_proximity[1]
 dk_proximity.drop(['RANK LAST WEEK','ROUNDS','TOTAL DISTANCE (FEET)','# OF ATTEMPTS','RELATIVE TO PAR'], axis=1, inplace=True)
 dk_proximity.drop(dk_proximity.columns[0],axis=1,inplace=True)
-dk_proximity['Proxy'] = dk_proximity["AVG"].apply(lambda x: date(x))
+dk_proximity['Proxy'] = dk_proximity["AVG"].apply(lambda x: distance(x))
 dk_proximity.drop(['AVG'],axis=1,inplace=True)
 dk_proximity.rename(columns={'PLAYER NAME':'Name','Proxy':'Proximity'}, inplace=True)
 
@@ -94,55 +101,62 @@ dk_eagle['%'] = dk_eagle.apply(lambda x: eaglePerc(x),axis=1)
 dk_eagle.drop(['TOTAL','TOTAL PAR 5 HOLES'],axis=1,inplace=True)
 dk_eagle.rename(columns={'PLAYER NAME':'Name','%':'Eagles'}, inplace=True)
 
-#past results
+#past results course
 dk_pastResults = pd.read_html('https://www.espn.com/golf/leaderboard/_/tournamentId/982')
 dk_pastResults = dk_pastResults[0]
 dk_pastResults.drop(['POS','TO PAR','R1','R2','R3','R4','EARNINGS','FEDEX PTS'],axis=1,inplace=True)
 dk_pastResults.drop(dk_pastResults[dk_pastResults['TOT'] < 170].index,inplace=True)
 dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
 
-#merge
+#past results tournament
+dk_pastResults1 = pd.read_html('https://www.espn.com/golf/leaderboard/_/tournamentId/401056547')
+dk_pastResults1 = dk_pastResults1[0]
+dk_pastResults1.drop(['POS','TO PAR','R1','R2','R3','R4','EARNINGS','FEDEX PTS'],axis=1,inplace=True)
+dk_pastResults1.drop(dk_pastResults1[dk_pastResults1['TOT'] < 170].index,inplace=True)
+dk_pastResults1.rename(columns={'PLAYER':'Name','TOT':'TOT1'}, inplace=True)
+
+#merge all dataframes - Can probably do this in a loop?
 dk_merge = pd.merge(df,dk_par3efficiency, how='left', on='Name')
 dk_merge = pd.merge(dk_merge,dk_par3efficiency1, how='left', on='Name')
 dk_merge = pd.merge(dk_merge, dk_par4efficiency ,how='left',on='Name')
 dk_merge = pd.merge(dk_merge, dk_proximity, how='left',on='Name')
 dk_merge = pd.merge(dk_merge, dk_eagle, how='left',on='Name')
 dk_merge = pd.merge(dk_merge, dk_pastResults,how='left',on='Name')
+dk_merge = pd.merge(dk_merge, dk_pastResults1,how='left',on='Name')
 
-maxIter = 0
-i = 0
-j = 0
-topTier = pd.DataFrame(columns=['Player'])
-
-base = np.zeros(len(dk_merge))
-
+#define variables
+maxIter = 0                                    #placeholder for best lineup
+i = 0                                          #main iterable
+j = 0                                          #top tier iterable
+topTier = pd.DataFrame(columns=['Player'])     #a dataframe of the top lineups (mean+sigma)
 
 #scale for avg DK points 10 - 30 uniform
 avgPointsScale = np.linspace(10,30,len(dk_merge['AvgPointsPerGame'].dropna()))
 
 #scale for to par efficiency 0 - 10 uniform
-parEfficiencyScale = np.concatenate((np.linspace(5,0,len(dk_merge['Par3Eff_225-250'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Par3Eff_225-250'].dropna()))))
+parEfficiencyScale = np.concatenate((np.linspace(10,0,len(dk_merge['Par3Eff_225-250'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Par3Eff_225-250'].dropna()))))
 
-#proximity scale
-proximityScale = np.concatenate((np.linspace(5,0,len(dk_merge['Proximity'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Proximity'].dropna()))))
+#proximity scale 0 - 10 uniform
+proximityScale = np.concatenate((np.linspace(10,0,len(dk_merge['Proximity'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Proximity'].dropna()))))
 
-#birdies scale
-eagleScale = np.concatenate((np.linspace(5,0,len(dk_merge['Eagles'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Eagles'].dropna()))))
+#eagle scale 0 - 10 uniform
+eagleScale = np.concatenate((np.linspace(10,0,len(dk_merge['Eagles'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['Eagles'].dropna()))))
 
-#pastresults scale
+#pastresults course scale 0 - 5 uniform
 pastResultsScale = np.concatenate((np.linspace(5,0,len(dk_merge['TOT'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['TOT'].dropna()))))
 
+#pastresults tournament scale 0 - 5 uniform
+pastResultsScale1 = np.concatenate((np.linspace(5,0,len(dk_merge['TOT1'].dropna())),np.zeros(len(dk_merge)-len(dk_merge['TOT1'].dropna()))))
 
-#fill NaN
+
+#fill NaN values
 dk_merge['TOT'] = dk_merge['TOT'].fillna(300)
+dk_merge['TOT1'] = dk_merge['TOT1'].fillna(300)
 dk_merge['Eagles'] = dk_merge['Eagles'].fillna(0)
 dk_merge['Par3Eff_150-175'] = dk_merge['Par3Eff_150-175'].fillna(5)
 dk_merge['Par3Eff_225-250'] = dk_merge['Par3Eff_225-250'].fillna(5)
 dk_merge['Proximity'] = dk_merge['Proximity'].fillna(100)
 dk_merge['Par4Eff_400-450'] = dk_merge['Par4Eff_400-450'].fillna(7)
-
-
-
 
 #add avg points scale
 dk_merge.sort_values(by=['AvgPointsPerGame'],inplace=True)
@@ -164,51 +178,61 @@ dk_merge['P4E'] = parEfficiencyScale
 dk_merge.sort_values(by='Proximity',ascending=True,inplace=True)
 dk_merge['Prox'] = proximityScale
 
-
-#add par5efficiency scale
+#add eagle scale
 dk_merge.sort_values(by='Eagles',ascending=False,inplace=True)
 dk_merge['Eag'] = eagleScale
-#print(dk_merge.head())
 
-#add past results
+#add past results course
 dk_merge.sort_values(by='TOT', ascending=True,inplace=True)
 dk_merge['PR'] = pastResultsScale
 
-#reshape
+#add past results tournament
+dk_merge.sort_values(by='TOT1', ascending=True,inplace=True)
+dk_merge['PR1'] = pastResultsScale1
+
+#reshape dataframe to sort by Salary
 dk_merge.sort_values(by='Salary',ascending=False,inplace=True)
-dk_merge.to_csv('DKTest.csv', index = False)
-#dk_merge.to_csv('DKRMC_IS.csv', index = False)
+#dk_merge.to_csv('DKData_RStG.csv', index = False)  #optional line if you want to see data in CSV
 
 dk_merge.drop(['AvgPointsPerGame','Par3Eff_150-175','Par3Eff_225-250','Par4Eff_400-450','Eagles','Proximity','TOT'],axis=1,inplace=True)
-column_list = ['APPG','P3E','P4E','Prox','P3E1','Eag','PR']
+column_list = ['APPG','P3E','P4E','Prox','P3E1','Eag','PR','PR1']
 dk_merge['Total'] = dk_merge[column_list].sum(axis=1)
 dk_merge.drop(column_list,axis=1,inplace=True)
-#dk_merge.dropna(inplace=True)
-#dk_merge.to_csv('DKTest.csv', index = False)
+#dk_merge.to_csv('DKFinal.csv', index = False) #optional line if you want to see data in CSV
 
-
+#Calculate Mean and Standard Deviation
 mean = dk_merge['Total'].mean()*6
 sigma = dk_merge['Total'].std()*6
 
+#Sanity Check - preview
 print(dk_merge.head())
 
+#main loop
 while i < iterations:
+    #get a sample
     lineup = genIter()
     lineup.sort()
+    #assign sample
     currentIter = objective(lineup)
+    #check if sample is better than current best sample
     if currentIter > maxIter and constraint(lineup):
+        #reassign
         maxIter = currentIter
         maxLineup = lineup
+    #check if sample is a top tier sample
     if currentIter > (mean+sigma):
+        #add players to top tier dataframe
         for x in lineup:
             topTier.loc[j] = dk_merge.loc[x]['Name']
             j = j + 1
+    #iterate only if it is a valid lineup
     if constraint(lineup):
         i = i + 1
+    #counter
     if i % 1000 == 0:
         print(i)
 
-#topTier = topTier.loc[topTier.duplicated(keep=False),:]
+#print data for easy view
 topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 10]
 print(topTier['Player'].value_counts())
 print(maxIter)
