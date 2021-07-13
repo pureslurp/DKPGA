@@ -7,7 +7,7 @@ import pandas as pd
 
 
 ##user input
-iterations = 200000
+iterations = 300000
 
 ##function definitions
 
@@ -128,7 +128,9 @@ dk_merge = pd.merge(dk_merge, dk_pastResults1,how='left',on='Name')
 maxIter = 0                                    #placeholder for best lineup
 i = 0                                          #main iterable
 j = 0                                          #top tier iterable
+k = 0                                          #top tier lineupdf iterable
 topTier = pd.DataFrame(columns=['Player'])     #a dataframe of the top lineups (mean+sigma)
+topTierLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 
 #scale for avg DK points 10 - 30 uniform
 avgPointsScale = np.linspace(10,30,len(dk_merge['AvgPointsPerGame'].dropna()))
@@ -194,7 +196,7 @@ dk_merge['PR1'] = pastResultsScale1
 dk_merge.sort_values(by='Salary',ascending=False,inplace=True)
 #dk_merge.to_csv('DKData_RStG.csv', index = False)  #optional line if you want to see data in CSV
 
-dk_merge.drop(['AvgPointsPerGame','Par3Eff_150-175','Par3Eff_225-250','Par4Eff_400-450','Eagles','Proximity','TOT'],axis=1,inplace=True)
+dk_merge.drop(['AvgPointsPerGame','Par3Eff_150-175','Par3Eff_225-250','Par4Eff_400-450','Eagles','Proximity','TOT','TOT1'],axis=1,inplace=True)
 column_list = ['APPG','P3E','P4E','Prox','P3E1','Eag','PR','PR1']
 dk_merge['Total'] = dk_merge[column_list].sum(axis=1)
 dk_merge.drop(column_list,axis=1,inplace=True)
@@ -220,8 +222,12 @@ while i < iterations:
         maxIter = currentIter
         maxLineup = lineup
     #check if sample is a top tier sample
-    if currentIter > (mean+sigma):
+    if currentIter > (mean+(1.25*sigma)) and constraint(lineup):
         #add players to top tier dataframe
+        topTierData = getNames(lineup)
+        topTierData.append(currentIter)
+        topTierLineup.loc[k] = topTierData
+        k = k + 1
         for x in lineup:
             topTier.loc[j] = dk_merge.loc[x]['Name']
             j = j + 1
@@ -234,7 +240,10 @@ while i < iterations:
 
 #print data for easy view
 topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 10]
-print(topTier['Player'].value_counts())
+topPlayers = pd.DataFrame(topTier['Player'].value_counts())
+topPlayers['Name'] = topPlayers.index
+#topPlayers.to_csv('DK_TopPlayers.csv', index = False)   #optional line if you want a csv of the most used players
+#topTierLineup.to_csv('DK_TopLineup.csv',index = False)  #optional line if you want to view the best lineups
 print(maxIter)
 print(getNames(maxLineup))
 
