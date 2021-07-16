@@ -2,4 +2,4 @@ An optimization program to maximize 'AvgPointsPerGame' of a DraftKings lineup, s
 
 Originally tried to use scipy.optimize library, but the methods needed for lineup optimization does not support constraints. For now, using a crude optimization based on high volume iterations (i.e. guess and check... a lot)
 
-TODO - formulate a model beyond "AvgPointsPerGame" based on specifics of courses
+Repo is organized by course not tournament! Course attributes have been included in the script and should be back tested upon completion of each tournament for validity.
