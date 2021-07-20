@@ -9,7 +9,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 ##user input
-iterations = 100000
+iterations = 300000
 
 ##function definitions
 
@@ -183,12 +183,12 @@ while i < iterations:
 
 #print data for easy view
 
-topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 10]
+topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 50]
 topPlayers = pd.DataFrame(topTier['Player'].value_counts())
 topPlayers['Name'] = topPlayers.index
 #print(topPlayers)
-#topPlayers.to_csv('DK_TopPlayers.csv', index = False)   #optional line if you want a csv of the most used players
-#topTierLineup.to_csv('DK_TopLineup.csv',index = False)  #optional line if you want to view the best lineups
+topPlayers.to_csv('DK_TopPlayers.csv', index = False)   #optional line if you want a csv of the most used players
+topTierLineup.to_csv('DK_TopLineup.csv',index = False)  #optional line if you want to view the best lineups
 print(maxIter)
 print(getNames(maxLineup))
 
