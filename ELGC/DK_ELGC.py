@@ -70,7 +70,7 @@ def rewrite(data):
 
 #draftkings csv
 df = pd.read_csv('DKSalaries-ELGC.csv')
-df.drop(['Position','Name + ID','ID','Roster Position','Game Info', 'TeamAbbrev'],axis=1,inplace=True)
+df.drop(['Position','ID','Roster Position','Game Info', 'TeamAbbrev'],axis=1,inplace=True)
 
 ## pull data from google sheets
 scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/spreadsheets',"https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/drive"]
@@ -121,13 +121,26 @@ dk_pastResults.drop(dk_pastResults[dk_pastResults['TOT'] < 170].index,inplace=Tr
 dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
 df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
 
+#driving accuracy
+dk_drivingAcc = pd.read_html('https://www.pgatour.com/stats/stat.102.html')
+dk_drivingAcc = dk_drivingAcc[1]
+dk_drivingAcc.drop(['RANK LAST WEEK','ROUNDS','FAIRWAYS HIT','POSSIBLE FAIRWAYS'], axis=1, inplace=True)
+dk_drivingAcc.drop(dk_drivingAcc.columns[0],axis=1,inplace=True)
+dk_drivingAcc.rename(columns={'PLAYER NAME':'Name','%':'DriveAcc'}, inplace=True)
+df_merge = pd.merge(df_merge, dk_drivingAcc, how='left',on='Name')
+
 # #scale for past results
-pastResultsScale = np.concatenate((np.linspace(8,0,len(df_merge['TOT'].dropna())),np.zeros(len(df_merge)-len(df_merge['TOT'].dropna()))))
+pastResultsScale = np.concatenate((np.linspace(5,0,len(df_merge['TOT'].dropna())),np.zeros(len(df_merge)-len(df_merge['TOT'].dropna()))))
 df_merge.sort_values(by=['TOT'],inplace=True)
 df_merge['TOT'] = pastResultsScale
 
+#drive accuracy scale
+driveAccScale = np.concatenate((np.linspace(5,0,len(df_merge['DriveAcc'].dropna())),np.zeros(len(df_merge)-len(df_merge['DriveAcc'].dropna()))))
+df_merge.sort_values(by='DriveAcc',ascending=False,inplace=True)
+df_merge['DA'] = driveAccScale
+
 #scale for avg DK points 10 - 30 uniform
-avgPointsScale = np.linspace(10,30,len(df_merge['AvgPointsPerGame'].dropna()))
+avgPointsScale = np.linspace(10, 30,len(df_merge['AvgPointsPerGame'].dropna()))
 df_merge.sort_values(by=['AvgPointsPerGame'],inplace=True)
 df_merge['AvgPointsPerGame'] = avgPointsScale
 
@@ -137,6 +150,7 @@ df_merge.to_csv('DKData.csv', index = False) #optional line if you want to see d
 column_list = keys
 column_list.append('AvgPointsPerGame')
 column_list.append('TOT')
+column_list.append('DA')
 df_merge['Total'] = df_merge[column_list].sum(axis=1)
 df_merge.drop(column_list,axis=1,inplace=True)
 df_merge.sort_values(by='Salary',ascending=False,inplace=True)
