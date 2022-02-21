@@ -21,8 +21,8 @@ topTierLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','P
 OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 
-path = 'Riviera/'
-name = 'DKSalaries-Riviera.csv'
+path = 'National/'
+name = 'DKSalaries-National.csv'
 df = DK_csv_assignemnt(path, name)
 scope, creds, client = google_credentials()
 course_df = assign_course_df(client)
@@ -48,9 +48,9 @@ General:
 '''
 
 df_merge = weight_efficiencies(df, course_df)
-df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243001', playoff=True)
-df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard/_/tournamentId/401155423', upperBound=2.5, pr_i=1)
-df_merge = around_green(df_merge)
+df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243006')
+df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard/_/tournamentId/401155426', upperBound=2.5, pr_i=1)
+df_merge = putting(df_merge)
 
 #delete_unused_columns(df_merge)
 
