@@ -3,13 +3,14 @@
 
 ##libraries
 import numpy as np
-import pandas as pd
 from pgafunc import *
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import pandas as pd
+warnings.simplefilter(action='ignore', category=Warning)
 
 #user input
-iterations = 100000
+iterations = 200000
 
 #define variables
 maxIter = 0                                    #placeholder for best lineup
@@ -98,6 +99,7 @@ while i < iterations:
 #optimize data after loop
 OptimizedLineup = optimize_main(topTierLineup, df_merge)
 MaximizedLineup = maximize_main(OptimizedLineup, df_merge)
+MaximizedLineup = remove_outliers_main(MaximizedLineup, df_merge)
 
 #print and export data for easy view
 #df_merge = df_total_and_reformat(df_merge)
