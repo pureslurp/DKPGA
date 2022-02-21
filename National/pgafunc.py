@@ -5,14 +5,18 @@ Created on Sun Jul 18 20:17:02 2021
 
 @author: seanraymor
 """
-import pandas as pd
+from dataclasses import replace
+
 import numpy as np
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from sqlalchemy import column
+import warnings
+import pandas as pd
+warnings.simplefilter(action='ignore', category=Warning)
 
 OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
+NewMaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 
 def getEff(df, key, count):
     pgaEff = [['125-150 Eff',3,'https://www.pgatour.com/stats/stat.02519.html'],
@@ -149,6 +153,58 @@ def maximize(df, salary, budget):
     #print(window)
     return window.iloc[0]['Name + ID']
 
+def replace_outlier(df, salary, budget, maxNames):
+    upperbound = int(salary) + budget
+    lowerbound = int(salary) + budget - 1000
+    df = df[~df.loc[:, 'Name + ID'].isin(maxNames)]
+    df.sort_values(by=['Total'], ascending = False, inplace=True)
+    window = df[(df['Salary'] <= upperbound) & (df['Salary'] > lowerbound)]
+    #print(window)
+    return window.iloc[0]['Name + ID']
+
+def find_lowest_salary(lineup, df_merge):
+    low = 15000
+    for player in lineup:
+        p_row = df_merge.loc[df_merge['Name + ID'] == player]
+        sal = p_row.iloc[0]['Salary']
+        if sal < low:
+            low = sal
+            lowPlayer = p_row.iloc[0]['Name + ID']
+    return lowPlayer
+
+
+def remove_outliers_main(topTierLineup, df_merge):
+    for index, row in topTierLineup.iterrows():
+        maxNames = [row[0],row[1],row[2],row[3],row[4],row[5]]
+        ID = getID(maxNames, df_merge)
+        
+        budget = 50000 - get_salary(getID(maxNames, df_merge), df_merge)
+        if budget >= 2000:
+            lowID = df_merge[df_merge['Name + ID'] == find_lowest_salary(maxNames, df_merge)].index
+            try:
+                replacement = replace_outlier(df_merge, df_merge.loc[lowID]['Salary'], budget, maxNames)
+            except:
+                print('no available replacement')
+                replacement = find_lowest_salary(maxNames, df_merge)
+            if replacement not in maxNames:
+                maxNames[maxNames.index(find_lowest_salary(maxNames, df_merge))] = replacement
+                print(f'Replacing {find_lowest_salary(maxNames, df_merge)} with {replacement} at index {index}')
+            else:
+                print('no available replacement - dup')
+        
+        newTotal = objective(getID(maxNames, df_merge), df_merge)
+        maxNames.append(newTotal)
+        MaximizedLineup.loc[index] = maxNames
+
+    
+    #NewMaximizedLineup.reset_index(drop=True, inplace=True)
+    MaximizedLineup.sort_values(by='TOT', ascending=False, inplace=True)
+    MaximizedLineup.drop_duplicates(subset=["TOT"],inplace=True)
+
+    
+    
+    return MaximizedLineup
+
 def duplicates(x):
     '''Check for duplicates in the lineup'''
     duplicates = False
@@ -173,7 +229,7 @@ def optimize_main(topTierLineup, df_merge):
         print(index)
         maxNames = [row[0],row[1],row[2],row[3],row[4],row[5]]
         budget = 50000 - get_salary(getID(maxNames, df_merge), df_merge)
-        
+        find_lowest_salary(maxNames, df_merge)
         for player in range(0,len(maxNames)):
             ID = getID(maxNames, df_merge)
             if optimize(df_merge, df_merge.loc[ID[player]]['Salary'],budget) not in maxNames:
