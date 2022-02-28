@@ -11,8 +11,14 @@ import numpy as np
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import warnings
+import selenium
+from selenium.webdriver.support.select import Select
+from selenium import webdriver
 import pandas as pd
 warnings.simplefilter(action='ignore', category=Warning)
+import requests
+import time
+from bs4 import BeautifulSoup
 
 OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
@@ -253,6 +259,7 @@ def maximize_main(OptimizedLinup, df_merge):
 
         Args: 
             OptimizedLineup (list): lineup from a row of dataframe as a list
+            df_merge (dataFrame): DK PGA main dataFrame
 
         Return:
             Maximizedlineup (list): lineup with maximized points    
@@ -287,6 +294,38 @@ def delete_unused_columns(df_merge):
     for (columnName, columnData) in df_merge.iteritems():
         if sum(columnData.to_numeric.values) == 0:
             col_list.append(columnName)
+
+def fix_player_name(name):
+    name_spl = name.split(',')
+    ln_strip = name_spl[0].strip()
+    fn_strip = name_spl[1].strip()
+    full_name = fn_strip + ' ' + ln_strip
+    return full_name
+
+def course_fit(df_merge):
+    driver = webdriver.Firefox()
+    driver.get('https://datagolf.com/course-fit-tool')
+    driver.implicitly_wait(120)
+    time.sleep(3)
+    result = driver.page_source
+    soup = BeautifulSoup(result, "html.parser")
+    #print(soup)
+    course_fit_data = soup.find_all("div", class_="datarow")
+    course_fit_df = pd.DataFrame(columns=['Name', 'Adjustment'])
+    i = 0
+    for player_row in course_fit_data:
+        adj = player_row.find_all('div', class_='ev-text')
+        course_fit_df.loc[i] = [fix_player_name(player_row['name']), float(adj[-1].text) * 30]
+        i += 1
+    driver.close()
+    driver.quit()   
+    df_merge = pd.merge(df_merge, course_fit_df, how='left',on='Name')
+    print(df_merge.head())
+    return df_merge
+    
+
+    
+
 
 def past_results(df_merge, url, lowerBound=0, upperBound=5, playoff=False, pr_i=0):
     '''Check for past tournament results 
@@ -430,7 +469,7 @@ def DK_csv_assignemnt(path, name, lowerBound=10, upperBound=30):
     '''find exported csv from DK and assign it to dataFrame with upper and lower bound values'''
     df = pd.read_csv('{}CSVs/{}'.format(path,name))
     df.drop(['Position','ID','Roster Position','Game Info', 'TeamAbbrev'],axis=1,inplace=True)
-    avgPointsScale = np.linspace(5, 20,len(df['AvgPointsPerGame'].dropna()))
+    avgPointsScale = np.linspace(0, 15,len(df['AvgPointsPerGame'].dropna()))
     df.sort_values(by=['AvgPointsPerGame'],inplace=True)
     df['AvgPointsPerGame'] = avgPointsScale
     return df
