@@ -1,5 +1,7 @@
-An optimization program to maximize 'AvgPointsPerGame' of a DraftKings lineup, specifically for PGA tournaments. In order to execute the script, you will need to download roster csv from DraftKings website for the specific tournament.
-
-Originally tried to use scipy.optimize library, but the methods needed for lineup optimization does not support constraints. For now, using a crude optimization based on high volume iterations (i.e. guess and check... a lot)
-
 Repo is organized by course not tournament! Course attributes have been included in the script and should be back tested upon completion of each tournament for validity.
+
+Current model attributes:
+- Weight DK PPG 5 to 20 pts 
+- Weight hole yardage efficiency 0 to 2 pts per hole (https://www.pgatour.com/stats/categories.RSCR_INQ.html)
+- Weight course fit based on datagolf.com (https://datagolf.com/course-fit-tool) Total Adjustment * 30
+- Optional add ons based on course attributes (See commented code in V2 script)

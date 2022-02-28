@@ -10,7 +10,7 @@ import pandas as pd
 warnings.simplefilter(action='ignore', category=Warning)
 
 #user input
-iterations = 200000
+iterations = 100000
 
 #define variables
 maxIter = 0                                    #placeholder for best lineup
@@ -19,14 +19,13 @@ j = 0                                          #top tier iterable
 k = 0                                          #top tier lineupdf iterable
 topTier = pd.DataFrame(columns=['Player'])     #a dataframe of the top lineups (mean+sigma)
 topTierLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
-OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
-MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 
 path = 'National/'
 name = 'DKSalaries-National.csv'
 df = DK_csv_assignemnt(path, name)
 scope, creds, client = google_credentials()
 course_df = assign_course_df(client)
+
 
 '''
 Options for course/player attributes
@@ -49,9 +48,10 @@ General:
 '''
 
 df_merge = weight_efficiencies(df, course_df)
-df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243006')
+df_merge = course_fit(df_merge)
+df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243006', upperBound=5)
 df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard/_/tournamentId/401155426', upperBound=2.5, pr_i=1)
-df_merge = putting(df_merge)
+#df_merge = putting(df_merge)
 
 #delete_unused_columns(df_merge)
 
