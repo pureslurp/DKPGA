@@ -5,6 +5,7 @@ Created on Sun Jul 18 20:17:02 2021
 
 @author: seanraymor
 """
+from audioop import getsample
 from dataclasses import replace
 
 import numpy as np
@@ -23,9 +24,9 @@ from bs4 import BeautifulSoup
 import sys
 sys.path.insert(0, "/Users/seanraymor/Documents/Python Scripts/DKPGA")
 
-OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
-MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
-NewMaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
+OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
+MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
+NewMaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
 
 def check_last_year(data, ly_df, key):
     value = np.nan
@@ -243,8 +244,9 @@ def remove_outliers_main(topTierLineup, df_merge):
             else:
                 print('no available replacement - dup')
         
-        newTotal = objective(getID(maxNames, df_merge), df_merge)
-        maxNames.append(newTotal)
+        maxNameID = getID(maxNames, df_merge)
+        maxNames.append(objective(maxNameID, df_merge))
+        maxNames.append(get_salary(maxNameID, df_merge))
         MaximizedLineup.loc[index] = maxNames
 
     
@@ -287,8 +289,9 @@ def optimize_main(topTierLineup, df_merge):
                 maxNames[player] = optimize(df_merge, df_merge.loc[ID[player]]['Salary'],budget)
                 budget = 50000 - get_salary(getID(maxNames, df_merge), df_merge)
 
-        newTotal = objective(getID(maxNames, df_merge), df_merge)
-        maxNames.append(newTotal)
+        maxNameID = getID(maxNames, df_merge)
+        maxNames.append(objective(maxNameID, df_merge))
+        maxNames.append(get_salary(maxNameID, df_merge))
         OptimizedLineup.loc[index] = maxNames
         
     for index, row in OptimizedLineup.iterrows():
@@ -321,8 +324,9 @@ def maximize_main(OptimizedLinup, df_merge):
                 maxNames[player] = maximize(df_merge, df_merge.loc[ID[player]]['Salary'],budget)
                 budget = 50000 - get_salary(getID(maxNames, df_merge), df_merge)
         
-        newTotal = objective(getID(maxNames, df_merge), df_merge)
-        maxNames.append(newTotal)
+        maxNameID = getID(maxNames, df_merge)
+        maxNames.append(objective(maxNameID, df_merge))
+        maxNames.append(get_salary(maxNameID, df_merge))
         MaximizedLineup.loc[index] = maxNames
 
     
