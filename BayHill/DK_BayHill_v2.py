@@ -51,6 +51,7 @@ General:
 - Yardage efficiency = weight_efficiencies(df, course_df)
 '''
 
+df = drop_players_lower_than(df, 6500)
 df_merge = weight_efficiencies(df, course_df)
 df_merge = course_fit(df_merge)
 df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243004', upperBound=5)
