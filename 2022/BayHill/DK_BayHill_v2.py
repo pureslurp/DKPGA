@@ -14,7 +14,7 @@ warnings.simplefilter(action='ignore', category=Warning)
 
 
 #user input
-iterations = 100000
+iterations = 300000
 
 #define variables
 maxIter = 0                                    #placeholder for best lineup
@@ -24,7 +24,7 @@ k = 0                                          #top tier lineupdf iterable
 topTier = pd.DataFrame(columns=['Player'])     #a dataframe of the top lineups (mean+sigma)
 topTierLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 
-path = 'BayHill/'
+path = '2022/BayHill/'
 name = 'DKSalaries-BayHill.csv'
 df = DK_csv_assignemnt(path, name)
 scope, creds, client = google_credentials()
@@ -49,6 +49,8 @@ General:
 - Par 5 Eagle Percentage = par5_eaglePercentage(df)
 - Birdie or Better Percentage = birdie_or_better(df)
 - Yardage efficiency = weight_efficiencies(df, course_df)
+- Course fit from datagolf.com = course_fit(df)
+- Drop players below a certain salary range = drop_players_lower_than(df, salary)
 '''
 
 df = drop_players_lower_than(df, 6500)
