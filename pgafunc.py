@@ -28,18 +28,30 @@ MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4',
 NewMaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 
 def check_last_year(data, ly_df, key):
-    value = 0
+    value = np.nan
+    rookie = True
     for index, row in ly_df.iterrows():
-        if row['PLAYER NAME'] == data['Name']:
+        if row['PLAYER NAME'].lower() == data['Name']:
             if math.isnan(data[key]):
                 print(f'using last year for: {row["PLAYER NAME"]}')
                 value = row["AVG"]
+                rookie = False
             else:
                 value = data[key]
-                
+                rookie = False
+    if rookie == True:
+        print('Rookie: ', data['Name'])
+        try:
+            value = data[key]
+        except:
+            value = np.nan
+
     
     return float(value)
 
+
+def drop_players_lower_than(df, salaryThreshold):
+    return df[df['Salary'] >= salaryThreshold]
 
 
 def getEff(df, key, count):
@@ -67,19 +79,26 @@ def getEff(df, key, count):
     eff_df.drop(['RANK LAST WEEK','ROUNDS','TOTAL STROKES','TOTAL ATTEMPTS'], axis=1, inplace=True)
     eff_df.drop(eff_df.columns[0],axis=1,inplace=True)
     eff_df.rename(columns={'PLAYER NAME':'Name','AVG':key}, inplace=True)
-    
-    dk_merge = pd.merge(df,eff_df, how='left', on='Name')
+    eff_df['Name'] = eff_df['Name'].apply(lambda x: series_lower(x))
+    dk_merge = pd.merge(df, eff_df, how='left', on='Name')
+
+
 
     if count > 0:
         ly_url = url[:-4] + 'y2021.' + url[-4:]
         eff_df_ly = pd.read_html(ly_url)
         eff_df_ly = eff_df_ly[1]
         dk_merge[key] = dk_merge.apply(lambda x: check_last_year(x, eff_df_ly, key), axis=1)
+    
+    effRank = dk_merge[key].rank(pct=True, ascending=False)
+
+    dk_merge[key].fillna(0)
+    dk_merge[key] = effRank * count * 2
 
 
-    effScale = np.concatenate((np.linspace(count*1.5,0,len(dk_merge[key].dropna())),np.zeros(len(dk_merge)-len(dk_merge[key].dropna()))))
+    #effScale = np.concatenate((np.linspace(count*2,0,len(dk_merge[key].dropna())),np.zeros(len(dk_merge)-len(dk_merge[key].dropna()))))
     dk_merge.sort_values(by=key,ascending=True,inplace=True)
-    dk_merge[key] = effScale
+    
 
     return dk_merge
 
@@ -345,6 +364,8 @@ def course_fit(df_merge, multiplier=50):
         i += 1
     driver.close()
     driver.quit()   
+    course_fit_df['Adjustment'] = course_fit_df['Adjustment'].fillna(0)
+    course_fit_df['Name'] = course_fit_df['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, course_fit_df, how='left',on='Name')
     print(df_merge.head())
     return df_merge
@@ -378,13 +399,13 @@ def past_results(df_merge, url, lowerBound=0, upperBound=5, playoff=False, pr_i=
     dk_pastResults.drop(['POS','SCORE','R1','R2','R3','R4','EARNINGS','FEDEX PTS','TOT'],axis=1,inplace=True)
     dk_pastResults.drop(dk_pastResults[dk_pastResults[f'TOT{pr_i}'] < 170].index,inplace=True)
     dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
+    dk_pastResults['Name'] = dk_pastResults['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
 
-
-    pastResultsScale = np.concatenate((np.linspace(upperBound,lowerBound,len(df_merge[f'TOT{pr_i}'].dropna())),np.zeros(len(df_merge)-len(df_merge[f'TOT{pr_i}'].dropna()))))
+    pastResultRank = df_merge[f'TOT{pr_i}'].rank(pct=True, ascending=False)
     df_merge.sort_values(by=[f'TOT{pr_i}'],inplace=True)
-    df_merge[f'TOT{pr_i}'] = pastResultsScale
-    
+    df_merge[f'TOT{pr_i}'] = pastResultRank * upperBound + lowerBound
+    df_merge[f'TOT{pr_i}'] = df_merge[f'TOT{pr_i}'].fillna(0)
 
     return df_merge
 
@@ -395,6 +416,7 @@ def driving_distance(df_merge, lowerBound=0, upperBound=5):
     dk_distance.drop(['RANK LAST WEEK','ROUNDS','TOTAL DISTANCE','TOTAL DRIVES'], axis=1, inplace=True)
     dk_distance.drop(dk_distance.columns[0],axis=1,inplace=True)
     dk_distance.rename(columns={'PLAYER NAME':'Name','AVG.':'DriveDist'}, inplace=True)
+    dk_distance['Name'] = dk_distance['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_distance, how='left',on='Name')
 
     driveDistScale = np.concatenate((np.linspace(upperBound,lowerBound,len(df_merge['DriveDist'].dropna())),np.zeros(len(df_merge)-len(df_merge['DriveDist'].dropna()))))
@@ -409,6 +431,7 @@ def driving_accuracy(df_merge, lowerBound=0, upperBound=5):
     dk_accuracy.drop(['RANK LAST WEEK','ROUNDS','FAIRWAYS HIT','POSSIBLE FAIRWAYS'], axis=1, inplace=True)
     dk_accuracy.drop(dk_accuracy.columns[0],axis=1,inplace=True)
     dk_accuracy.rename(columns={'PLAYER NAME':'Name','%':'DriveAcc'}, inplace=True)
+    dk_accuracy['Name'] = dk_accuracy['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_accuracy, how='left',on='Name')
 
     driveDistScale = np.concatenate((np.linspace(upperBound,lowerBound,len(df_merge['DriveAcc'].dropna())),np.zeros(len(df_merge)-len(df_merge['DriveAcc'].dropna()))))
@@ -423,6 +446,7 @@ def putting(df_merge, lowerBound=0, upperBound=5):
     dk_putting.drop(['RANK LAST WEEK','ROUNDS','TOTAL SG:PUTTING','MEASURED ROUNDS'], axis=1, inplace=True)
     dk_putting.drop( dk_putting.columns[0],axis=1,inplace=True)
     dk_putting.rename(columns={'PLAYER NAME':'Name','AVERAGE':'PuttGain'}, inplace=True)
+    dk_putting['Name'] = dk_putting['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_putting, how='left',on='Name')
 
     puttScale = np.concatenate((np.linspace(upperBound,lowerBound,len(df_merge['PuttGain'].dropna())),np.zeros(len(df_merge)-len(df_merge['PuttGain'].dropna()))))
@@ -437,6 +461,7 @@ def around_green(df_merge, lowerBound=0, upperBound=5):
     dk_around_green.drop(['RANK LAST WEEK','ROUNDS','TOTAL SG:ARG','MEASURED ROUNDS'], axis=1, inplace=True)
     dk_around_green.drop( dk_around_green.columns[0],axis=1,inplace=True)
     dk_around_green.rename(columns={'PLAYER NAME':'Name','AVERAGE':'ARGGain'}, inplace=True)
+    dk_around_green['Name'] = dk_around_green['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_around_green, how='left',on='Name')
 
     puttScale = np.concatenate((np.linspace(upperBound, lowerBound,len(df_merge['ARGGain'].dropna())),np.zeros(len(df_merge)-len(df_merge['ARGGain'].dropna()))))
@@ -491,6 +516,9 @@ def assign_course_df(client):
     course_df['Par'] = course_df['Par'].apply(lambda x: rewrite(x))
     return course_df
 
+def series_lower(data):
+    return data.lower()
+
 def DK_csv_assignemnt(path, name, lowerBound=5, upperBound=20):
     '''find exported csv from DK and assign it to dataFrame with upper and lower bound values'''
     df = pd.read_csv('{}CSVs/{}'.format(path,name))
@@ -498,6 +526,7 @@ def DK_csv_assignemnt(path, name, lowerBound=5, upperBound=20):
     avgPointsScale = np.linspace(lowerBound, upperBound,len(df['AvgPointsPerGame'].dropna()))
     df.sort_values(by=['AvgPointsPerGame'],inplace=True)
     df['AvgPointsPerGame'] = avgPointsScale
+    df['Name'] = df['Name'].apply(lambda x: series_lower(x))
     return df
 
 def df_total_and_reformat(df_merge):
@@ -518,6 +547,7 @@ def par5_eaglePercentage(df_merge, lowerBound=0, upperBound=5):
     dk_eagle['%'] = dk_eagle.apply(lambda x: eaglePerc(x),axis=1)
     dk_eagle.drop(['TOTAL','TOTAL PAR 5 HOLES'],axis=1,inplace=True)
     dk_eagle.rename(columns={'PLAYER NAME':'Name','%':'Eagles'}, inplace=True)
+    dk_eagle['Name'] = dk_eagle['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_eagle, how='left',on='Name')
 
     eagleScale = np.concatenate((np.linspace(upperBound, lowerBound,len(df_merge['Eagles'].dropna())),np.zeros(len(df_merge)-len(df_merge['Eagles'].dropna()))))
@@ -535,6 +565,7 @@ def proximity_125to150(df_merge, lowerBound=0, upperBound=5):
     dk_proximity['Proxy'] = dk_proximity["AVG"].apply(lambda x: distance(x))
     dk_proximity.drop(['AVG'],axis=1,inplace=True)
     dk_proximity.rename(columns={'PLAYER NAME':'Name','Proxy':'Proximity'}, inplace=True)
+    dk_proximity['Name'] = dk_proximity['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_proximity, how='left',on='Name')
 
     proxScale = np.concatenate((np.linspace(upperBound,lowerBound,len(df_merge['Proximity'].dropna())),np.zeros(len(df_merge)-len(df_merge['Proximity'].dropna()))))
@@ -550,6 +581,7 @@ def birdie_or_better(df_merge, lowerBound=0, upperBound=5):
     dk_birdies.drop(['RANK LAST WEEK','ROUNDS','TOTAL BIRDIES','TOTAL HOLES','GIR RANK'], axis=1, inplace=True)
     dk_birdies.drop(dk_birdies.columns[0],axis=1,inplace=True)
     dk_birdies.rename(columns={'PLAYER NAME':'Name','%':'Birdies'}, inplace=True)
+    dk_birdies['Name'] = dk_birdies['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_birdies, how='left',on='Name')
 
     birdScale = np.concatenate((np.linspace(upperBound,lowerBound,len(df_merge['Birdies'].dropna())),np.zeros(len(df_merge)-len(df_merge['Birdies'].dropna()))))
