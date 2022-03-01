@@ -14,7 +14,7 @@ warnings.simplefilter(action='ignore', category=Warning)
 
 
 #user input
-iterations = 300000
+iterations = 200000
 
 #define variables
 maxIter = 0                                    #placeholder for best lineup
@@ -55,6 +55,7 @@ General:
 
 df = drop_players_lower_than(df, 6500)
 df_merge = weight_efficiencies(df, course_df)
+df_merge = pga_odds(df_merge)
 df_merge = course_fit(df_merge)
 df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243004', upperBound=5)
 df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard/_/tournamentId/401155427', upperBound=2.5, pr_i=1)
@@ -87,7 +88,7 @@ while i < iterations:
         maxIter = currentIter
         maxLineup = lineup
     #check if sample is a top tier sample
-    if currentIter > (mean + sigma) and constraint(lineup, df_merge):
+    if currentIter > (mean + sigma - 5) and constraint(lineup, df_merge):
         #add players to top tier dataframe
         topTierData = getNames(lineup, df_merge)
         topTierData.append(currentIter)

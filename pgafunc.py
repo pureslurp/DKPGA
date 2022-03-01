@@ -28,6 +28,60 @@ OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4',
 MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
 NewMaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
 
+def split_odds(data):
+    try:
+        data = data.split('+')
+        data = int(data[1])
+    except:
+        data = np.nan
+    return data
+
+def odds_name(data):
+    try:
+        data = data.split(' ')
+        if len(data) > 2:
+            if data[0][-1] == '.':
+                name = data[0][:-2] + ' ' + data[1] + ' ' + data[2]
+            else:
+                name = data[0] + ' ' + data[1][:-2] + ' ' + data[2]
+        else:
+            name = data[0][:-2] + ' ' + data[1]
+    except:
+        name = np.nan
+    return name
+
+def pga_odds(df_merge):
+    driver = webdriver.Firefox()
+    driver.get('https://www.pgatour.com/odds.html#/')
+    driver.implicitly_wait(120)
+    time.sleep(3)
+    result = driver.page_source
+    driver.close()
+    driver.quit()   
+    dfs = pd.read_html(result)
+    dfs = dfs[1]
+    dfs.drop(['Pos','TotTotal','Thru','RdRound'], axis=1, inplace=True)
+    
+    dfs['Odds'] = dfs['Odds'].apply(lambda x: split_odds(x))
+    dfs['Player'] = dfs['Player'].apply(lambda x: odds_name(x))
+    dfs.rename(columns={'Player':'Name'}, inplace=True)
+    dfs = dfs.dropna()
+    dfs['Name'] = dfs['Name'].apply(lambda x: series_lower(x))
+    dk_merge = pd.merge(df_merge, dfs, how='left', on='Name')
+    
+    print(dfs.head())
+    print(dfs.info())
+
+    oddsRank = dk_merge['Odds'].rank(pct=True, ascending=False)
+
+    dk_merge['Odds'].fillna(0)
+    dk_merge['Odds'] = oddsRank * 5
+
+
+    dk_merge.sort_values(by='Odds',ascending=True,inplace=True)
+
+    return dk_merge
+
 def check_last_year(data, ly_df, key):
     value = np.nan
     rookie = True
@@ -94,7 +148,7 @@ def getEff(df, key, count):
     effRank = dk_merge[key].rank(pct=True, ascending=False)
 
     dk_merge[key].fillna(0)
-    dk_merge[key] = effRank * count * 2
+    dk_merge[key] = effRank * count * 1.5
 
 
     #effScale = np.concatenate((np.linspace(count*2,0,len(dk_merge[key].dropna())),np.zeros(len(dk_merge)-len(dk_merge[key].dropna()))))
@@ -405,9 +459,8 @@ def past_results(df_merge, url, lowerBound=0, upperBound=5, playoff=False, pr_i=
     dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
     dk_pastResults['Name'] = dk_pastResults['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
-
-    pastResultRank = df_merge[f'TOT{pr_i}'].rank(pct=True, ascending=False)
     df_merge.sort_values(by=[f'TOT{pr_i}'],inplace=True)
+    pastResultRank = df_merge[f'TOT{pr_i}'].rank(pct=True, ascending=False)
     df_merge[f'TOT{pr_i}'] = pastResultRank * upperBound + lowerBound
     df_merge[f'TOT{pr_i}'] = df_merge[f'TOT{pr_i}'].fillna(0)
 
