@@ -4,7 +4,7 @@
 ##libraries
 import numpy as np
 import pandas as pd
-from pgastats import getEff
+from pgastats_old import getEff
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from selenium import webdriver

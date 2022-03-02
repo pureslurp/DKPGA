@@ -28,6 +28,24 @@ OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4',
 MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
 NewMaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
 
+def find_top_players_for(df, df_merge):
+    j = 0
+    topTier = pd.DataFrame(columns=['Player'])
+    for index, row in df.iterrows():
+        lineup = getID(row[0:6], df_merge)
+        for x in lineup:
+            temp = df_merge.loc[x]['Name + ID']
+            temp = temp.iloc[0]
+            topTier.loc[j] = temp
+            j = j + 1
+            
+    topTier.to_csv('{}CSVs/Top_Players.csv'.format('2022/BayHill/'),index=False)
+    topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 25]
+    topPlayers = pd.DataFrame(topTier['Player'].value_counts())
+    topPlayers['Name'] = topPlayers.index
+    
+    return topPlayers
+
 def split_odds(data):
     try:
         data = data.split('+')
