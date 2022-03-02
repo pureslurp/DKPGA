@@ -4,12 +4,12 @@
 ##libraries
 import numpy as np
 import pandas as pd
-from pgastats import getEff
+from pgastats_old import getEff
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 ##user input
-iterations = 100000
+iterations = 50000
 
 ##function definitions
 
@@ -170,7 +170,6 @@ def maximize_main(OptimizedLinup):
 def past_results(df_merge, url):
     dk_pastResults = pd.read_html(url)
     dk_pastResults = dk_pastResults[0]
-    print(dk_pastResults.head())
     dk_pastResults.drop(['POS','SCORE','R1','R2','R3','R4','EARNINGS','FEDEX PTS'],axis=1,inplace=True)
     dk_pastResults['TOT'] = dk_pastResults['TOT'].apply(lambda x: rewrite(x))
     dk_pastResults.drop(dk_pastResults[dk_pastResults['TOT'] < 170].index,inplace=True)
@@ -210,31 +209,7 @@ def driving_accuracy(df_merge):
     df_merge['DriveAcc'] = driveDistScale
     return df_merge
 
-def putting(df_merge):
-    dk_putting = pd.read_html('https://www.pgatour.com/stats/stat.02564.html')
-    dk_putting = dk_putting[1]
-    dk_putting.drop(['RANK LAST WEEK','ROUNDS','TOTAL SG:PUTTING','MEASURED ROUNDS'], axis=1, inplace=True)
-    dk_putting.drop( dk_putting.columns[0],axis=1,inplace=True)
-    dk_putting.rename(columns={'PLAYER NAME':'Name','AVERAGE':'PuttGain'}, inplace=True)
-    df_merge = pd.merge(df_merge, dk_putting, how='left',on='Name')
 
-    puttScale = np.concatenate((np.linspace(5,0,len(df_merge['PuttGain'].dropna())),np.zeros(len(df_merge)-len(df_merge['PuttGain'].dropna()))))
-    df_merge.sort_values(by='PuttGain',ascending=False,inplace=True)
-    df_merge['PuttGain'] = puttScale
-    return df_merge
-
-def around_green(df_merge):
-    dk_around_green = pd.read_html('https://www.pgatour.com/stats/stat.02569.html')
-    dk_around_green = dk_around_green[1]
-    dk_around_green.drop(['RANK LAST WEEK','ROUNDS','TOTAL SG:ARG','MEASURED ROUNDS'], axis=1, inplace=True)
-    dk_around_green.drop( dk_around_green.columns[0],axis=1,inplace=True)
-    dk_around_green.rename(columns={'PLAYER NAME':'Name','AVERAGE':'ARGGain'}, inplace=True)
-    df_merge = pd.merge(df_merge, dk_around_green, how='left',on='Name')
-
-    puttScale = np.concatenate((np.linspace(5,0,len(df_merge['ARGGain'].dropna())),np.zeros(len(df_merge)-len(df_merge['ARGGain'].dropna()))))
-    df_merge.sort_values(by='ARGGain',ascending=False,inplace=True)
-    df_merge['ARGGain'] = puttScale
-    return df_merge
 
 def weight_efficiencies(df, course_df):
     ## weight the efficiencies
@@ -283,7 +258,7 @@ def assign_course_df(client):
 def DK_csv_assignemnt(path, name):
     df = pd.read_csv('{}{}'.format(path,name))
     df.drop(['Position','ID','Roster Position','Game Info', 'TeamAbbrev'],axis=1,inplace=True)
-    avgPointsScale = np.linspace(10, 30,len(df['AvgPointsPerGame'].dropna()))
+    avgPointsScale = np.linspace(20, 35,len(df['AvgPointsPerGame'].dropna()))
     df.sort_values(by=['AvgPointsPerGame'],inplace=True)
     df['AvgPointsPerGame'] = avgPointsScale
     return df
@@ -297,8 +272,8 @@ def df_total_and_reformat(df_merge):
     return df_merge
 
 
-path = 'AMEX/'
-name = 'DKSalaries-AMEX.csv'
+path = 'DKPGA/Albany/'
+name = 'DKSalaries-Albany.csv'
 
 df = DK_csv_assignemnt(path, name)
 
@@ -309,8 +284,8 @@ course_df = assign_course_df(client)
 df_merge = weight_efficiencies(df, course_df)
 print(df_merge.head())
 
-df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard/_/tournamentId/401243401')
-df_merge = driving_distance(df_merge)
+df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard/_/tournamentId/401148244')
+#df_merge = driving_accuracy(df_merge)
 
 print(df_merge.head())
 
@@ -353,7 +328,7 @@ while i < iterations:
         maxIter = currentIter
         maxLineup = lineup
     #check if sample is a top tier sample
-    if currentIter > (mean + sigma - 15) and constraint(lineup):
+    if currentIter > (mean + 40) and constraint(lineup):
         #add players to top tier dataframe
         topTierData = getNames(lineup)
         topTierData.append(currentIter)

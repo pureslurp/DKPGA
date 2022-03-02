@@ -14,14 +14,13 @@ warnings.simplefilter(action='ignore', category=Warning)
 
 
 #user input
-iterations = 200000
+iterations = 300000
 
 #define variables
 maxIter = 0                                    #placeholder for best lineup
 i = 0                                          #main iterable
 j = 0                                          #top tier iterable
 k = 0                                          #top tier lineupdf iterable
-topTier = pd.DataFrame(columns=['Player'])     #a dataframe of the top lineups (mean+sigma)
 topTierLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 
 path = '2022/BayHill/'
@@ -94,9 +93,7 @@ while i < iterations:
         topTierData.append(currentIter)
         topTierLineup.loc[k] = topTierData
         k = k + 1
-        for x in lineup:
-            topTier.loc[j] = df_merge.loc[x]['Name + ID']
-            j = j + 1
+        
     #iterate only if it is a valid lineup
     if constraint(lineup, df_merge):
         i = i + 1
@@ -108,9 +105,10 @@ while i < iterations:
 OptimizedLineup = optimize_main(topTierLineup, df_merge)
 MaximizedLineup = maximize_main(OptimizedLineup, df_merge)
 MaximizedLineup = remove_outliers_main(MaximizedLineup, df_merge)
+topPlayers = find_top_players_for(MaximizedLineup, df_merge)
 
-#print and export data for easy view
-#df_merge = df_total_and_reformat(df_merge)
+
+topPlayers.to_csv('{}CSVs/Top_Players.csv'.format(path),index=False)
 MaximizedLineup.to_csv('{}CSVs/Maximized_Lineups.csv'.format(path),index=False)
 
 print(MaximizedLineup.head())
