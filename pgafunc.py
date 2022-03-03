@@ -40,7 +40,7 @@ def find_top_players_for(df, df_merge):
             j = j + 1
             
     topTier.to_csv('{}CSVs/Top_Players.csv'.format('2022/BayHill/'),index=False)
-    topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 25]
+    topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 10]
     topPlayers = pd.DataFrame(topTier['Player'].value_counts())
     topPlayers['Name'] = topPlayers.index
     
