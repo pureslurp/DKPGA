@@ -93,7 +93,7 @@ def pga_odds(df_merge):
     oddsRank = dk_merge['Odds'].rank(pct=True, ascending=False)
 
     dk_merge['Odds'].fillna(0)
-    dk_merge['Odds'] = oddsRank * 5
+    dk_merge['Odds'] = oddsRank * 7.5
 
 
     dk_merge.sort_values(by='Odds',ascending=True,inplace=True)
@@ -166,7 +166,7 @@ def getEff(df, key, count):
     effRank = dk_merge[key].rank(pct=True, ascending=False)
 
     dk_merge[key].fillna(0)
-    dk_merge[key] = effRank * count * 1.5
+    dk_merge[key] = effRank * count * 2
 
 
     #effScale = np.concatenate((np.linspace(count*2,0,len(dk_merge[key].dropna())),np.zeros(len(dk_merge)-len(dk_merge[key].dropna()))))
@@ -423,7 +423,7 @@ def fix_player_name(name):
     full_name = fn_strip + ' ' + ln_strip
     return full_name
 
-def course_fit(df_merge, multiplier=50):
+def course_fit(df_merge, multiplier=75):
     driver = webdriver.Firefox()
     driver.get('https://datagolf.com/course-fit-tool')
     driver.implicitly_wait(120)
@@ -450,7 +450,7 @@ def course_fit(df_merge, multiplier=50):
     
 
 
-def past_results(df_merge, url, lowerBound=0, upperBound=5, playoff=False, pr_i=0):
+def past_results(df_merge, url, lowerBound=0, upperBound=4, playoff=False, pr_i=0):
     '''Check for past tournament results 
     
     Args:
