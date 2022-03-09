@@ -7,6 +7,7 @@ Created on Sun Jul 18 20:17:02 2021
 """
 from audioop import getsample
 from dataclasses import replace
+from itertools import count
 
 import numpy as np
 import gspread
@@ -28,9 +29,11 @@ OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4',
 MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
 NewMaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
 
+
+
 def find_top_players_for(df, df_merge):
     j = 0
-    topTier = pd.DataFrame(columns=['Player'])
+    topTier = pd.DataFrame(columns=['Count'])
     for index, row in df.iterrows():
         lineup = getID(row[0:6], df_merge)
         for x in lineup:
@@ -40,9 +43,9 @@ def find_top_players_for(df, df_merge):
             j = j + 1
             
     topTier.to_csv('{}CSVs/Top_Players.csv'.format('2022/BayHill/'),index=False)
-    topTier = topTier[topTier.groupby('Player')['Player'].transform('size') > 10]
-    topPlayers = pd.DataFrame(topTier['Player'].value_counts())
-    topPlayers['Name'] = topPlayers.index
+    topTier = topTier[topTier.groupby('Count')['Count'].transform('size') > 10]
+    topPlayers = pd.DataFrame(topTier['Count'].value_counts())
+    topPlayers['Name + ID'] = topPlayers.index
     
     return topPlayers
 
@@ -59,13 +62,19 @@ def odds_name(data):
         data = data.split(' ')
         if len(data) > 2:
             if data[0][-1] == '.':
-                name = data[0][:-2] + ' ' + data[1] + ' ' + data[2]
+                name = data[0][:-2] + ' ' + data[1].strip() + ' ' + data[2].strip()
             else:
-                name = data[0] + ' ' + data[1][:-2] + ' ' + data[2]
+                name = data[0].strip() + ' ' + data[1][:-2] + ' ' + data[2].strip()
         else:
-            name = data[0][:-2] + ' ' + data[1]
+            if data[1] == 'Smith':
+                name = data[0][:-3] + ' ' + data[1].strip()
+            elif data[1] == 'Pan':
+                name = data[0][:-4] + ' ' + data[1].strip()
+            else:
+                name = data[0][:-2] + ' ' + data[1].strip()
     except:
         name = np.nan
+    
     return name
 
 def pga_odds(df_merge):
@@ -320,15 +329,66 @@ def remove_outliers_main(topTierLineup, df_merge):
         maxNames.append(objective(maxNameID, df_merge))
         maxNames.append(get_salary(maxNameID, df_merge))
         MaximizedLineup.loc[index] = maxNames
+        MaximizedLineup.sort_values(by='TOT', ascending=False, inplace=True)
+        MaximizedLineup.drop_duplicates(subset=["TOT"],inplace=True)
+
+
 
     
     #NewMaximizedLineup.reset_index(drop=True, inplace=True)
-    MaximizedLineup.sort_values(by='TOT', ascending=False, inplace=True)
-    MaximizedLineup.drop_duplicates(subset=["TOT"],inplace=True)
+    
 
     
     
     return MaximizedLineup
+
+def calculate_oversub_count(current_df, df_merge, sub=0.66, csv=False):
+    countPlayers = pd.DataFrame(columns=['Name + ID', 'Salary', 'Value'])
+    countPlayers['Name + ID'] = df_merge['Name + ID']
+    countPlayers['Salary'] = df_merge['Salary']
+    countPlayers['Value'] = df_merge['Value']
+    overSubList = []
+    tp = find_top_players_for(current_df, df_merge)
+    countPlayers = pd.merge(countPlayers, tp, how='left',on='Name + ID')
+    
+    countPlayers['Count'] = countPlayers['Count'] / len(current_df.index)
+    countPlayers['Count'] = countPlayers['Count'].fillna(0)
+    if csv:
+        return countPlayers
+    overSubDF = countPlayers[countPlayers['Count'] > 0.66]
+    overSubList = overSubDF['Name + ID'].tolist()
+    return overSubList
+
+def optimize_ownership(current_df, df_merge):
+    
+    current_df.sort_values(by='TOT', ascending=True, inplace=True)
+    prev_ownership = []
+    for index, row in current_df.iterrows():
+        print(index)
+        maxNames = [row[0],row[1],row[2],row[3],row[4],row[5]]
+        budget = 50000 - get_salary(getID(maxNames, df_merge), df_merge)
+        curr_ownership = calculate_oversub_count(current_df, df_merge)
+        if set(prev_ownership) != set(curr_ownership):
+            print(curr_ownership)
+        prev_ownership = curr_ownership
+        exclude = list(set(curr_ownership + maxNames))
+        df_Sub = df_merge[~df_merge['Name + ID'].isin(exclude)]
+        for player in range(0, len(maxNames)):
+            if row[player] in curr_ownership:
+                ID = getID(maxNames, df_merge)
+                if maximize(df_Sub, df_merge.loc[ID[player]]['Salary'],budget) not in maxNames:
+                    maxNames[player] = maximize(df_Sub, df_merge.loc[ID[player]]['Salary'],budget)
+                    budget = 50000 - get_salary(getID(maxNames, df_merge), df_merge)
+
+        maxNameID = getID(maxNames, df_merge)
+        maxNames.append(objective(maxNameID, df_merge))
+        maxNames.append(get_salary(maxNameID, df_merge))
+        current_df.loc[index] = maxNames
+
+
+    current_df.sort_values(by='TOT', ascending=False, inplace=True)
+
+    return current_df
 
 def duplicates(x):
     '''Check for duplicates in the lineup'''
@@ -354,7 +414,6 @@ def optimize_main(topTierLineup, df_merge):
         print(index)
         maxNames = [row[0],row[1],row[2],row[3],row[4],row[5]]
         budget = 50000 - get_salary(getID(maxNames, df_merge), df_merge)
-        find_lowest_salary(maxNames, df_merge)
         for player in range(0,len(maxNames)):
             ID = getID(maxNames, df_merge)
             if optimize(df_merge, df_merge.loc[ID[player]]['Salary'],budget) not in maxNames:
@@ -473,7 +532,7 @@ def past_results(df_merge, url, lowerBound=0, upperBound=4, playoff=False, pr_i=
     
     dk_pastResults[f'TOT{pr_i}'] = dk_pastResults['TOT'].apply(lambda x: rewrite(x))
     dk_pastResults.drop(['POS','SCORE','R1','R2','R3','R4','EARNINGS','FEDEX PTS','TOT'],axis=1,inplace=True)
-    dk_pastResults.drop(dk_pastResults[dk_pastResults[f'TOT{pr_i}'] < 170].index,inplace=True)
+    dk_pastResults.drop(dk_pastResults[dk_pastResults[f'TOT{pr_i}'] < 250].index,inplace=True)
     dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
     dk_pastResults['Name'] = dk_pastResults['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
@@ -556,12 +615,12 @@ def weight_efficiencies(df, course_df):
     eff350 = course_df[(course_df['Yards'] < 400) & (course_df['Yards'] > 350)]['Yards'].count()
     eff400 = course_df[(course_df['Yards'] < 450) & (course_df['Yards'] > 400)]['Yards'].count()
     eff450 = course_df[(course_df['Yards'] < 500) & (course_df['Yards'] > 450)]['Yards'].count()
-    eff500 = course_df[(course_df['Yards'] < 550) & (course_df['Yards'] > 500) & (course_df['Par'] == 5)]['Yards'].count()
     eff500_p4 = course_df[(course_df['Yards'] > 500) & (course_df['Par'] == 4)]['Yards'].count()
+    eff500 = course_df[(course_df['Yards'] < 550) & (course_df['Yards'] > 500) & (course_df['Par'] == 5)]['Yards'].count()
     eff550 = course_df[(course_df['Yards'] < 600) & (course_df['Yards'] > 550) & (course_df['Par'] == 5)]['Yards'].count()
     eff600 = course_df[(course_df['Yards'] < 650) & (course_df['Yards'] > 600)]['Yards'].count()
 
-    scales = [eff125, eff150,eff175,eff200,eff225,eff300,eff350,eff400,eff450,eff500, eff500_p4, eff550,eff600]
+    scales = [eff125, eff150,eff175,eff200,eff225,eff300,eff350,eff400,eff450, eff500_p4, eff500, eff550,eff600]
     keys = ['125-150 Eff','150-175 Eff','175-200 Eff','200-225 Eff','225-250 Eff','300-350 Eff','350-400 Eff','400-450 Eff','450-500 Eff','500+ Eff','500-550 Eff','550-600 Eff','600-650 Eff']
     
     #merge efficiencies
@@ -592,7 +651,10 @@ def assign_course_df(client):
     return course_df
 
 def series_lower(data):
-    return data.lower()
+    if data.lower() == 'matthew fitzpatrick':
+        return 'matt fitzpatrick'
+    else:
+        return data.lower()
 
 def DK_csv_assignemnt(path, name, lowerBound=5, upperBound=20):
     '''find exported csv from DK and assign it to dataFrame with upper and lower bound values'''
