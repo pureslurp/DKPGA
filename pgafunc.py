@@ -77,7 +77,55 @@ def odds_name(data):
     
     return name
 
-def pga_odds(df_merge):
+def pga_odds_vegas(df_merge):
+    url = 'https://www.vegasinsider.com/golf/odds/futures/'
+    # driver = webdriver.Firefox()
+    # driver.get(url)
+    # driver.implicitly_wait(120)
+    # time.sleep(3)
+    # result = driver.page_source
+    # driver.close()
+    # driver.quit()   
+    req = requests.get(url)
+    soup = BeautifulSoup(req.content, 'html.parser')
+    odds_list = soup.find_all('ul')
+    odds_list = odds_list[17]
+    odds_list = odds_list.find_all('li')
+    names = []
+    odd_array = []
+    for data in odds_list:
+        data = data.text
+        data = data.split('+')
+        name = data[0].strip()
+        odds = data[1]
+        names.append(name)
+        odd_array.append(odds)
+    odds_df = pd.DataFrame(columns=['Name', 'Odds'])
+    odds_df['Name'] = names
+    odds_df['Odds'] = odd_array
+    odds_df['Name'] = odds_df['Name'].apply(lambda x: series_lower(x))
+    print(odds_df.head())
+    dk_merge = pd.merge(df_merge, odds_df, how='left', on='Name')
+    dk_merge["Odds"] = pd.to_numeric(dk_merge["Odds"])
+    dk_merge.sort_values(by='Odds',ascending=False,inplace=True)
+    print(dk_merge.head())
+
+    oddsRank = dk_merge['Odds'].rank(pct=True, ascending=False)
+
+
+    dk_merge['Odds'].fillna(0)
+    dk_merge['Odds'] = oddsRank * 15
+
+
+    dk_merge.sort_values(by='Odds',ascending=True,inplace=True)
+    print(dk_merge.head())
+
+    return dk_merge
+
+
+
+
+def pga_odds_pga(df_merge):
     driver = webdriver.Firefox()
     driver.get('https://www.pgatour.com/odds.html#/')
     driver.implicitly_wait(120)
@@ -175,7 +223,7 @@ def getEff(df, key, count):
     effRank = dk_merge[key].rank(pct=True, ascending=False)
 
     dk_merge[key].fillna(0)
-    dk_merge[key] = effRank * count * 2
+    dk_merge[key] = effRank * count
 
 
     #effScale = np.concatenate((np.linspace(count*2,0,len(dk_merge[key].dropna())),np.zeros(len(dk_merge)-len(dk_merge[key].dropna()))))
@@ -239,7 +287,10 @@ def get_salary(lineup, df_merge):
 def rewrite(data):
     '''convert string to integer in dataframe'''
     try:
-        output = int(data)
+        if data[0] == 'T':
+            output = int(data[1:])
+        else:
+            output = int(data)
     except:
         output = 0
     return output
@@ -482,7 +533,7 @@ def fix_player_name(name):
     full_name = fn_strip + ' ' + ln_strip
     return full_name
 
-def course_fit(df_merge, multiplier=75):
+def course_fit(df_merge, lowerBound=0, upperBound=7.5):
     driver = webdriver.Firefox()
     driver.get('https://datagolf.com/course-fit-tool')
     driver.implicitly_wait(120)
@@ -495,18 +546,48 @@ def course_fit(df_merge, multiplier=75):
     i = 0
     for player_row in course_fit_data:
         adj = player_row.find_all('div', class_='ev-text')
-        course_fit_df.loc[i] = [fix_player_name(player_row['name']), float(adj[-1].text) * multiplier]
+        course_fit_df.loc[i] = [fix_player_name(player_row['name']), float(adj[-1].text)]
         i += 1
     driver.close()
     driver.quit()   
     course_fit_df['Adjustment'] = course_fit_df['Adjustment'].fillna(0)
     course_fit_df['Name'] = course_fit_df['Name'].apply(lambda x: series_lower(x))
+    
     df_merge = pd.merge(df_merge, course_fit_df, how='left',on='Name')
+    fitRank = df_merge['Adjustment'].rank(pct=True, ascending=True)
+    df_merge['Adjustment'] = fitRank * upperBound + lowerBound
+    df_merge['Adjustment'] = df_merge['Adjustment'].fillna(0)
     print(df_merge.head())
     return df_merge
     
 
+def past_results_match(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
+    driver = webdriver.Firefox()
+    driver.get(url)
+    driver.implicitly_wait(120)
+    time.sleep(10)
+    result = driver.page_source
+    # soup = BeautifulSoup(result, "html.parser")
+    # dk_pastResults = pd.DataFrame(columns=['Name', 'Adjustment'])
+    dk_pastResults = pd.read_html(result)
+    dk_pastResults = dk_pastResults[1]
+    print(dk_pastResults.head())
+    driver.close()
+    driver.quit()  
+    dk_pastResults[f'POS{pr_i}'] = dk_pastResults['POS'].apply(lambda x: rewrite(x))
     
+    dk_pastResults.drop(['RESULT','GROUP RECORD','OFFICIALMONEY','FEDEXCUPPOINTS','POS'],axis=1,inplace=True)
+    print(dk_pastResults.head())
+    #dk_pastResults.drop(dk_pastResults[dk_pastResults[f'TOT{pr_i}'] < 250].index,inplace=True)
+    dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
+    dk_pastResults['Name'] = dk_pastResults['Name'].apply(lambda x: series_lower(x))
+    df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
+    df_merge.sort_values(by=[f'POS{pr_i}'],inplace=True)
+    pastResultRank = df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False)
+    df_merge[f'POS{pr_i}'] = pastResultRank * upperBound + lowerBound
+    df_merge[f'POS{pr_i}'] = df_merge[f'POS{pr_i}'].fillna(0)
+
+    return df_merge
 
 
 def past_results(df_merge, url, lowerBound=0, upperBound=4, playoff=False, pr_i=0):
@@ -653,6 +734,10 @@ def assign_course_df(client):
 def series_lower(data):
     if data.lower() == 'matthew fitzpatrick':
         return 'matt fitzpatrick'
+    elif data.lower() == 'tyrell hatton':
+        return 'tyrrell hatton'
+    elif data.lower() == 'taylor gooch':
+        return 'talor gooch'
     else:
         return data.lower()
 
