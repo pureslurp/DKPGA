@@ -89,7 +89,8 @@ def pga_odds_vegas(df_merge):
     req = requests.get(url)
     soup = BeautifulSoup(req.content, 'html.parser')
     odds_list = soup.find_all('ul')
-    odds_list = odds_list[17]
+    odds_list = odds_list[18]
+    print(odds_list)
     odds_list = odds_list.find_all('li')
     names = []
     odd_array = []
@@ -150,7 +151,7 @@ def pga_odds_pga(df_merge):
     oddsRank = dk_merge['Odds'].rank(pct=True, ascending=False)
 
     dk_merge['Odds'].fillna(0)
-    dk_merge['Odds'] = oddsRank * 7.5
+    dk_merge['Odds'] = oddsRank * 15
 
 
     dk_merge.sort_values(by='Odds',ascending=True,inplace=True)
@@ -559,7 +560,48 @@ def course_fit(df_merge, lowerBound=0, upperBound=7.5):
     df_merge['Adjustment'] = df_merge['Adjustment'].fillna(0)
     print(df_merge.head())
     return df_merge
+
+def pos_rewrite(x):
+    data = x.split(' ')
+    pos = data[-1]
+    if pos[0] == 'T':
+        pos = int(pos[1:])
+    else:
+        try:
+            pos = int(pos)
+        except:
+            pos = np.nan
+    return pos
     
+def past_results_dyn(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
+    driver = webdriver.Firefox()
+    driver.get(url)
+    driver.implicitly_wait(120)
+    time.sleep(10)
+    result = driver.page_source
+    dk_pastResults = pd.read_html(result)
+    dk_pastResults = dk_pastResults[1]
+    new_col = ['PLAYER', 'POS', 'R1', 'R2', 'R3', 'R4', 'TOTAL SCORE', 'TO PAR', 'OFFICIAL MONEY', 'FEDEXCUP POINTS']
+    dk_pastResults.columns = new_col
+    dk_pastResults[f'POS{pr_i}'] = dk_pastResults['POS'].apply(lambda x: pos_rewrite(x))
+    dk_pastResults.drop(['POS', 'R1', 'R2', 'R3', 'R4', 'TOTAL SCORE', 'TO PAR', 'OFFICIAL MONEY', 'FEDEXCUP POINTS'],axis=1,inplace=True)
+    #print(dk_pastResults.head())
+    driver.close()
+    driver.quit()  
+    #dk_pastResults[f'POS{pr_i}'] = dk_pastResults['POS'].apply(lambda x: rewrite(x))
+    
+    #dk_pastResults.drop(['RESULT','GROUP RECORD','OFFICIALMONEY','FEDEXCUPPOINTS','POS'],axis=1,inplace=True)
+    print(dk_pastResults.head())
+    #dk_pastResults.drop(dk_pastResults[dk_pastResults[f'TOT{pr_i}'] < 250].index,inplace=True)
+    dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
+    dk_pastResults['Name'] = dk_pastResults['Name'].apply(lambda x: series_lower(x))
+    df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
+    df_merge.sort_values(by=[f'POS{pr_i}'],inplace=True)
+    pastResultRank = df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False)
+    df_merge[f'POS{pr_i}'] = pastResultRank * upperBound + lowerBound
+    df_merge[f'POS{pr_i}'] = df_merge[f'POS{pr_i}'].fillna(0)
+
+    return df_merge
 
 def past_results_match(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
     driver = webdriver.Firefox()
@@ -589,7 +631,6 @@ def past_results_match(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
 
     return df_merge
 
-
 def past_results(df_merge, url, lowerBound=0, upperBound=4, playoff=False, pr_i=0):
     '''Check for past tournament results 
     
@@ -609,7 +650,6 @@ def past_results(df_merge, url, lowerBound=0, upperBound=4, playoff=False, pr_i=
         dk_pastResults = dk_pastResults[1]
     else:
         dk_pastResults = dk_pastResults[0]
-    
     
     dk_pastResults[f'TOT{pr_i}'] = dk_pastResults['TOT'].apply(lambda x: rewrite(x))
     dk_pastResults.drop(['POS','SCORE','R1','R2','R3','R4','EARNINGS','FEDEX PTS','TOT'],axis=1,inplace=True)
