@@ -578,6 +578,12 @@ def past_results_dyn(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
     driver.get(url)
     driver.implicitly_wait(120)
     time.sleep(10)
+    select = Select(driver.find_element_by_id('pastResultsYearSelector'))
+    if pr_i == 0:
+        select.select_by_value('2021.536')
+    else:
+        select.select_by_value('2021.014')
+    time.sleep(5)
     result = driver.page_source
     dk_pastResults = pd.read_html(result)
     dk_pastResults = dk_pastResults[1]
@@ -778,6 +784,12 @@ def series_lower(data):
         return 'tyrrell hatton'
     elif data.lower() == 'taylor gooch':
         return 'talor gooch'
+    elif data.lower() == 'cam champ':
+        return 'cameron champ'
+    elif data.lower() == 'cam davis':
+        return 'cameron davis'
+    elif data.lower() == 'sung-jae im':
+        return 'sungjae im'
     else:
         return data.lower()
 
