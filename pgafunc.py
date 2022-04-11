@@ -566,6 +566,8 @@ def pos_rewrite(x):
     pos = data[-1]
     if pos[0] == 'T':
         pos = int(pos[1:])
+    elif pos == 'CUT':
+        pos = 100
     else:
         try:
             pos = int(pos)
@@ -580,9 +582,9 @@ def past_results_dyn(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
     time.sleep(10)
     select = Select(driver.find_element_by_id('pastResultsYearSelector'))
     if pr_i == 0:
-        select.select_by_value('2021.536')
+        select.select_by_value('2021.012')
     else:
-        select.select_by_value('2021.014')
+        select.select_by_value('2020.012')
     time.sleep(5)
     result = driver.page_source
     dk_pastResults = pd.read_html(result)
@@ -602,10 +604,11 @@ def past_results_dyn(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
     dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
     dk_pastResults['Name'] = dk_pastResults['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
+    df_merge[f'POS{pr_i}'] = df_merge[f'POS{pr_i}'].fillna(99)
     df_merge.sort_values(by=[f'POS{pr_i}'],inplace=True)
     pastResultRank = df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False)
     df_merge[f'POS{pr_i}'] = pastResultRank * upperBound + lowerBound
-    df_merge[f'POS{pr_i}'] = df_merge[f'POS{pr_i}'].fillna(0)
+    #df_merge[f'POS{pr_i}'] = df_merge[f'POS{pr_i}'].fillna(0)
 
     return df_merge
 
@@ -790,6 +793,14 @@ def series_lower(data):
         return 'cameron davis'
     elif data.lower() == 'sung-jae im':
         return 'sungjae im'
+    elif data.lower() == 'hason kokrak':
+        return 'jason kokrak'
+    elif data.lower() == 'sebastián muñoz':
+        return 'sebastian munoz'
+    elif data.lower() == 'k.h. lee' or data.lower() == 'kyounghoon lee':
+        return 'kyoung-hoon lee'
+    elif data.lower() == 'charles howell':
+        return 'charles howell iii'
     else:
         return data.lower()
 
