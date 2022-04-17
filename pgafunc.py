@@ -534,7 +534,7 @@ def fix_player_name(name):
     full_name = fn_strip + ' ' + ln_strip
     return full_name
 
-def course_fit(df_merge, lowerBound=0, upperBound=7.5):
+def course_fit(df_merge, lowerBound=0, upperBound=5):
     driver = webdriver.Firefox()
     driver.get('https://datagolf.com/course-fit-tool')
     driver.implicitly_wait(120)
