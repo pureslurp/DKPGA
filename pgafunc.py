@@ -77,15 +77,89 @@ def odds_name(data):
     
     return name
 
+def duo_data_ln(names, df_merge):
+    print(names)
+    split_names = names.split('/')
+    if len(split_names) == 1:
+        split_names = names.split('.')
+    print(split_names)
+    name1 = split_names[0].strip().lower()
+    name2 = split_names[1].strip().lower()
+    if name1 == 'potson':
+        name1 = 'poston'
+    elif name1 == 'poluter':
+        name1 = 'poulter'
+    elif name1 == 'stnaley':
+        name1 = 'stanley'
+    if name2 == 'potson':
+        name2 = 'poston'
+    elif name2 == 'poluter':
+        name2 = 'poulter'
+    elif name2 == 'stnaley':
+        name2 = 'stanley'
+    for index, row in df_merge.iterrows():
+        name = row['Name']
+        split_name = name.split(' ')
+        if len(split_name) == 3:
+            print(split_name)
+            if split_name[1] == 'varner':
+                ln = split_name[1]
+            else:
+                ln = split_name[1].strip() + ' ' + split_name[2].strip()
+        else:
+            ln = split_name[1].strip()
+        if ln == name1:
+            name1 = name
+        elif ln == name2:
+            name2 = name
+        else:
+            pass
+    return name1, name2
+
+def pga_odds_vegas_duo(df_merge):
+    url = 'https://www.vegasinsider.com/golf/odds/futures/'  
+    req = requests.get(url)
+    soup = BeautifulSoup(req.content, 'html.parser')
+    odds_list = soup.find_all('ul')
+    odds_list = odds_list[18]
+    print(odds_list)
+    odds_list = odds_list.find_all('li')
+    names = []
+    odd_array = []
+    for data in odds_list:
+        data = data.text
+        data = data.split('+')
+        name1, name2 = duo_data_ln(data[0], df_merge)
+        odds = data[1]
+        names.append(name1)
+        names.append(name2)
+        odd_array.append(odds)
+        odd_array.append(odds)
+    odds_df = pd.DataFrame(columns=['Name', 'Odds'])
+    odds_df['Name'] = names
+    odds_df['Odds'] = odd_array
+    odds_df['Name'] = odds_df['Name'].apply(lambda x: series_lower(x))
+    print(odds_df.head())
+    dk_merge = pd.merge(df_merge, odds_df, how='left', on='Name')
+    dk_merge["Odds"] = pd.to_numeric(dk_merge["Odds"])
+    dk_merge.sort_values(by='Odds',ascending=False,inplace=True)
+    print(dk_merge.head())
+
+    oddsRank = dk_merge['Odds'].rank(pct=True, ascending=False)
+
+
+    dk_merge['Odds'].fillna(0)
+    dk_merge['Odds'] = oddsRank * 15
+
+
+    dk_merge.sort_values(by='Odds',ascending=True,inplace=True)
+    print(dk_merge.head())
+
+    return dk_merge
+
+
 def pga_odds_vegas(df_merge):
-    url = 'https://www.vegasinsider.com/golf/odds/futures/'
-    # driver = webdriver.Firefox()
-    # driver.get(url)
-    # driver.implicitly_wait(120)
-    # time.sleep(3)
-    # result = driver.page_source
-    # driver.close()
-    # driver.quit()   
+    url = 'https://www.vegasinsider.com/golf/odds/futures/'  
     req = requests.get(url)
     soup = BeautifulSoup(req.content, 'html.parser')
     odds_list = soup.find_all('ul')
@@ -164,14 +238,12 @@ def check_last_year(data, ly_df, key):
     for index, row in ly_df.iterrows():
         if row['PLAYER NAME'].lower() == data['Name']:
             if math.isnan(data[key]):
-                print(f'using last year for: {row["PLAYER NAME"]}')
                 value = row["AVG"]
                 rookie = False
             else:
                 value = data[key]
                 rookie = False
     if rookie == True:
-        print('Rookie: ', data['Name'])
         try:
             value = data[key]
         except:
@@ -574,7 +646,70 @@ def pos_rewrite(x):
         except:
             pos = np.nan
     return pos
+
+def duo_data_fn(names):
+    split_names = names.split('/')
+    name1 = split_names[0].strip()
+    name2 = split_names[1].strip()
+    return name1, name2
+
+
+def past_results_dyn_duo(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
+    driver = webdriver.Firefox()
+    driver.get(url)
+    print('made it')
+    driver.implicitly_wait(120)
+    print('made it again')
+    time.sleep(10)
+    print('made it again again')
+
+    select = Select(driver.find_element_by_id('pastResultsYearSelector'))
+    if pr_i == 0:
+        select.select_by_value('2021.018')
+    else:
+        select.select_by_value('2019.018')
+    time.sleep(5)
+    result = driver.page_source
+    dk_pastResults = pd.read_html(result)
+    dk_pastResults = dk_pastResults[1]
+    new_col = ['PLAYER', 'POS', 'R1', 'R2', 'R3', 'R4', 'TOTAL SCORE', 'TO PAR', 'OFFICIAL MONEY', 'FEDEXCUP POINTS']
+    dk_pastResults.columns = new_col
+    dk_pastResults[f'POS{pr_i}'] = dk_pastResults['POS'].apply(lambda x: pos_rewrite(x))
+    dk_pastResults.drop(['POS', 'R1', 'R2', 'R3', 'R4', 'TOTAL SCORE', 'TO PAR', 'OFFICIAL MONEY', 'FEDEXCUP POINTS'],axis=1,inplace=True)
+    #print(dk_pastResults.head())
+    driver.close()
+    driver.quit()  
+    #dk_pastResults[f'POS{pr_i}'] = dk_pastResults['POS'].apply(lambda x: rewrite(x))
     
+    #dk_pastResults.drop(['RESULT','GROUP RECORD','OFFICIALMONEY','FEDEXCUPPOINTS','POS'],axis=1,inplace=True)
+    print(dk_pastResults.head())
+    #dk_pastResults.drop(dk_pastResults[dk_pastResults[f'TOT{pr_i}'] < 250].index,inplace=True)
+    new_df = pd.DataFrame(columns=['Name',f'POS{pr_i}'])
+    names = []
+    pos = []
+    for index, row in dk_pastResults.iterrows():
+        players = row['PLAYER']
+        name1, name2 = duo_data_fn(players)
+        names.append(name1)
+        names.append(name2)
+        pos.append(row[f'POS{pr_i}'])
+        pos.append(row[f'POS{pr_i}'])
+        #new_first_row = 
+
+    new_df['Name'] = names
+    new_df[f'POS{pr_i}'] = pos
+    print(new_df.head())
+    new_df['Name'] = new_df['Name'].apply(lambda x: series_lower(x))
+    df_merge = pd.merge(df_merge, new_df,how='left',on='Name')
+    df_merge[f'POS{pr_i}'] = df_merge[f'POS{pr_i}'].fillna(99)
+    df_merge.sort_values(by=[f'POS{pr_i}'],inplace=True)
+    pastResultRank = df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False)
+    df_merge[f'POS{pr_i}'] = pastResultRank * upperBound + lowerBound
+    #df_merge[f'POS{pr_i}'] = df_merge[f'POS{pr_i}'].fillna(0)
+
+    return df_merge
+
+
 def past_results_dyn(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
     driver = webdriver.Firefox()
     driver.get(url)
