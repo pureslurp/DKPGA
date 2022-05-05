@@ -163,7 +163,7 @@ def pga_odds_vegas(df_merge):
     req = requests.get(url)
     soup = BeautifulSoup(req.content, 'html.parser')
     odds_list = soup.find_all('ul')
-    odds_list = odds_list[18]
+    odds_list = odds_list[17]
     print(odds_list)
     odds_list = odds_list.find_all('li')
     names = []
@@ -915,7 +915,7 @@ def assign_course_df(client):
     course_df['Par'] = course_df['Par'].apply(lambda x: rewrite(x))
     return course_df
 
-def series_lower(data):
+def check_spelling_errors(data):
     if data.lower() == 'matthew fitzpatrick':
         return 'matt fitzpatrick'
     elif data.lower() == 'tyrell hatton':
@@ -936,8 +936,20 @@ def series_lower(data):
         return 'kyoung-hoon lee'
     elif data.lower() == 'charles howell':
         return 'charles howell iii'
+    elif data.lower() == 'sung-hoon kang':
+        return 'sung kang'
+    elif data.lower() == 'charl schwarztel':
+        return 'charl schwartzel'
+    elif data.lower() == 'roger slaon':
+        return 'roger sloan'
+    elif data.lower() == 'scott pierce':
+        return 'scott piercy'
     else:
         return data.lower()
+
+def series_lower(data):
+    name_fix = check_spelling_errors(data)
+    return name_fix
 
 def DK_csv_assignemnt(path, name, lowerBound=5, upperBound=20):
     '''find exported csv from DK and assign it to dataFrame with upper and lower bound values'''
