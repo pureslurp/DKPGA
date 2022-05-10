@@ -78,11 +78,9 @@ def odds_name(data):
     return name
 
 def duo_data_ln(names, df_merge):
-    print(names)
     split_names = names.split('/')
     if len(split_names) == 1:
         split_names = names.split('.')
-    print(split_names)
     name1 = split_names[0].strip().lower()
     name2 = split_names[1].strip().lower()
     if name1 == 'potson':
@@ -101,7 +99,6 @@ def duo_data_ln(names, df_merge):
         name = row['Name']
         split_name = name.split(' ')
         if len(split_name) == 3:
-            print(split_name)
             if split_name[1] == 'varner':
                 ln = split_name[1]
             else:
@@ -162,8 +159,9 @@ def pga_odds_vegas(df_merge):
     url = 'https://www.vegasinsider.com/golf/odds/futures/'  
     req = requests.get(url)
     soup = BeautifulSoup(req.content, 'html.parser')
+    soup = soup.main
     odds_list = soup.find_all('ul')
-    odds_list = odds_list[17]
+    odds_list = odds_list[0]
     print(odds_list)
     odds_list = odds_list.find_all('li')
     names = []
@@ -541,6 +539,7 @@ def optimize_main(topTierLineup, df_merge):
         for player in range(0,len(maxNames)):
             ID = getID(maxNames, df_merge)
             if optimize(df_merge, df_merge.loc[ID[player]]['Salary'],budget) not in maxNames:
+                print(f"replacing {df_merge.loc[ID[player]]['Salary']} with {optimize(df_merge, df_merge.loc[ID[player]]['Salary'],budget)}")
                 maxNames[player] = optimize(df_merge, df_merge.loc[ID[player]]['Salary'],budget)
                 budget = 50000 - get_salary(getID(maxNames, df_merge), df_merge)
 
@@ -576,6 +575,7 @@ def maximize_main(OptimizedLinup, df_merge):
         for player in range(0,len(maxNames)):
             ID = getID(maxNames, df_merge)
             if maximize(df_merge, df_merge.loc[ID[player]]['Salary'],budget) not in maxNames:
+                print(f"replacing {df_merge.loc[ID[player]]['Salary']} with {maximize(df_merge, df_merge.loc[ID[player]]['Salary'],budget)}")
                 maxNames[player] = maximize(df_merge, df_merge.loc[ID[player]]['Salary'],budget)
                 budget = 50000 - get_salary(getID(maxNames, df_merge), df_merge)
         
@@ -657,11 +657,8 @@ def duo_data_fn(names):
 def past_results_dyn_duo(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
     driver = webdriver.Firefox()
     driver.get(url)
-    print('made it')
     driver.implicitly_wait(120)
-    print('made it again')
     time.sleep(10)
-    print('made it again again')
 
     select = Select(driver.find_element_by_id('pastResultsYearSelector'))
     if pr_i == 0:
@@ -717,9 +714,9 @@ def past_results_dyn(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
     time.sleep(10)
     select = Select(driver.find_element_by_id('pastResultsYearSelector'))
     if pr_i == 0:
-        select.select_by_value('2021.012')
+        select.select_by_value('2021.019')
     else:
-        select.select_by_value('2020.012')
+        select.select_by_value('2020.019')
     time.sleep(5)
     result = driver.page_source
     dk_pastResults = pd.read_html(result)
@@ -800,11 +797,13 @@ def past_results(df_merge, url, lowerBound=0, upperBound=4, playoff=False, pr_i=
     dk_pastResults.drop(dk_pastResults[dk_pastResults[f'TOT{pr_i}'] < 250].index,inplace=True)
     dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
     dk_pastResults['Name'] = dk_pastResults['Name'].apply(lambda x: series_lower(x))
+    
     df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
     df_merge.sort_values(by=[f'TOT{pr_i}'],inplace=True)
     pastResultRank = df_merge[f'TOT{pr_i}'].rank(pct=True, ascending=False)
     df_merge[f'TOT{pr_i}'] = pastResultRank * upperBound + lowerBound
     df_merge[f'TOT{pr_i}'] = df_merge[f'TOT{pr_i}'].fillna(0)
+    
 
     return df_merge
 
@@ -932,7 +931,7 @@ def check_spelling_errors(data):
         return 'jason kokrak'
     elif data.lower() == 'sebastián muñoz':
         return 'sebastian munoz'
-    elif data.lower() == 'k.h. lee' or data.lower() == 'kyounghoon lee':
+    elif data.lower() == 'k.h. lee' or data.lower() == 'kyounghoon lee' or data.lower() == 'lee kyoung-hoon':
         return 'kyoung-hoon lee'
     elif data.lower() == 'charles howell':
         return 'charles howell iii'
@@ -944,6 +943,16 @@ def check_spelling_errors(data):
         return 'roger sloan'
     elif data.lower() == 'scott pierce':
         return 'scott piercy'
+    elif data.lower() == 'vincent whaley':
+        return 'vince whaley'
+    elif data.lower() == 'stephan jaegar':
+        return 'stephan jaeger'
+    elif data.lower() == 'mathhias schwab':
+        return 'matthias schwab'
+    elif data.lower() == 'kang sung-hoon':
+        return 'sung kang'
+    elif data.lower() == 'jorda spieth':
+        return 'jordan spieth'
     else:
         return data.lower()
 
@@ -968,6 +977,7 @@ def df_total_and_reformat(df_merge):
     df_merge['Value'] = (df_merge['Total'] / df_merge['Salary']) * 1000
     df_merge = df_merge[['Name + ID', 'Salary', 'Total', 'Value']]
     df_merge.sort_values(by='Salary',ascending=False,inplace=True)
+    df_merge.drop_duplicates(inplace=True, ignore_index=True)
     return df_merge
 
 def par5_eaglePercentage(df_merge, lowerBound=0, upperBound=5):
