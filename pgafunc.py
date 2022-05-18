@@ -294,7 +294,7 @@ def getEff(df, key, count):
     effRank = dk_merge[key].rank(pct=True, ascending=False)
 
     dk_merge[key].fillna(0)
-    dk_merge[key] = effRank * count
+    dk_merge[key] = effRank * count * (15/18)
 
 
     #effScale = np.concatenate((np.linspace(count*2,0,len(dk_merge[key].dropna())),np.zeros(len(dk_merge)-len(dk_merge[key].dropna()))))
@@ -600,13 +600,13 @@ def delete_unused_columns(df_merge):
             col_list.append(columnName)
 
 def fix_player_name(name):
-    name_spl = name.split(',')
+    name_spl = name.split(' ')
     ln_strip = name_spl[0].strip()
     fn_strip = name_spl[1].strip()
     full_name = fn_strip + ' ' + ln_strip
     return full_name
 
-def course_fit(df_merge, lowerBound=0, upperBound=5):
+def course_fit(df_merge, lowerBound=0, upperBound=7.5):
     driver = webdriver.Firefox()
     driver.get('https://datagolf.com/course-fit-tool')
     driver.implicitly_wait(120)
@@ -791,18 +791,18 @@ def past_results(df_merge, url, lowerBound=0, upperBound=4, playoff=False, pr_i=
         dk_pastResults = dk_pastResults[1]
     else:
         dk_pastResults = dk_pastResults[0]
-    
-    dk_pastResults[f'TOT{pr_i}'] = dk_pastResults['TOT'].apply(lambda x: rewrite(x))
+    dk_pastResults[f'POS{pr_i}'] = dk_pastResults['POS'].apply(lambda x: pos_rewrite(x))
     dk_pastResults.drop(['POS','SCORE','R1','R2','R3','R4','EARNINGS','FEDEX PTS','TOT'],axis=1,inplace=True)
-    dk_pastResults.drop(dk_pastResults[dk_pastResults[f'TOT{pr_i}'] < 250].index,inplace=True)
     dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
     dk_pastResults['Name'] = dk_pastResults['Name'].apply(lambda x: series_lower(x))
-    
+    dk_pastResults[f'POS{pr_i}'] = dk_pastResults[f'POS{pr_i}'].fillna(99)
     df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
-    df_merge.sort_values(by=[f'TOT{pr_i}'],inplace=True)
-    pastResultRank = df_merge[f'TOT{pr_i}'].rank(pct=True, ascending=False)
-    df_merge[f'TOT{pr_i}'] = pastResultRank * upperBound + lowerBound
-    df_merge[f'TOT{pr_i}'] = df_merge[f'TOT{pr_i}'].fillna(0)
+    df_merge[f'POS{pr_i}'] = df_merge[f'POS{pr_i}'].fillna(98)
+    df_merge.sort_values(by=[f'POS{pr_i}'],inplace=True)
+    count = df_merge[f'POS{pr_i}'].count()
+    min_val = min(df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False))
+    pastResultRank = (df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False)-(min_val)) * df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False)/(1-min_val)
+    df_merge[f'POS{pr_i}'] = pastResultRank * upperBound + lowerBound
     
 
     return df_merge
@@ -953,6 +953,8 @@ def check_spelling_errors(data):
         return 'sung kang'
     elif data.lower() == 'jorda spieth':
         return 'jordan spieth'
+    elif data.lower() == 'louis oosthuzien':
+        return 'louis oosthuizen'
     else:
         return data.lower()
 
@@ -960,7 +962,7 @@ def series_lower(data):
     name_fix = check_spelling_errors(data)
     return name_fix
 
-def DK_csv_assignemnt(path, name, lowerBound=5, upperBound=20):
+def DK_csv_assignemnt(path, name, lowerBound=2, upperBound=20):
     '''find exported csv from DK and assign it to dataFrame with upper and lower bound values'''
     df = pd.read_csv('{}CSVs/{}'.format(path,name))
     df.drop(['Position','ID','Roster Position','Game Info', 'TeamAbbrev'],axis=1,inplace=True)
