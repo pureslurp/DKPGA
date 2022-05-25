@@ -29,9 +29,17 @@ OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4',
 MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
 NewMaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
 
+def find_top_players_for(df: pd.DataFrame, df_merge: pd.DataFrame):
+    '''A function that finds players that were used more than twice in a series of lineups given
 
-
-def find_top_players_for(df, df_merge):
+    Args:
+        df (DataFrame): the dataframe of lineups that need to be counted
+        df_merge (DataFrame): the origin dataframe that contains the player, salary, score, and value
+    
+    Returns:
+        topPlayers (DataFrame): A dataframe of players that were used more than twice
+    
+    '''
     j = 0
     topTier = pd.DataFrame(columns=['Count'])
     for index, row in df.iterrows():
@@ -42,14 +50,21 @@ def find_top_players_for(df, df_merge):
             topTier.loc[j] = temp
             j = j + 1
             
-    topTier.to_csv('{}CSVs/Top_Players.csv'.format('2022/BayHill/'),index=False)
     topTier = topTier[topTier.groupby('Count')['Count'].transform('size') > 2]
     topPlayers = pd.DataFrame(topTier['Count'].value_counts())
     topPlayers['Name + ID'] = topPlayers.index
     
     return topPlayers
 
-def split_odds(data):
+def split_odds(data: str):
+    '''A function that converts odds as a string to an integer (e.g. +500 to 500)
+
+    Args:
+        data (str): The odds represented as a string
+
+    Return:
+        data (int): The odds converted to an integer, returns nan if invalid
+    '''
     try:
         data = data.split('+')
         data = int(data[1])
@@ -57,7 +72,15 @@ def split_odds(data):
         data = np.nan
     return data
 
-def odds_name(data):
+def odds_name(data: str):
+    '''A function that converts a the name from the pga dynamic website into a name that is recognized by draftkings
+
+    Args:
+        data (str): The name of the player as it is displayed in the pga html.
+
+    Returns:
+        name (str): The name in the correct format for draftkings, return nan if invalid
+    '''
     try:
         data = data.split(' ')
         if len(data) > 2:
@@ -155,7 +178,16 @@ def pga_odds_vegas_duo(df_merge):
     return dk_merge
 
 
-def pga_odds_vegas(df_merge):
+def pga_odds_vegas(df_merge: pd.DataFrame, upper_bound: int = 15):
+    '''A function that scrapes odds data from vegas website and merges it into the main df
+
+    Args:
+        df_merge (DataFrame): The origin dataframe that contains the player, salary, score, value
+        upper_bound (int): The amount of points you want to award to the player with the best odds, scaled down to the worst player at 0
+
+    Returns:
+        dk_merge (DataFrame): The origin dataframe with an extra column that has the odds of each player ranked
+    '''
     url = 'https://www.vegasinsider.com/golf/odds/futures/'  
     req = requests.get(url)
     soup = BeautifulSoup(req.content, 'html.parser')
@@ -187,7 +219,7 @@ def pga_odds_vegas(df_merge):
 
 
     dk_merge['Odds'].fillna(0)
-    dk_merge['Odds'] = oddsRank * 15
+    dk_merge['Odds'] = oddsRank * upper_bound
 
 
     dk_merge.sort_values(by='Odds',ascending=True,inplace=True)
@@ -198,7 +230,16 @@ def pga_odds_vegas(df_merge):
 
 
 
-def pga_odds_pga(df_merge):
+def pga_odds_pga(df_merge: pd.DataFrame, upper_bound: int = 15):
+    '''A function that scrapes the odds of each player from the pga website and merges into the origin dataframe
+
+    Args:
+        df_merge (DataFrame): The origin dataframe that contains the player, salary, score, value
+        upper_bound (int): The amount of points you want to award to the player with the best odds, scaled down to the worst player at 0
+
+    Returns:
+        dk_merge (DataFrame): The origin dataframe with an extra column that has the odds of each player ranked
+    '''
     driver = webdriver.Firefox()
     driver.get('https://www.pgatour.com/odds.html#/')
     driver.implicitly_wait(120)
@@ -223,14 +264,24 @@ def pga_odds_pga(df_merge):
     oddsRank = dk_merge['Odds'].rank(pct=True, ascending=False)
 
     dk_merge['Odds'].fillna(0)
-    dk_merge['Odds'] = oddsRank * 15
+    dk_merge['Odds'] = oddsRank * upper_bound
 
 
     dk_merge.sort_values(by='Odds',ascending=True,inplace=True)
 
     return dk_merge
 
-def check_last_year(data, ly_df, key):
+def check_last_year(data: pd.DataFrame, ly_df:pd.DataFrame, key: str):
+    '''A function that checks whether each player has stats that can be used from the previous year
+
+    Args:
+        data (DataFrame): The origin dataframe that contains all players and their data
+        ly_df (DataFrame): The stats from the previous year from the pga website for the given key
+        key (str): The hole yardage
+
+    Returns:
+        value (float): The players averages strokes for that hole
+    '''
     value = np.nan
     rookie = True
     for index, row in ly_df.iterrows():
@@ -252,10 +303,30 @@ def check_last_year(data, ly_df, key):
 
 
 def drop_players_lower_than(df, salaryThreshold):
+    '''A function that drops players from a dataframe that have a salary less than what is specified
+
+    Args:
+        df (DataFrame): the dataframe that contains the players and their salaries
+        salaryThreshold (int): the salary cut off to be used
+
+    Results:
+        df (DataFrame): A new dataframe that only contains players above the salary threshold
+    '''
     return df[df['Salary'] >= salaryThreshold]
 
 
-def getEff(df, key, count):
+def getEff(df: pd.DataFrame, key: str, count: int):
+    '''A function that checks the players average strokes per hole, as a rank, based onthe yardage
+
+    Args:
+        df (DataFrame): The origin dataframe that contains the players and their data
+        key (str): the length of the hole
+        count (int): the amount of times that length of hole appears
+
+    Returns:
+        dk_merge (DataFrame): The origin dataframe with a new column of the rank of each player based on the holes yardage
+    
+    '''
     pgaEff = [['125-150 Eff',3,'https://www.pgatour.com/stats/stat.02519.html'],
               ['150-175 Eff',3,'https://www.pgatour.com/stats/stat.02520.html'],
               ['175-200 Eff',3,'https://www.pgatour.com/stats/stat.02521.html'],
@@ -304,14 +375,14 @@ def getEff(df, key, count):
     return dk_merge
 
 
-def objective(x, df_merge):
+def objective(x: list, df_merge: pd.DataFrame):
     '''Calculate the total points of a lineup (find objective)'''
     p0 = []
     for iden in x:
         p0.append(float(df_merge.loc[iden]['Total']))
     return sum(p0)
 
-def constraint(x, df_merge):
+def constraint(x: list, df_merge: pd.DataFrame):
     '''Check if a lineup is within the DK salary range 50_000'''
     s0 = []
     for iden in x:
@@ -321,7 +392,7 @@ def constraint(x, df_merge):
     else:
         return False
 
-def genIter(df_merge):
+def genIter(df_merge: pd.DataFrame):
     '''Generate a random lineup'''
     r0 = []
     while len(r0) < 6:
@@ -330,32 +401,32 @@ def genIter(df_merge):
             r0.append(r)
     return r0
 
-def getNames(lineup, df_merge):
+def getNames(lineup: list, df_merge: pd.DataFrame):
     '''Convert IDs into Names'''
     n0 = []
     for iden in lineup:
         n0.append(df_merge.loc[int(iden)]['Name + ID'])
     return n0
 
-def distance(data):
+def distance(data: str):
     '''Convert feet inches into float (e.g. 12'6" = 12.5)'''
     data = data.split("'")
     data[1] = data[1][:-1]
     x = int(data[0])+(int(data[1])/12)
     return x
 
-def eaglePerc(data):
+def eaglePerc(data: list):
     '''Calculate eagle percentage (i.e. total eagles/total par 5s)'''
     return data[1]/data[2]
 
-def get_salary(lineup, df_merge):
+def get_salary(lineup: list, df_merge: pd.DataFrame):
     '''get the total salary for a particular lineup'''
     s0 = []
     for iden in lineup:
         s0.append(float(df_merge.loc[iden]['Salary']))
     return sum(s0)
 
-def rewrite(data):
+def rewrite(data: list):
     '''convert string to integer in dataframe'''
     try:
         if data[0] == 'T':
@@ -366,14 +437,14 @@ def rewrite(data):
         output = 0
     return output
 
-def getID(lineup, df_merge):
+def getID(lineup: list, df_merge: pd.DataFrame):
     '''convert lineup names to ID'''
     i0 = []
     for iden in lineup: 
         i0.append(df_merge[df_merge['Name + ID'] == iden].index)
     return i0
 
-def optimize(df, salary, budget):
+def optimize(df: pd.DataFrame, salary: int, budget: int):
     '''Optimize a lineup by checking for a more valuable player within price range
 
         Args:
@@ -390,7 +461,7 @@ def optimize(df, salary, budget):
     window = df[(df['Salary'] <= upper_bound) & (df['Salary'] > lower_bound)]
     return window.iloc[0]['Name + ID']
 
-def maximize(df, salary, budget):     
+def maximize(df: pd.DataFrame, salary: int, budget: int):     
     '''Maximize a lineup by checking for a player that scores more points within price range
 
         Args:
@@ -405,19 +476,19 @@ def maximize(df, salary, budget):
     lower_bound = int(salary) - 500
     df.sort_values(by=['Total'],ascending = False, inplace=True)
     window = df[(df['Salary'] <= upper_bound) & (df['Salary'] > lower_bound)]
-    #print(window)
     return window.iloc[0]['Name + ID']
 
-def replace_outlier(df, salary, budget, maxNames):
+def replace_outlier(df: pd.DataFrame, salary: int, budget: int, maxNames: list):
+    '''A function that finds a replacement player because of an excess amount of budget available'''
     upperbound = int(salary) + budget
     lowerbound = int(salary) + 1000
     df = df[~df.loc[:, 'Name + ID'].isin(maxNames)]
     df.sort_values(by=['Total'], ascending = False, inplace=True)
     window = df[(df['Salary'] <= upperbound) & (df['Salary'] > lowerbound)]
-    #print(window)
     return window.iloc[0]['Name + ID']
 
-def find_lowest_salary(lineup, df_merge):
+def find_lowest_salary(lineup: list, df_merge: pd.DataFrame):
+    '''A function that finds the lowest salary from a lineup'''
     low = 15000
     for player in lineup:
         p_row = df_merge.loc[df_merge['Name + ID'] == player]
@@ -428,7 +499,8 @@ def find_lowest_salary(lineup, df_merge):
     return lowPlayer
 
 
-def remove_outliers_main(topTierLineup, df_merge):
+def remove_outliers_main(topTierLineup: pd.DataFrame, df_merge: pd.DataFrame):
+    '''A function that replaces players from lineups that have an excess budget (i.e. greater than $2000 available'''
     for index, row in topTierLineup.iterrows():
         maxNames = [row[0],row[1],row[2],row[3],row[4],row[5]]
         ID = getID(maxNames, df_merge)
@@ -452,19 +524,23 @@ def remove_outliers_main(topTierLineup, df_merge):
         maxNames.append(get_salary(maxNameID, df_merge))
         MaximizedLineup.loc[index] = maxNames
         MaximizedLineup.sort_values(by='TOT', ascending=False, inplace=True)
-        MaximizedLineup.drop_duplicates(subset=["TOT"],inplace=True)
-
-
-
-    
-    #NewMaximizedLineup.reset_index(drop=True, inplace=True)
-    
-
-    
+        MaximizedLineup.drop_duplicates(subset=["TOT"],inplace=True)    
     
     return MaximizedLineup
 
-def calculate_oversub_count(current_df, df_merge, sub=0.66, csv=False):
+def calculate_oversub_count(current_df: pd.DataFrame, df_merge: pd.DataFrame, sub: float=0.66, csv: bool=False):
+    '''A function that counts the amount of times a player is used in a series of lineups, retured as a percentage
+
+    Args:
+        current_df (DataFrame): The df that contains the lineups that will be counted
+        df_merge (DataFrame): The df that contains the players, salary, scores, and value
+        sub (float): the limit that is used to determine if a player is oversubscribed to
+        csv (bool): a boolean that dictates if you'd like to return all players (true) or just the ones that are being oversubscribed to
+
+    Return:
+        countPlayers or overSubList: Returns a dataframe with all player counts or a list of the oversubscribed players, respectively.
+    
+    '''
     countPlayers = pd.DataFrame(columns=['Name + ID', 'Salary', 'Value'])
     countPlayers['Name + ID'] = df_merge['Name + ID']
     countPlayers['Salary'] = df_merge['Salary']
@@ -481,8 +557,8 @@ def calculate_oversub_count(current_df, df_merge, sub=0.66, csv=False):
     overSubList = overSubDF['Name + ID'].tolist()
     return overSubList
 
-def optimize_ownership(current_df, df_merge):
-    
+def optimize_ownership(current_df: pd.DataFrame, df_merge: pd.DataFrame):
+    '''A function that replaces players that are oversubscribed to'''
     current_df.sort_values(by='TOT', ascending=True, inplace=True)
     prev_ownership = []
     for index, row in current_df.iterrows():
@@ -523,14 +599,14 @@ def duplicates(x):
         
     return duplicates
 
-def optimize_main(topTierLineup, df_merge):
+def optimize_main(topTierLineup: pd.DataFrame, df_merge: pd.DataFrame):
     '''Iterate over lineups to try to optimize all players (maximize value)
 
         Args: 
-            topTierLineup (list): lineup from a row of dataframe as a list
+            topTierLineup (DataFrame): lineup from a row of dataframe as a list
 
         Return:
-            Optimizedlineup (list): lineup with maximized value    
+            Optimizedlineup (DataFrame): lineup with maximized value    
     '''
     for index, row in topTierLineup.iterrows():
         print(index)
@@ -556,15 +632,15 @@ def optimize_main(topTierLineup, df_merge):
     
     return OptimizedLineup
 
-def maximize_main(OptimizedLinup, df_merge):
+def maximize_main(OptimizedLinup: pd.DataFrame, df_merge: pd.DataFrame):
     '''Iterate over lineups to try to maximize all players (maximize points)
 
         Args: 
-            OptimizedLineup (list): lineup from a row of dataframe as a list
-            df_merge (dataFrame): DK PGA main dataFrame
+            OptimizedLineup (DataFrame): lineup from a row of dataframe as a list
+            df_merge (DataFrame): DK PGA main dataFrame
 
         Return:
-            Maximizedlineup (list): lineup with maximized points    
+            Maximizedlineup (DataFrame): lineup with maximized points    
     '''
     for index, row in OptimizedLinup.iterrows():
         print(index)
@@ -588,25 +664,27 @@ def maximize_main(OptimizedLinup, df_merge):
     MaximizedLineup.reset_index(drop=True, inplace=True)
     MaximizedLineup.sort_values(by='TOT', ascending=False, inplace=True)
     MaximizedLineup.drop_duplicates(subset=["TOT"],inplace=True)
-
-    
     
     return MaximizedLineup
 
-def delete_unused_columns(df_merge):
+#needs disposition
+def delete_unused_columns(df_merge: pd.DataFrame):
+    '''A function that deletes columns that only contian 0s or NaN'''
     col_list = []
     for (columnName, columnData) in df_merge.iteritems():
         if sum(columnData.to_numeric.values) == 0:
             col_list.append(columnName)
 
-def fix_player_name(name):
+def fix_player_name(name: str):
+    '''A function that rearranges a string containing the players name from last name, first name to first name, last name (e.g. Woods Tiger->Tiger Woods)'''
     name_spl = name.split(' ')
     ln_strip = name_spl[0].strip()
     fn_strip = name_spl[1].strip()
     full_name = fn_strip + ' ' + ln_strip
     return full_name
 
-def course_fit(df_merge, lowerBound=0, upperBound=7.5):
+def course_fit(df_merge: pd.DataFrame, lowerBound: float=0, upperBound:float=5):
+    '''A function that scrapes data from datagolf.coms course fit tool and weights it based on the inputted bound'''
     driver = webdriver.Firefox()
     driver.get('https://datagolf.com/course-fit-tool')
     driver.implicitly_wait(120)
@@ -619,13 +697,13 @@ def course_fit(df_merge, lowerBound=0, upperBound=7.5):
     i = 0
     for player_row in course_fit_data:
         adj = player_row.find_all('div', class_='ev-text')
-        course_fit_df.loc[i] = [fix_player_name(player_row['name']), float(adj[-1].text)]
+        course_fit_df.loc[i] = [player_row['name'], float(adj[-1].text)]
         i += 1
     driver.close()
     driver.quit()   
+    
     course_fit_df['Adjustment'] = course_fit_df['Adjustment'].fillna(0)
     course_fit_df['Name'] = course_fit_df['Name'].apply(lambda x: series_lower(x))
-    
     df_merge = pd.merge(df_merge, course_fit_df, how='left',on='Name')
     fitRank = df_merge['Adjustment'].rank(pct=True, ascending=True)
     df_merge['Adjustment'] = fitRank * upperBound + lowerBound
@@ -633,7 +711,8 @@ def course_fit(df_merge, lowerBound=0, upperBound=7.5):
     print(df_merge.head())
     return df_merge
 
-def pos_rewrite(x):
+def pos_rewrite(x: str):
+    '''A function that converts a position from a str to an integer, including ties'''
     data = x.split(' ')
     pos = data[-1]
     if pos[0] == 'T':
@@ -707,7 +786,8 @@ def past_results_dyn_duo(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
     return df_merge
 
 
-def past_results_dyn(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
+def past_results_dyn(df_merge: pd.DataFrame, url: str, lowerBound: int=0, upperBound:float=4, pr_i:int=0):
+    '''A function that scrapes data from a dynamic website and ranks the players based on their past results'''
     driver = webdriver.Firefox()
     driver.get(url)
     driver.implicitly_wait(120)
@@ -725,14 +805,8 @@ def past_results_dyn(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
     dk_pastResults.columns = new_col
     dk_pastResults[f'POS{pr_i}'] = dk_pastResults['POS'].apply(lambda x: pos_rewrite(x))
     dk_pastResults.drop(['POS', 'R1', 'R2', 'R3', 'R4', 'TOTAL SCORE', 'TO PAR', 'OFFICIAL MONEY', 'FEDEXCUP POINTS'],axis=1,inplace=True)
-    #print(dk_pastResults.head())
     driver.close()
     driver.quit()  
-    #dk_pastResults[f'POS{pr_i}'] = dk_pastResults['POS'].apply(lambda x: rewrite(x))
-    
-    #dk_pastResults.drop(['RESULT','GROUP RECORD','OFFICIALMONEY','FEDEXCUPPOINTS','POS'],axis=1,inplace=True)
-    print(dk_pastResults.head())
-    #dk_pastResults.drop(dk_pastResults[dk_pastResults[f'TOT{pr_i}'] < 250].index,inplace=True)
     dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
     dk_pastResults['Name'] = dk_pastResults['Name'].apply(lambda x: series_lower(x))
     df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
@@ -740,8 +814,6 @@ def past_results_dyn(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
     df_merge.sort_values(by=[f'POS{pr_i}'],inplace=True)
     pastResultRank = df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False)
     df_merge[f'POS{pr_i}'] = pastResultRank * upperBound + lowerBound
-    #df_merge[f'POS{pr_i}'] = df_merge[f'POS{pr_i}'].fillna(0)
-
     return df_merge
 
 def past_results_match(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
@@ -772,7 +844,7 @@ def past_results_match(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
 
     return df_merge
 
-def past_results(df_merge, url, lowerBound=0, upperBound=4, playoff=False, pr_i=0):
+def past_results(df_merge: pd.DataFrame, url: str, lowerBound: float=0, upperBound: float=4, playoff: bool=False, pr_i: int=0):
     '''Check for past tournament results 
     
     Args:
@@ -803,11 +875,10 @@ def past_results(df_merge, url, lowerBound=0, upperBound=4, playoff=False, pr_i=
     min_val = min(df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False))
     pastResultRank = (df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False)-(min_val)) * df_merge[f'POS{pr_i}'].rank(pct=True, ascending=False)/(1-min_val)
     df_merge[f'POS{pr_i}'] = pastResultRank * upperBound + lowerBound
-    
 
     return df_merge
 
-def driving_distance(df_merge, lowerBound=0, upperBound=5):
+def driving_distance(df_merge: pd.DataFrame, lowerBound:float=0, upperBound:float=5):
     '''Check for players with longest driving distance'''
     dk_distance = pd.read_html('https://www.pgatour.com/stats/stat.101.html')
     dk_distance = dk_distance[1]
@@ -822,7 +893,7 @@ def driving_distance(df_merge, lowerBound=0, upperBound=5):
     df_merge['DriveDist'] = driveDistScale
     return df_merge
 
-def driving_accuracy(df_merge, lowerBound=0, upperBound=5):
+def driving_accuracy(df_merge: pd.DataFrame, lowerBound:float=0, upperBound:float=5):
     ''''Check for players with best driving accuracy (FIR)'''
     dk_accuracy = pd.read_html('https://www.pgatour.com/stats/stat.102.html')
     dk_accuracy = dk_accuracy[1]
@@ -837,7 +908,7 @@ def driving_accuracy(df_merge, lowerBound=0, upperBound=5):
     df_merge['DriveAcc'] = driveDistScale
     return df_merge
 
-def putting(df_merge, lowerBound=0, upperBound=5):
+def putting(df_merge: pd.DataFrame, lowerBound:float=0, upperBound:float=5):
     '''Check for players with most strokes gained putting'''
     dk_putting = pd.read_html('https://www.pgatour.com/stats/stat.02564.html')
     dk_putting = dk_putting[1]
@@ -852,7 +923,7 @@ def putting(df_merge, lowerBound=0, upperBound=5):
     df_merge['PuttGain'] = puttScale
     return df_merge
 
-def around_green(df_merge, lowerBound=0, upperBound=5):
+def around_green(df_merge: pd.DataFrame, lowerBound: float=0, upperBound: float=5):
     '''Check for players with most storkes gained around green'''
     dk_around_green = pd.read_html('https://www.pgatour.com/stats/stat.02569.html')
     dk_around_green = dk_around_green[1]
@@ -867,9 +938,8 @@ def around_green(df_merge, lowerBound=0, upperBound=5):
     df_merge['ARGGain'] = puttScale
     return df_merge
 
-def weight_efficiencies(df, course_df):
+def weight_efficiencies(df: pd.DataFrame, course_df: pd.DataFrame):
     '''weight efficiencies based on the course'''
-    ## weight the efficiencies
     eff125 = course_df[(course_df['Yards'] < 150) & (course_df['Yards'] > 125)]['Yards'].count()
     eff150 = course_df[(course_df['Yards'] < 175) & (course_df['Yards'] > 150)]['Yards'].count()
     eff175 = course_df[(course_df['Yards'] < 200) & (course_df['Yards'] > 175)]['Yards'].count()
@@ -914,7 +984,8 @@ def assign_course_df(client):
     course_df['Par'] = course_df['Par'].apply(lambda x: rewrite(x))
     return course_df
 
-def check_spelling_errors(data):
+def check_spelling_errors(data: str):
+    '''A function that checks for common misspells'''
     if data.lower() == 'matthew fitzpatrick':
         return 'matt fitzpatrick'
     elif data.lower() == 'tyrell hatton':
@@ -958,11 +1029,12 @@ def check_spelling_errors(data):
     else:
         return data.lower()
 
-def series_lower(data):
-    name_fix = check_spelling_errors(data)
+def series_lower(data: str):
+    '''A function that converts a string to a lower case, while checking for errors'''
+    name_fix = check_spelling_errors(data).strip()
     return name_fix
 
-def DK_csv_assignemnt(path, name, lowerBound=2, upperBound=20):
+def DK_csv_assignemnt(path: str, name: str, lowerBound:float=2, upperBound:float=20):
     '''find exported csv from DK and assign it to dataFrame with upper and lower bound values'''
     df = pd.read_csv('{}CSVs/{}'.format(path,name))
     df.drop(['Position','ID','Roster Position','Game Info', 'TeamAbbrev'],axis=1,inplace=True)
@@ -972,7 +1044,7 @@ def DK_csv_assignemnt(path, name, lowerBound=2, upperBound=20):
     df['Name'] = df['Name'].apply(lambda x: series_lower(x))
     return df
 
-def df_total_and_reformat(df_merge):
+def df_total_and_reformat(df_merge: pd.DataFrame):
     '''reformate dataFrame to be easily exported'''
     column_list = list(df_merge.columns[3:])
     df_merge['Total'] = df_merge[column_list].sum(axis=1)
@@ -982,7 +1054,7 @@ def df_total_and_reformat(df_merge):
     df_merge.drop_duplicates(inplace=True, ignore_index=True)
     return df_merge
 
-def par5_eaglePercentage(df_merge, lowerBound=0, upperBound=5):
+def par5_eaglePercentage(df_merge:pd.DataFrame, lowerBound:float=0, upperBound:float=5):
     '''Check for players with best eagle percentage on Par 5s'''
     dk_eagle = pd.read_html('https://www.pgatour.com/stats/stat.448.html')
     dk_eagle = dk_eagle[1]
@@ -999,7 +1071,7 @@ def par5_eaglePercentage(df_merge, lowerBound=0, upperBound=5):
     df_merge['Eagles'] = eagleScale
     return df_merge
 
-def proximity_125to150(df_merge, lowerBound=0, upperBound=5):
+def proximity_125to150(df_merge: pd.DataFrame, lowerBound:float=0, upperBound:float=5):
     '''Check for players with closest proximity when 125 to 150 yards out'''
     #proximity 125-150
     dk_proximity = pd.read_html('https://www.pgatour.com/stats/stat.339.html')
@@ -1017,7 +1089,7 @@ def proximity_125to150(df_merge, lowerBound=0, upperBound=5):
     df_merge['Proximity'] = proxScale
     return df_merge
 
-def birdie_or_better(df_merge, lowerBound=0, upperBound=5):
+def birdie_or_better(df_merge:pd.DataFrame, lowerBound:float=0, upperBound:float=5):
     '''Check for players birdie or better percentage'''
     #birdie or better%
     dk_birdies = pd.read_html('https://www.pgatour.com/stats/stat.352.html')
