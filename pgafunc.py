@@ -1006,7 +1006,7 @@ def check_spelling_errors(data: str):
         return 'kyoung-hoon lee'
     elif data.lower() == 'charles howell':
         return 'charles howell iii'
-    elif data.lower() == 'sung-hoon kang':
+    elif data.lower() == 'sung-hoon kang' or data.lower() == 's.h. kang':
         return 'sung kang'
     elif data.lower() == 'charl schwarztel':
         return 'charl schwartzel'
@@ -1024,8 +1024,12 @@ def check_spelling_errors(data: str):
         return 'sung kang'
     elif data.lower() == 'jorda spieth':
         return 'jordan spieth'
+    elif data.lower() == 'christopher gotterup':
+        return 'chris gotterup'
     elif data.lower() == 'louis oosthuzien':
         return 'louis oosthuizen'
+    elif data.lower() == 'sungmoon bae':
+        return 'sung-moon bae'
     else:
         return data.lower()
 
