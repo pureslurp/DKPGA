@@ -72,7 +72,7 @@ sigma = df_merge['Total'].std()*6
 
 print(df_merge.head())
 
-while k < 200:
+while k < 250:
     #get a sample
     lineup = genIter(df_merge)
     lineup.sort()
