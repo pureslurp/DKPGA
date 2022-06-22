@@ -859,10 +859,7 @@ def past_results(df_merge: pd.DataFrame, url: str, lowerBound: float=0, upperBou
         df_merge(DataFrame): The dataFrame storing data after past results data is applied
     '''
     dk_pastResults = pd.read_html(url)
-    if playoff:
-        dk_pastResults = dk_pastResults[1]
-    else:
-        dk_pastResults = dk_pastResults[0]
+    dk_pastResults = dk_pastResults[-1]
     dk_pastResults[f'POS{pr_i}'] = dk_pastResults['POS'].apply(lambda x: pos_rewrite(x))
     dk_pastResults.drop(['POS','SCORE','R1','R2','R3','R4','EARNINGS','FEDEX PTS','TOT'],axis=1,inplace=True)
     dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
@@ -1038,7 +1035,7 @@ def series_lower(data: str):
     name_fix = check_spelling_errors(data).strip()
     return name_fix
 
-def DK_csv_assignemnt(path: str, name: str, lowerBound:float=2, upperBound:float=20):
+def DK_csv_assignemnt(path: str, name: str, lowerBound:float=0, upperBound:float=0):
     '''find exported csv from DK and assign it to dataFrame with upper and lower bound values'''
     df = pd.read_csv('{}CSVs/{}'.format(path,name))
     df.drop(['Position','ID','Roster Position','Game Info', 'TeamAbbrev'],axis=1,inplace=True)
@@ -1047,6 +1044,52 @@ def DK_csv_assignemnt(path: str, name: str, lowerBound:float=2, upperBound:float
     df['AvgPointsPerGame'] = avgPointsScale
     df['Name'] = df['Name'].apply(lambda x: series_lower(x))
     return df
+
+def find_last_x_events(player, events):
+    event_url_array = []
+    event_list = [22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 73, 94, 55, 54, 53, 39, 38, 37, 36]
+    for le in event_list:
+        if len(event_url_array) < events:
+            url = f'https://www.espn.com/golf/leaderboard/_/tournamentId/4013532{le}'
+            dk_pastResults = pd.read_html(url)
+            dk_pastResults = dk_pastResults[-1]
+            dk_pastResults['PLAYER'] = dk_pastResults['PLAYER'].apply(lambda x: series_lower(x))
+            if player in dk_pastResults['PLAYER'].values:
+                event_url_array.append(url)
+        else:
+            break
+    return event_url_array
+
+def last_x_event_points(df_merge, events=10, upper_bound=15, i=0):
+    new_df = pd.DataFrame(columns=['Name',f'L10Pts{i}'])
+    cnt = 0
+    len_merge = len(df_merge)
+    for index, row in df_merge.iterrows():
+        cnt += 1
+        tot = 0
+        player = row["Name"]
+        urls = find_last_x_events(player, events)
+        if len(urls) > 0:
+            for url in urls:
+                pr_df = past_results(df_merge, url, upperBound=2)
+                nr = pr_df[pr_df["Name"] == player]
+                tot = tot + float(nr['POS0'])
+            tot = (tot / len(urls))
+            new_row = [player, tot]
+            if cnt % 5 == 0:
+                print(f'{(cnt/len_merge)*100}% complete')
+            df_len = len(new_df)
+            new_df.loc[df_len] = new_row
+    df_merge = pd.merge(df_merge, new_df, how='left',on='Name')
+    fitRank = df_merge[f'L10Pts{i}'].rank(pct=True, ascending=True)
+    df_merge[f'L10Pts{i}'] = fitRank * upper_bound
+    df_merge[f'L10Pts{i}'] = df_merge[f'L10Pts{i}'].fillna(0)
+    return df_merge
+
+
+
+
+
 
 def df_total_and_reformat(df_merge: pd.DataFrame):
     '''reformate dataFrame to be easily exported'''
