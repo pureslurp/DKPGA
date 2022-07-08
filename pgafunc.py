@@ -16,6 +16,7 @@ import warnings
 import selenium
 from selenium.webdriver.support.select import Select
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 import pandas as pd
 warnings.simplefilter(action='ignore', category=Warning)
 import requests
@@ -24,6 +25,10 @@ import math
 from bs4 import BeautifulSoup
 import sys
 sys.path.insert(0, "/Users/seanraymor/Documents/Python Scripts/DKPGA")
+from pga_dk_scoring import *
+from os import listdir
+
+options = Options()
 
 OptimizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
 MaximizedLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT','Salary'])
@@ -91,7 +96,7 @@ def odds_name(data: str):
         else:
             if data[1] == 'Smith':
                 name = data[0][:-3] + ' ' + data[1].strip()
-            elif data[1] == 'Pan':
+            elif data[1] == 'Pan' or data[1] == 'Poston':
                 name = data[0][:-4] + ' ' + data[1].strip()
             else:
                 name = data[0][:-2] + ' ' + data[1].strip()
@@ -240,7 +245,7 @@ def pga_odds_pga(df_merge: pd.DataFrame, upper_bound: int = 15):
     Returns:
         dk_merge (DataFrame): The origin dataframe with an extra column that has the odds of each player ranked
     '''
-    driver = webdriver.Firefox()
+    driver = webdriver.Firefox(service_log_path=os.path.devnull, options=options)
     driver.get('https://www.pgatour.com/odds.html#/')
     driver.implicitly_wait(120)
     time.sleep(3)
@@ -685,7 +690,7 @@ def fix_player_name(name: str):
 
 def course_fit(df_merge: pd.DataFrame, lowerBound: float=0, upperBound:float=5):
     '''A function that scrapes data from datagolf.coms course fit tool and weights it based on the inputted bound'''
-    driver = webdriver.Firefox()
+    driver = webdriver.Firefox(service_log_path=os.path.devnull, options=options)
     driver.get('https://datagolf.com/course-fit-tool')
     driver.implicitly_wait(120)
     time.sleep(3)
@@ -734,7 +739,7 @@ def duo_data_fn(names):
 
 
 def past_results_dyn_duo(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
-    driver = webdriver.Firefox()
+    driver = webdriver.Firefox(service_log_path=os.path.devnull, options=options)
     driver.get(url)
     driver.implicitly_wait(120)
     time.sleep(10)
@@ -788,7 +793,7 @@ def past_results_dyn_duo(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
 
 def past_results_dyn(df_merge: pd.DataFrame, url: str, lowerBound: int=0, upperBound:float=4, pr_i:int=0):
     '''A function that scrapes data from a dynamic website and ranks the players based on their past results'''
-    driver = webdriver.Firefox()
+    driver = webdriver.Firefox(service_log_path=os.path.devnull, options=options)
     driver.get(url)
     driver.implicitly_wait(120)
     time.sleep(10)
@@ -817,7 +822,7 @@ def past_results_dyn(df_merge: pd.DataFrame, url: str, lowerBound: int=0, upperB
     return df_merge
 
 def past_results_match(df_merge, url, lowerBound=0, upperBound=4, pr_i=0):
-    driver = webdriver.Firefox()
+    driver = webdriver.Firefox(service_log_path=os.path.devnull, options=options)
     driver.get(url)
     driver.implicitly_wait(120)
     time.sleep(10)
@@ -1047,7 +1052,7 @@ def DK_csv_assignemnt(path: str, name: str, lowerBound:float=0, upperBound:float
 
 def find_last_x_events(player, events):
     event_url_array = []
-    event_list = [22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 73, 94, 55, 54, 53, 39, 38, 37, 36]
+    event_list = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 73, 94, 55, 54, 53, 39, 38, 37, 36]
     for le in event_list:
         if len(event_url_array) < events:
             url = f'https://www.espn.com/golf/leaderboard/_/tournamentId/4013532{le}'
@@ -1055,13 +1060,65 @@ def find_last_x_events(player, events):
             dk_pastResults = dk_pastResults[-1]
             dk_pastResults['PLAYER'] = dk_pastResults['PLAYER'].apply(lambda x: series_lower(x))
             if player in dk_pastResults['PLAYER'].values:
-                event_url_array.append(url)
+                data = dk_pastResults[dk_pastResults['PLAYER'] == player]
+                if str(data['SCORE'].values[0]) == 'WD' or str(data['SCORE'].values[0]) == 'DQ':
+                    print(f"{player} WD or DQ")
+                else:
+                    event_url_array.append(url)
         else:
             break
     return event_url_array
 
-def last_x_event_points(df_merge, events=10, upper_bound=15, i=0):
-    new_df = pd.DataFrame(columns=['Name',f'L10Pts{i}'])
+def find_csv_filenames(path, suffix='.csv'):
+    filenames = listdir(path)
+    return [filename for filename in filenames if filename.endswith(suffix)]
+
+def tournament_id_from_csv(csv_name):
+    csv_name = csv_name.split('_')
+    id = csv_name[-1]
+    id = id.split('.')
+    id = id[0]
+    return(id)
+
+def last_x_events_dk_points(df_merge, events=10, upper_bound=15):
+    new_df = pd.DataFrame(columns=['Name',f'L{events}Pts'])
+    cnt = 0
+    len_merge = len(df_merge)
+    for index, row in df_merge.iterrows():
+        cnt += 1
+        tot = 0
+        player = row["Name"]
+        urls = find_last_x_events(player, events)
+        if len(urls) > 0:
+            for url in urls:
+                t_id = tournament_id(url)
+                csv_arr = []
+                for csv_n in find_csv_filenames('past_results/2022'):
+                    csv_arr.append(tournament_id_from_csv(csv_n))
+                if t_id in csv_arr:
+                    print(f'found {t_id}')
+                    pr_df = pd.read_csv(f'past_results/2022/dk_points_id_{t_id}.csv')
+                else:
+                    print(f'writing {t_id} to past results')
+                    pr_df = dk_points_df(url)
+                pr_df['Name'] = pr_df['Name'].apply(lambda x: series_lower(x))
+                nr = pr_df[pr_df["Name"] == player]
+                tot += float(nr.iloc[0,1])/float(pr_df['DK Score'].max())
+            #tot = (tot / len(urls))
+            new_row = [player, tot]
+            if cnt % 5 == 0:
+                print(f'{(cnt/len_merge)*100}% complete')
+            df_len = len(new_df)
+            new_df.loc[df_len] = new_row
+    df_merge = pd.merge(df_merge, new_df, how='left',on='Name')
+    fitRank = df_merge[f'L{events}Pts'] / df_merge[f'L{events}Pts'].max()
+    df_merge[f'L{events}Pts'] = fitRank * upper_bound
+    df_merge[f'L{events}Pts'] = df_merge[f'L{events}Pts'].fillna(0)
+    return df_merge
+
+
+def last_x_event_points(df_merge, events=10, upper_bound=15):
+    new_df = pd.DataFrame(columns=['Name',f'L{events}Pts'])
     cnt = 0
     len_merge = len(df_merge)
     for index, row in df_merge.iterrows():
@@ -1081,9 +1138,9 @@ def last_x_event_points(df_merge, events=10, upper_bound=15, i=0):
             df_len = len(new_df)
             new_df.loc[df_len] = new_row
     df_merge = pd.merge(df_merge, new_df, how='left',on='Name')
-    fitRank = df_merge[f'L10Pts{i}'].rank(pct=True, ascending=True)
-    df_merge[f'L10Pts{i}'] = fitRank * upper_bound
-    df_merge[f'L10Pts{i}'] = df_merge[f'L10Pts{i}'].fillna(0)
+    fitRank = df_merge[f'L{events}Pts'].rank(pct=True, ascending=True)
+    df_merge[f'L{events}Pts'] = fitRank * upper_bound
+    df_merge[f'L{events}Pts'] = df_merge[f'L{events}Pts'].fillna(0)
     return df_merge
 
 

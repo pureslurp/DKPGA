@@ -53,6 +53,8 @@ df = drop_players_lower_than(df, 6200)
 df_merge = weight_efficiencies(df, course_df)
 df_merge = pga_odds_pga(df_merge)
 df_merge = course_fit(df_merge)
+
+
 #2021
 df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243418', upperBound=1.5, playoff=False)
 df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243010', upperBound=1.5, playoff=False, pr_i=1)
