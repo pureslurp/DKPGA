@@ -7,7 +7,7 @@ import warnings
 import sys
 import numpy as np
 sys.path.insert(0, "/Users/seanraymor/Documents/Python Scripts/DKPGA")
-from pgafunc import *
+from pgafunc_v3 import *
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
@@ -20,11 +20,11 @@ j = 0                                          #top tier iterable
 k = 0                                          #top tier lineupdf iterable
 topTierLineup = pd.DataFrame(columns=['Player1','Player2','Player3','Player4','Player5','Player6','TOT'])
 
-path = '2022/CC/'
-name = 'DKSalaries-CC.csv'
+path = '2022/StA/'
+name = 'DKSalaries-StA.csv'
 df = DK_csv_assignemnt(path, name)
-scope, creds, client = google_credentials()
-course_df = assign_course_df(client)
+# scope, creds, client = google_credentials()
+# course_df = assign_course_df(client)
 
 
 '''
@@ -50,21 +50,12 @@ General:
 '''
 
 df = drop_players_lower_than(df, 6200)
-df_merge = weight_efficiencies(df, course_df)
-df_merge = pga_odds_pga(df_merge)
-df_merge = course_fit(df_merge)
+
+df_merge = last_x_events_dk_points(df, events=5, upper_bound=10)
+df_merge = last_x_majors_dk_points(df_merge, events=7, upper_bound=10)
 
 
-#2021
-df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243418', upperBound=1.5, playoff=False)
-df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243010', upperBound=1.5, playoff=False, pr_i=1)
-df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243414', upperBound=1.5, playoff=False, pr_i=2)
-df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401243410', upperBound=1.5, playoff=False, pr_i=3)
-#2022
-df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard?tournamentId=401353232', upperBound=2, playoff=False, pr_i=4)
-df_merge = past_results(df_merge, 'https://www.espn.com/golf/leaderboard/_/tournamentId/401353226', upperBound=2, playoff=True, pr_i=5)
-
-
+df_merge = pga_odds_pga(df_merge, upper_bound=22)
 
 df_merge.to_csv('{}/CSVs/DKData.csv'.format(path), index = False) #optional line if you want to see data in CSV
 
@@ -78,7 +69,7 @@ sigma = df_merge['Total'].std()*6
 
 print(df_merge.head())
 
-while k < 200:
+while k < 100:
     #get a sample
     lineup = genIter(df_merge)
     lineup.sort()
