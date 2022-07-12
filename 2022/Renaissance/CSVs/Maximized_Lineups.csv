@@ -1,4 +1,5 @@
 Player1,Player2,Player3,Player4,Player5,Player6,TOT,Salary
+<<<<<<< HEAD
 Xander Schauffele (23248832),Patrick Cantlay (23248833),Max Homa (23248848),Keegan Bradley (23248849),Aaron Rai (23248863),Thomas Detry (23248880),206.47398533881636,49900.0
 Xander Schauffele (23248832),Max Homa (23248848),Keith Mitchell (23248852),Aaron Rai (23248863),Keegan Bradley (23248849),Hideki Matsuyama (23248838),206.3494546754872,50000.0
 Xander Schauffele (23248832),Hideki Matsuyama (23248838),Max Homa (23248848),Keegan Bradley (23248849),Keith Mitchell (23248852),Aaron Rai (23248863),206.34945467548715,50000.0
@@ -88,3 +89,90 @@ Jon Rahm (23248829),Keegan Bradley (23248849),Hideki Matsuyama (23248838),Harold
 Matt Fitzpatrick (23248831),Will Zalatoris (23248835),Keegan Bradley (23248849),Chris Kirk (23248864),Luke List (23248875),Patrick Rodgers (23248886),179.14115859109603,48900.0
 Jon Rahm (23248829),Keegan Bradley (23248849),Tyrrell Hatton (23248851),Lucas Herbert (23248856),Jason Kokrak (23248868),Thomas Detry (23248880),178.59467191131773,48700.0
 Matt Fitzpatrick (23248831),Keegan Bradley (23248849),Brian Harman (23248855),Adrian Meronk (23248854),Sebastian Munoz (23248859),Chris Kirk (23248864),177.77078490970857,48300.0
+=======
+Xander Schauffele (23248832),Cameron Young (23248847),Joaquin Niemann (23248842),Max Homa (23248848),Matt Kuchar (23248865),Keegan Bradley (23248849),200.29160219594712,49900.0
+Xander Schauffele (23248832),Hideki Matsuyama (23248838),Max Homa (23248848),Keith Mitchell (23248852),Keegan Bradley (23248849),Matt Kuchar (23248865),199.7646652941386,50000.0
+Xander Schauffele (23248832),Hideki Matsuyama (23248838),Max Homa (23248848),Matt Kuchar (23248865),Keith Mitchell (23248852),Keegan Bradley (23248849),199.76466529413858,50000.0
+Patrick Cantlay (23248833),Hideki Matsuyama (23248838),Max Homa (23248848),Cameron Young (23248847),Keegan Bradley (23248849),Matt Kuchar (23248865),199.4745327976748,50000.0
+Xander Schauffele (23248832),Cameron Young (23248847),Max Homa (23248848),Aaron Rai (23248863),Matt Kuchar (23248865),Sam Burns (23248836),199.33668312024227,50000.0
+Xander Schauffele (23248832),Max Homa (23248848),Hideki Matsuyama (23248838),Cameron Young (23248847),Sebastian Munoz (23248859),Matt Kuchar (23248865),199.05659526989197,49900.0
+Xander Schauffele (23248832),Max Homa (23248848),Keegan Bradley (23248849),Keith Mitchell (23248852),Sebastian Munoz (23248859),Cameron Young (23248847),198.94073647614147,49200.0
+Cameron Young (23248847),Sam Burns (23248836),Max Homa (23248848),Sebastian Munoz (23248859),Will Zalatoris (23248835),Keegan Bradley (23248849),198.73507946481624,50000.0
+Xander Schauffele (23248832),Hideki Matsuyama (23248838),Max Homa (23248848),Mito Pereira (23248853),Matt Kuchar (23248865),Keegan Bradley (23248849),198.60549832621865,49900.0
+Xander Schauffele (23248832),Sam Burns (23248836),Max Homa (23248848),Keegan Bradley (23248849),Aaron Rai (23248863),Matt Kuchar (23248865),198.1902481103352,49800.0
+Xander Schauffele (23248832),Sam Burns (23248836),Cameron Young (23248847),Max Homa (23248848),Keegan Bradley (23248849),Rickie Fowler (23248890),197.2731424067473,50000.0
+Xander Schauffele (23248832),Joaquin Niemann (23248842),Max Homa (23248848),Keith Mitchell (23248852),Tyrrell Hatton (23248851),Keegan Bradley (23248849),197.15968412467157,50000.0
+Xander Schauffele (23248832),Sam Burns (23248836),Max Homa (23248848),Keegan Bradley (23248849),Chris Kirk (23248864),Matt Kuchar (23248865),197.00383726782692,49800.0
+Xander Schauffele (23248832),Sam Burns (23248836),Max Homa (23248848),Keegan Bradley (23248849),Lucas Herbert (23248856),Matt Kuchar (23248865),196.96657374793952,50000.0
+Xander Schauffele (23248832),Sam Burns (23248836),Max Homa (23248848),Keith Mitchell (23248852),Mito Pereira (23248853),Matt Kuchar (23248865),196.88270005545235,50000.0
+Xander Schauffele (23248832),Sam Burns (23248836),Max Homa (23248848),Mito Pereira (23248853),Keith Mitchell (23248852),Matt Kuchar (23248865),196.88270005545232,50000.0
+Xander Schauffele (23248832),Max Homa (23248848),Sam Burns (23248836),Keegan Bradley (23248849),Christiaan Bezuidenhout (23248862),Matt Kuchar (23248865),196.8170115992902,49900.0
+Xander Schauffele (23248832),Max Homa (23248848),Sam Burns (23248836),Lucas Herbert (23248856),Aaron Rai (23248863),Keegan Bradley (23248849),196.72996604187875,50000.0
+Xander Schauffele (23248832),Cameron Young (23248847),Max Homa (23248848),Chris Kirk (23248864),Matt Kuchar (23248865),Keegan Bradley (23248849),196.28825933946945,48700.0
+Xander Schauffele (23248832),Max Homa (23248848),Keith Mitchell (23248852),Aaron Rai (23248863),Matt Kuchar (23248865),Sam Burns (23248836),196.26327750618316,49700.0
+Xander Schauffele (23248832),Cameron Young (23248847),Max Homa (23248848),Keegan Bradley (23248849),Christiaan Bezuidenhout (23248862),Matt Kuchar (23248865),196.1014336709327,48800.0
+Xander Schauffele (23248832),Max Homa (23248848),Sam Burns (23248836),Cameron Young (23248847),Matt Kuchar (23248865),Min Woo Lee (23248871),195.57294639559277,49900.0
+Xander Schauffele (23248832),Max Homa (23248848),Sam Burns (23248836),Keegan Bradley (23248849),Mito Pereira (23248853),Kyoung-Hoon Lee (23248870),195.4017195388249,50000.0
+Xander Schauffele (23248832),Max Homa (23248848),Sam Burns (23248836),Justin Rose (23248850),Matt Kuchar (23248865),Aaron Rai (23248863),195.33274540279453,49800.0
+Cameron Young (23248847),Max Homa (23248848),Sam Burns (23248836),Keegan Bradley (23248849),Keith Mitchell (23248852),Matt Kuchar (23248865),195.3198019733434,48400.0
+Xander Schauffele (23248832),Sam Burns (23248836),Max Homa (23248848),Justin Rose (23248850),Sebastian Munoz (23248859),Matt Kuchar (23248865),195.25682988582994,49900.0
+Xander Schauffele (23248832),Max Homa (23248848),Sam Burns (23248836),Keegan Bradley (23248849),Keith Mitchell (23248852),Luke List (23248875),195.00313620354345,50000.0
+Xander Schauffele (23248832),Cameron Young (23248847),Max Homa (23248848),Keith Mitchell (23248852),Robert Macintyre (23248858),Keegan Bradley (23248849),194.4410218180367,49300.0
+Xander Schauffele (23248832),Max Homa (23248848),Sam Burns (23248836),Cameron Young (23248847),Matt Kuchar (23248865),Mackenzie Hughes (23248874),194.42811357537627,49800.0
+Xander Schauffele (23248832),Cameron Young (23248847),Max Homa (23248848),Aaron Rai (23248863),Luke List (23248875),Sam Burns (23248836),194.3709816962614,49800.0
+Xander Schauffele (23248832),Max Homa (23248848),Cameron Young (23248847),Keegan Bradley (23248849),Kyoung-Hoon Lee (23248870),Matt Kuchar (23248865),194.30332676725897,48600.0
+Xander Schauffele (23248832),Sam Burns (23248836),Max Homa (23248848),Cameron Young (23248847),Mito Pereira (23248853),Rickie Fowler (23248890),194.1870048346753,49800.0
+Xander Schauffele (23248832),Patrick Cantlay (23248833),Max Homa (23248848),Matt Kuchar (23248865),Luke List (23248875),Keegan Bradley (23248849),194.03107400771563,50000.0
+Xander Schauffele (23248832),Max Homa (23248848),Keegan Bradley (23248849),Keith Mitchell (23248852),Tyrrell Hatton (23248851),Brian Harman (23248855),193.9474158334842,49100.0
+Xander Schauffele (23248832),Max Homa (23248848),Tyrrell Hatton (23248851),Mito Pereira (23248853),Chris Kirk (23248864),Sam Burns (23248836),193.85918723853854,50000.0
+Xander Schauffele (23248832),Cameron Young (23248847),Max Homa (23248848),Brian Harman (23248855),Luke List (23248875),Hideki Matsuyama (23248838),193.77147308565776,49900.0
+Justin Thomas (23248830),Billy Horschel (23248846),Max Homa (23248848),Keith Mitchell (23248852),Matt Kuchar (23248865),Keegan Bradley (23248849),193.7525228743292,49900.0
+Xander Schauffele (23248832),Max Homa (23248848),Sam Burns (23248836),Keegan Bradley (23248849),Maverick McNealy (23248866),Matt Kuchar (23248865),193.73943893051782,49800.0
+Xander Schauffele (23248832),Sam Burns (23248836),Max Homa (23248848),Matt Kuchar (23248865),Maverick McNealy (23248866),Keegan Bradley (23248849),193.7394389305178,49800.0
+Xander Schauffele (23248832),Patrick Cantlay (23248833),Max Homa (23248848),Keith Mitchell (23248852),Matt Kuchar (23248865),Kyoung-Hoon Lee (23248870),193.66185370676493,50000.0
+Xander Schauffele (23248832),Max Homa (23248848),Tommy Fleetwood (23248844),Cameron Young (23248847),Christiaan Bezuidenhout (23248862),Aaron Rai (23248863),193.34049516439703,49300.0
+Cameron Young (23248847),Max Homa (23248848),Sam Burns (23248836),Keegan Bradley (23248849),Brian Harman (23248855),Aaron Rai (23248863),192.9092684728756,48300.0
+Xander Schauffele (23248832),Max Homa (23248848),Keegan Bradley (23248849),Chris Kirk (23248864),Luke List (23248875),Patrick Cantlay (23248833),192.60805545914656,50000.0
+Xander Schauffele (23248832),Max Homa (23248848),Corey Conners (23248845),Keegan Bradley (23248849),Tyrrell Hatton (23248851),Matt Kuchar (23248865),192.5173840423652,49300.0
+Xander Schauffele (23248832),Sam Burns (23248836),Cameron Young (23248847),Max Homa (23248848),Tom Hoge (23248877),Mito Pereira (23248853),192.37390583897667,50000.0
+Sam Burns (23248836),Xander Schauffele (23248832),Max Homa (23248848),Keegan Bradley (23248849),Alex Noren (23248860),Matt Kuchar (23248865),192.32744034376952,49900.0
+Max Homa (23248848),Keegan Bradley (23248849),Brian Harman (23248855),Xander Schauffele (23248832),Aaron Rai (23248863),Matt Kuchar (23248865),192.22733877351152,48300.0
+Xander Schauffele (23248832),Max Homa (23248848),Lucas Herbert (23248856),Christiaan Bezuidenhout (23248862),Aaron Rai (23248863),Patrick Cantlay (23248833),192.22108902479312,50000.0
+Xander Schauffele (23248832),Sam Burns (23248836),Max Homa (23248848),Sebastian Munoz (23248859),Alex Noren (23248860),Keegan Bradley (23248849),192.01491712074414,50000.0
+Xander Schauffele (23248832),Max Homa (23248848),Tommy Fleetwood (23248844),Billy Horschel (23248846),Justin Rose (23248850),Matt Kuchar (23248865),191.7040421854844,49800.0
+Xander Schauffele (23248832),Hideki Matsuyama (23248838),Joaquin Niemann (23248842),Max Homa (23248848),Matt Kuchar (23248865),Rickie Fowler (23248890),191.5649545408023,49800.0
+Xander Schauffele (23248832),Max Homa (23248848),Justin Rose (23248850),Keith Mitchell (23248852),Min Woo Lee (23248871),Keegan Bradley (23248849),191.2489775510088,48800.0
+Xander Schauffele (23248832),Max Homa (23248848),Corey Conners (23248845),Billy Horschel (23248846),Justin Rose (23248850),Mito Pereira (23248853),190.62224145061796,50000.0
+Xander Schauffele (23248832),Max Homa (23248848),Robert Macintyre (23248858),Patrick Cantlay (23248833),Aaron Rai (23248863),Matt Kuchar (23248865),190.47897742922518,49900.0
+Cameron Young (23248847),Patrick Cantlay (23248833),Max Homa (23248848),Alex Noren (23248860),Aaron Rai (23248863),Sam Burns (23248836),189.87372953709294,49800.0
+Xander Schauffele (23248832),Max Homa (23248848),Mito Pereira (23248853),Matt Kuchar (23248865),Min Woo Lee (23248871),Keegan Bradley (23248849),189.4783608753491,48200.0
+Xander Schauffele (23248832),Hideki Matsuyama (23248838),Justin Rose (23248850),Keegan Bradley (23248849),Sebastian Munoz (23248859),Min Woo Lee (23248871),189.29948481987438,49500.0
+Xander Schauffele (23248832),Hideki Matsuyama (23248838),Keith Mitchell (23248852),Tyrrell Hatton (23248851),Lucas Herbert (23248856),Sebastian Munoz (23248859),189.24261441301996,49600.0
+Xander Schauffele (23248832),Cameron Young (23248847),Lucas Herbert (23248856),Chris Kirk (23248864),Kyoung-Hoon Lee (23248870),Patrick Cantlay (23248833),188.63017798665862,49900.0
+Xander Schauffele (23248832),Hideki Matsuyama (23248838),Justin Rose (23248850),Keegan Bradley (23248849),Tyrrell Hatton (23248851),Jason Kokrak (23248868),188.56242100172886,49800.0
+Xander Schauffele (23248832),Keegan Bradley (23248849),Billy Horschel (23248846),Cameron Young (23248847),Brian Harman (23248855),Mackenzie Hughes (23248874),187.23340875206162,49000.0
+Cameron Young (23248847),Hideki Matsuyama (23248838),Sam Burns (23248836),Keegan Bradley (23248849),Lucas Herbert (23248856),Gary Woodland (23248867),186.64764164023697,49100.0
+Justin Thomas (23248830),Hideki Matsuyama (23248838),Keith Mitchell (23248852),Lucas Herbert (23248856),Christiaan Bezuidenhout (23248862),Matt Kuchar (23248865),186.59742366113727,49900.0
+Justin Thomas (23248830),Hideki Matsuyama (23248838),Keegan Bradley (23248849),Sebastian Munoz (23248859),Christiaan Bezuidenhout (23248862),Min Woo Lee (23248871),185.67180868001012,49800.0
+Matt Fitzpatrick (23248831),Cameron Young (23248847),Robert Macintyre (23248858),Sebastian Munoz (23248859),Christiaan Bezuidenhout (23248862),Sam Burns (23248836),185.42189762843066,50000.0
+Justin Thomas (23248830),Cameron Young (23248847),Keegan Bradley (23248849),Brian Harman (23248855),Robert Macintyre (23248858),Aaron Rai (23248863),185.40232538541017,49300.0
+Justin Thomas (23248830),Cameron Young (23248847),Justin Rose (23248850),Christiaan Bezuidenhout (23248862),Maverick McNealy (23248866),Keegan Bradley (23248849),185.39730356063558,49400.0
+Matt Fitzpatrick (23248831),Xander Schauffele (23248832),Keith Mitchell (23248852),Mito Pereira (23248853),Keegan Bradley (23248849),Stewart Cink (23248929),185.3012591532344,49800.0
+Justin Thomas (23248830),Keegan Bradley (23248849),Cameron Young (23248847),Justin Rose (23248850),Aaron Rai (23248863),Cameron Tringale (23248876),185.03732916356512,49100.0
+Justin Thomas (23248830),Hideki Matsuyama (23248838),Cameron Young (23248847),Chris Kirk (23248864),Aaron Rai (23248863),Cameron Tringale (23248876),184.66070151213518,49700.0
+Justin Thomas (23248830),Hideki Matsuyama (23248838),Keegan Bradley (23248849),Mito Pereira (23248853),Sebastian Munoz (23248859),Tom Hoge (23248877),184.0826123404998,49800.0
+Justin Thomas (23248830),Cameron Young (23248847),Tyrrell Hatton (23248851),Brian Harman (23248855),Cameron Tringale (23248876),Keegan Bradley (23248849),183.97203072139104,49300.0
+Justin Thomas (23248830),Cameron Young (23248847),Keith Mitchell (23248852),Tyrrell Hatton (23248851),Marc Leishman (23248857),Lucas Herbert (23248856),183.8022041546139,49500.0
+Justin Thomas (23248830),Hideki Matsuyama (23248838),Cameron Young (23248847),Mito Pereira (23248853),Christiaan Bezuidenhout (23248862),Joel Dahmen (23248879),183.58919965762604,50000.0
+Justin Thomas (23248830),Hideki Matsuyama (23248838),Keegan Bradley (23248849),Brian Harman (23248855),Kyoung-Hoon Lee (23248870),Min Woo Lee (23248871),183.55428101608308,49800.0
+Matt Fitzpatrick (23248831),Patrick Cantlay (23248833),Cameron Young (23248847),Justin Rose (23248850),Matt Kuchar (23248865),Wyndham Clark (23248927),183.3931332508947,49600.0
+Justin Thomas (23248830),Cameron Young (23248847),Keegan Bradley (23248849),Keith Mitchell (23248852),Christiaan Bezuidenhout (23248862),Si Woo Kim (23248882),183.17262192371277,49000.0
+Justin Thomas (23248830),Cameron Young (23248847),Patrick Cantlay (23248833),Brian Harman (23248855),Matt Kuchar (23248865),Wyndham Clark (23248927),182.9383645043287,49900.0
+Justin Thomas (23248830),Cameron Young (23248847),Hideki Matsuyama (23248838),Sebastian Munoz (23248859),Maverick McNealy (23248866),Gary Woodland (23248867),182.1661066953142,49900.0
+Patrick Cantlay (23248833),Cameron Young (23248847),Hideki Matsuyama (23248838),Brian Harman (23248855),Lucas Herbert (23248856),Tom Hoge (23248877),181.1093737829845,49100.0
+Justin Thomas (23248830),Hideki Matsuyama (23248838),Justin Rose (23248850),Christiaan Bezuidenhout (23248862),Alex Noren (23248860),Aaron Rai (23248863),180.79115044751788,49900.0
+Justin Thomas (23248830),Sam Burns (23248836),Cameron Young (23248847),Chris Kirk (23248864),Mackenzie Hughes (23248874),Patrick Rodgers (23248886),180.12567729051585,49500.0
+Justin Thomas (23248830),Hideki Matsuyama (23248838),Keith Mitchell (23248852),Tyrrell Hatton (23248851),Chris Kirk (23248864),Henrik Stenson (23248887),179.82281643699628,49600.0
+Justin Thomas (23248830),Will Zalatoris (23248835),Cameron Young (23248847),Keith Mitchell (23248852),Matt Kuchar (23248865),Matt Wallace (23248910),179.3316081949401,49900.0
+Justin Thomas (23248830),Hideki Matsuyama (23248838),Justin Rose (23248850),Mito Pereira (23248853),Alex Noren (23248860),Min Woo Lee (23248871),179.02007278318257,50000.0
+>>>>>>> c76e5d4ee90792142de145b4272402acba40692f

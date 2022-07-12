@@ -1050,6 +1050,25 @@ def DK_csv_assignemnt(path: str, name: str, lowerBound:float=0, upperBound:float
     df['Name'] = df['Name'].apply(lambda x: series_lower(x))
     return df
 
+def find_last_x_majors(player, events):
+    event_url_array = []
+    event_list = [353222, 353226, 353232, 243410, 243414, 243418, 243010, 219478, 219333]
+    for le in event_list:
+        if len(event_url_array) < events:
+            url = f'https://www.espn.com/golf/leaderboard/_/tournamentId/401{le}'
+            dk_pastResults = pd.read_html(url)
+            dk_pastResults = dk_pastResults[-1]
+            dk_pastResults['PLAYER'] = dk_pastResults['PLAYER'].apply(lambda x: series_lower(x))
+            if player in dk_pastResults['PLAYER'].values:
+                data = dk_pastResults[dk_pastResults['PLAYER'] == player]
+                if str(data['SCORE'].values[0]) == 'WD' or str(data['SCORE'].values[0]) == 'DQ':
+                    print(f"{player} WD or DQ")
+                else:
+                    event_url_array.append(url)
+        else:
+            break
+    return event_url_array
+
 def find_last_x_events(player, events):
     event_url_array = []
     event_list = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 73, 94, 55, 54, 53, 39, 38, 37, 36]
@@ -1080,6 +1099,45 @@ def tournament_id_from_csv(csv_name):
     id = id[0]
     return(id)
 
+def last_x_majors_dk_points(df_merge, events=6, upper_bound=15):
+    new_df = pd.DataFrame(columns=['Name',f'L{events}MajPts'])
+    cnt = 0
+    len_merge = len(df_merge)
+    for index, row in df_merge.iterrows():
+        cnt += 1
+        tot = 0
+        player = row["Name"]
+        urls = find_last_x_majors(player, events)
+        if len(urls) > 0:
+            for url in urls:
+                t_id = tournament_id(url)
+                csv_arr = []
+                for csv_n in find_csv_filenames('past_results/2022'):
+                    csv_arr.append(tournament_id_from_csv(csv_n))
+                if t_id in csv_arr:
+                    print(f'found {t_id}')
+                    pr_df = pd.read_csv(f'past_results/2022/dk_points_id_{t_id}.csv')
+                else:
+                    print(f'writing {t_id} to past results')
+                    pr_df = dk_points_df(url)
+                pr_df['Name'] = pr_df['Name'].apply(lambda x: series_lower(x))
+                nr = pr_df[pr_df["Name"] == player]
+                tot += float(nr.iloc[0,1])
+            if len(urls) > 2:
+                tot = (tot / len(urls))
+            else:
+                tot = tot / 3
+            new_row = [player, tot]
+            if cnt % 5 == 0:
+                print(f'{(cnt/len_merge)*100}% complete')
+            df_len = len(new_df)
+            new_df.loc[df_len] = new_row
+    df_merge = pd.merge(df_merge, new_df, how='left',on='Name')
+    fitRank = df_merge[f'L{events}MajPts'] / df_merge[f'L{events}MajPts'].max()
+    df_merge[f'L{events}MajPts'] = fitRank * upper_bound
+    df_merge[f'L{events}MajPts'] = df_merge[f'L{events}MajPts'].fillna(0)
+    return df_merge
+
 def last_x_events_dk_points(df_merge, events=10, upper_bound=15):
     new_df = pd.DataFrame(columns=['Name',f'L{events}Pts'])
     cnt = 0
@@ -1103,8 +1161,11 @@ def last_x_events_dk_points(df_merge, events=10, upper_bound=15):
                     pr_df = dk_points_df(url)
                 pr_df['Name'] = pr_df['Name'].apply(lambda x: series_lower(x))
                 nr = pr_df[pr_df["Name"] == player]
-                tot += float(nr.iloc[0,1])/float(pr_df['DK Score'].max())
-            #tot = (tot / len(urls))
+                tot += float(nr.iloc[0,1])
+            if len(urls) > 2:
+                tot = (tot / len(urls))
+            else:
+                tot = tot / 3
             new_row = [player, tot]
             if cnt % 5 == 0:
                 print(f'{(cnt/len_merge)*100}% complete')
