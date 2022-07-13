@@ -10,8 +10,6 @@ from dataclasses import replace
 from itertools import count
 
 import numpy as np
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 import warnings
 import selenium
 from selenium.webdriver.support.select import Select
@@ -24,7 +22,7 @@ import time
 import math
 from bs4 import BeautifulSoup
 import sys
-sys.path.insert(0, "/Users/seanraymor/Documents/Python Scripts/DKPGA")
+sys.path.insert(0, "/Users/seanraymor/Library/Mobile Documents/com~apple~CloudDocs/Documents/Python Scripts/DKPGA")
 from pga_dk_scoring import *
 from os import listdir
 
@@ -581,10 +579,11 @@ def find_last_x_majors(player, events):
 
 def find_last_x_events(player, events):
     event_url_array = []
-    event_list = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 73, 94, 55, 54, 53, 39, 38, 37, 36]
+    event_list = [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 73, 94, 55, 54, 53, 39, 38, 37, 36]
     for le in event_list:
         if len(event_url_array) < events:
             url = f'https://www.espn.com/golf/leaderboard/_/tournamentId/4013532{le}'
+            print(url)
             dk_pastResults = pd.read_html(url)
             dk_pastResults = dk_pastResults[-1]
             dk_pastResults['PLAYER'] = dk_pastResults['PLAYER'].apply(lambda x: series_lower(x))
