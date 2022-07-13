@@ -6,10 +6,8 @@ from itertools import count
 import warnings
 import sys
 import numpy as np
-sys.path.insert(0, "/Users/seanraymor/Documents/Python Scripts/DKPGA")
+sys.path.insert(0, "/Users/seanraymor/Library/Mobile Documents/com~apple~CloudDocs/Documents/Python Scripts/DKPGA")
 from pgafunc_v3 import *
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 warnings.simplefilter(action='ignore', category=Warning)
 
@@ -69,7 +67,7 @@ sigma = df_merge['Total'].std()*6
 
 print(df_merge.head())
 
-while k < 100:
+while k < 200:
     #get a sample
     lineup = genIter(df_merge)
     lineup.sort()
