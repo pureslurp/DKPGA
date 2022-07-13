@@ -235,7 +235,7 @@ def tournament_id(url):
 
 def dk_points_df(url):
     
-    driver = webdriver.Firefox(service_log_path=os.path.devnull, options=options)
+    driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver',service_log_path=os.path.devnull, options=options)
 
     raw_data = pd.read_html(url)
     raw_data = raw_data[-1]
@@ -258,8 +258,7 @@ def dk_points_df(url):
 
         # click the element
         element.click()
-        driver.implicitly_wait(120)
-        time.sleep(2)
+        time.sleep(1)
         
         if pos < 100:
             select = driver.find_element(By.CLASS_NAME, 'Leaderboard__Player__Detail')
