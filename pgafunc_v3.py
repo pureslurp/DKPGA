@@ -6,6 +6,7 @@ Created on Sun Jul 18 20:17:02 2021
 @author: seanraymor
 """
 from audioop import getsample
+from collections import defaultdict
 from dataclasses import replace
 from itertools import count
 
@@ -23,7 +24,7 @@ import math
 from bs4 import BeautifulSoup
 import sys
 sys.path.insert(0, "/Users/seanraymor/Library/Mobile Documents/com~apple~CloudDocs/Documents/Python Scripts/DKPGA")
-from pga_dk_scoring import *
+from Legacy.pga_dk_scoring import *
 from os import listdir
 
 options = Options()
@@ -75,6 +76,27 @@ def split_odds(data: str):
         data = np.nan
     return data
 
+def split_odds_new(data: str):
+    '''A function that converts odds as a string to an integer (e.g. +500 to 500)
+
+    Args:
+        data (str): The odds represented as a string
+
+    Return:
+        data (int): The odds converted to an integer, returns nan if invalid
+    '''
+    
+    try:
+        data = data.split('+')
+        data = int(data[1])
+    except:
+        data = data
+
+    if isinstance(data, list):
+        data = np.nan
+        
+    return data
+
 def odds_name(data: str):
     '''A function that converts a the name from the pga dynamic website into a name that is recognized by draftkings
 
@@ -121,15 +143,21 @@ def pga_odds_pga(df_merge: pd.DataFrame, upper_bound: int = 15):
     driver.close()
     driver.quit()   
     dfs = pd.read_html(result)
-    dfs = dfs[1]
-    dfs.drop(['Pos','TotTotal','Thru','RdRound'], axis=1, inplace=True)
+    dfs = dfs[0]
     
-    dfs['Odds'] = dfs['Odds'].apply(lambda x: split_odds(x))
-    dfs['Player'] = dfs['Player'].apply(lambda x: odds_name(x))
+    dfs = dfs[["Player", "Odds"]]
+
+    
+    dfs['Odds'] = dfs['Odds'].apply(lambda x: split_odds_new(x))
     dfs.rename(columns={'Player':'Name'}, inplace=True)
     dfs = dfs.dropna()
-    dfs['Name'] = dfs['Name'].apply(lambda x: series_lower(x))
+
+    dfs['Name'] = dfs['Name'].apply(lambda x: series_lower_v3(x))
     dk_merge = pd.merge(df_merge, dfs, how='left', on='Name')
+    print(dk_merge.head())
+    dk_merge.to_csv('{}/CSVs/DKData.csv'.format('2023/Royal/'), index = False) #optional line if you want to see data in CSV
+    dk_merge.sort_values(by='Odds',ascending=False,inplace=True)
+    
 
 
     oddsRank = dk_merge['Odds'].rank(pct=True, ascending=False)
@@ -361,7 +389,6 @@ def duplicates(x):
     elemOfList = list(x)
     for elem in elemOfList:
         if elemOfList.count(elem) > 1:
-            print('drop')
             duplicates = True
         
     return duplicates
@@ -381,7 +408,7 @@ def optimize_main(topTierLineup: pd.DataFrame, df_merge: pd.DataFrame):
         for player in range(0,len(maxNames)):
             ID = getID(maxNames, df_merge)
             if optimize(df_merge, df_merge.loc[ID[player]]['Salary'],budget) not in maxNames:
-                print(f"replacing {df_merge.loc[ID[player]]['Salary']} with {optimize(df_merge, df_merge.loc[ID[player]]['Salary'],budget)}")
+                #print(f"replacing {df_merge.loc[ID[player]]['Salary']} with {optimize(df_merge, df_merge.loc[ID[player]]['Salary'],budget)}")
                 maxNames[player] = optimize(df_merge, df_merge.loc[ID[player]]['Salary'],budget)
                 budget = 50000 - get_salary(getID(maxNames, df_merge), df_merge)
 
@@ -463,6 +490,56 @@ def pos_rewrite(x: str):
             pos = np.nan
     return pos
 
+
+def calc_score_kev(pos):
+    if not np.isnan(pos):
+        pos = int(pos)
+        if pos == 1:
+            score = 10
+        elif pos <= 10:
+            score = 9
+        elif pos <= 20:
+            score = 8
+        elif pos <=30:
+            score = 7
+        elif pos <= 40:
+            score = 6
+        elif pos < 90:
+            score = 5
+        else:
+            score = 0
+    else:
+        score = 0
+    return score
+
+
+
+def past_results_kev(df_merge: pd.DataFrame, url: str, lowerBound: float=0, upperBound: float=4, playoff: bool=False, pr_i: int=0):
+    '''Check for past tournament results 
+    
+    Args:
+        df_merge (DataFrame): The current dataFrame that is storing all the draftkings data
+        url (string): The url for the past results that will be webscraped (recommend to be espn link)
+        lowerBound (int): The lowerBound of the scale to be used to weight the scores
+        upperBound (int): The upperBound of the scale to be used to weight the scores
+        playoff (Bool): Indication if the past event was in a playoff or not (needed to make sure we grab the right table)
+        pr_i (int): If you are specifying multiple past events, indicate which iteration you are on (1st = 0, 2nd = 1)
+
+    Returns:
+        df_merge(DataFrame): The dataFrame storing data after past results data is applied
+    '''
+    dk_pastResults = pd.read_html(url)
+    dk_pastResults = dk_pastResults[-1]
+    dk_pastResults[f'POS{pr_i}'] = dk_pastResults['POS'].apply(lambda x: pos_rewrite(x))
+    dk_pastResults.rename(columns={'PLAYER':'Name'}, inplace=True)
+    dk_pastResults['Name'] = dk_pastResults['Name'].apply(lambda x: series_lower(x))
+    dk_pastResults[f'Score{pr_i}'] = dk_pastResults[f'POS{pr_i}'].apply(lambda x: calc_score_kev(x))
+    dk_pastResults.drop(['POS','SCORE','R1','R2','R3','R4','EARNINGS','FEDEX PTS','TOT', f'POS{pr_i}'],axis=1,inplace=True)
+    df_merge = pd.merge(df_merge, dk_pastResults,how='left',on='Name')
+    
+    return df_merge
+
+
 def past_results(df_merge: pd.DataFrame, url: str, lowerBound: float=0, upperBound: float=4, playoff: bool=False, pr_i: int=0):
     '''Check for past tournament results 
     
@@ -494,7 +571,7 @@ def past_results(df_merge: pd.DataFrame, url: str, lowerBound: float=0, upperBou
 
     return df_merge
 
-def check_spelling_errors(data: str):
+def check_spelling_errors_v3(data: str):
     '''A function that checks for common misspells'''
     if data.lower() == 'matthew fitzpatrick':
         return 'matt fitzpatrick'
@@ -540,17 +617,20 @@ def check_spelling_errors(data: str):
         return 'louis oosthuizen'
     elif data.lower() == 'sungmoon bae':
         return 'sung-moon bae'
+    elif data.lower() == "jose luis ballester":
+        return "jose luis  ballester"
     else:
         return data.lower()
 
-def series_lower(data: str):
+def series_lower_v3(data: str):
     '''A function that converts a string to a lower case, while checking for errors'''
-    name_fix = check_spelling_errors(data).strip()
+    name_fix = check_spelling_errors_v3(data).strip()
     return name_fix
 
 def DK_csv_assignemnt(path: str, name: str, lowerBound:float=0, upperBound:float=0):
     '''find exported csv from DK and assign it to dataFrame with upper and lower bound values'''
-    df = pd.read_csv('{}CSVs/{}'.format(path,name))
+    print('{}CSVs/{}'.format(path, name))
+    df = pd.read_csv('{}CSVs/{}'.format(path, name))
     df.drop(['Position','ID','Roster Position','Game Info', 'TeamAbbrev'],axis=1,inplace=True)
     avgPointsScale = np.linspace(lowerBound, upperBound,len(df['AvgPointsPerGame'].dropna()))
     df.sort_values(by=['AvgPointsPerGame'],inplace=True)
@@ -560,42 +640,77 @@ def DK_csv_assignemnt(path: str, name: str, lowerBound:float=0, upperBound:float
 
 def find_last_x_majors(player, events):
     event_url_array = []
-    event_list = [353222, 353226, 353232, 243410, 243414, 243418, 243010, 219478, 219333]
+    event_list = [465533, 465523, 465508, 353217, 353222, 353226, 353232, 243410, 243414, 243418, 243010, 219478, 219333]
+    csv_arr = []
+    # for le in event_list:
+    #     if len(event_url_array) < events:
+    #         url = f'https://www.espn.com/golf/leaderboard/_/tournamentId/401{le}'
+    #         dk_pastResults = pd.read_html(url)
+    #         dk_pastResults = dk_pastResults[-1]
+    #         dk_pastResults['PLAYER'] = dk_pastResults['PLAYER'].apply(lambda x: series_lower(x))
+    #         if player in dk_pastResults['PLAYER'].values:
+    #             data = dk_pastResults[dk_pastResults['PLAYER'] == player]
+    #             if str(data['SCORE'].values[0]) == 'WD' or str(data['SCORE'].values[0]) == 'DQ' or str(data['SCORE'].values[0]) == 'MDF':
+    #                 print(f"{player} WD or DQ")
+    #             else:
+    #                 event_url_array.append(url)
+    #     else:
+    #         break
+    # return event_url_array
+    for csv_n in find_csv_filenames('past_results/2022'):
+        csv_arr.append(tournament_id_from_csv(csv_n))
     for le in event_list:
+        t_id = f'401{le}'
         if len(event_url_array) < events:
-            url = f'https://www.espn.com/golf/leaderboard/_/tournamentId/401{le}'
-            dk_pastResults = pd.read_html(url)
-            dk_pastResults = dk_pastResults[-1]
-            dk_pastResults['PLAYER'] = dk_pastResults['PLAYER'].apply(lambda x: series_lower(x))
-            if player in dk_pastResults['PLAYER'].values:
-                data = dk_pastResults[dk_pastResults['PLAYER'] == player]
-                if str(data['SCORE'].values[0]) == 'WD' or str(data['SCORE'].values[0]) == 'DQ' or str(data['SCORE'].values[0]) == 'MDF':
-                    print(f"{player} WD or DQ")
-                else:
-                    event_url_array.append(url)
+            if t_id in csv_arr:
+                pr_df = pd.read_csv(f'past_results/2022/dk_points_id_{t_id}.csv')
+                if player in pr_df['Name'].values:
+                    event_url_array.append(t_id)
+            else:
+                print(f'Did not find {t_id}')
+                url = f'https://www.espn.com/golf/leaderboard/_/tournamentId/{t_id}'
+                dk_pastResults = pd.read_html(url)
+                dk_pastResults = dk_pastResults[-1]
+                dk_pastResults['PLAYER'] = dk_pastResults['PLAYER'].apply(lambda x: series_lower(x))
+                if player in dk_pastResults['PLAYER'].values:
+                    data = dk_pastResults[dk_pastResults['PLAYER'] == player]
+                    if str(data['SCORE'].values[0]) == 'WD' or str(data['SCORE'].values[0]) == 'DQ'  or str(data['SCORE'].values[0]) == 'MDF':
+                        print(f"{player} WD or DQ")
+                    else:
+                        event_url_array.append(t_id)
         else:
             break
     return event_url_array
 
 def find_last_x_events(player, events):
-    event_url_array = []
-    event_list = [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 73, 94, 55, 54, 53, 39, 38, 37, 36]
-    for le in event_list:
-        if len(event_url_array) < events:
-            url = f'https://www.espn.com/golf/leaderboard/_/tournamentId/4013532{le}'
-            print(url)
-            dk_pastResults = pd.read_html(url)
-            dk_pastResults = dk_pastResults[-1]
-            dk_pastResults['PLAYER'] = dk_pastResults['PLAYER'].apply(lambda x: series_lower(x))
-            if player in dk_pastResults['PLAYER'].values:
-                data = dk_pastResults[dk_pastResults['PLAYER'] == player]
-                if str(data['SCORE'].values[0]) == 'WD' or str(data['SCORE'].values[0]) == 'DQ'  or str(data['SCORE'].values[0]) == 'MDF':
-                    print(f"{player} WD or DQ")
-                else:
-                    event_url_array.append(url)
+    event_id_array = []
+    event_id_list = [465537, 465534, 465532, 465531, 465530, 465520, 465519, 465515, 465509, 465502, 465529, 465527, 465524, 465525, 465522, 465521, 465518, 465516, 465514, 465513, 465512, 465506, 465505, 465504, 465501, 465500, 465499, 465498, 465496, 353276, 353275, 353274, 353213, 353214, 353215, 353217, 353219, 353220, 353221, 353222, 353223, 353224, 353225, 353226, 353227, 353228, 353229, 353231, 353232, 353273, 353294, 353255, 353254, 353253, 353239, 353238, 353237, 353236]
+    csv_arr = []
+    for csv_n in find_csv_filenames('past_results/2022'):
+        csv_arr.append(tournament_id_from_csv(csv_n))
+    for le in event_id_list:
+        t_id = f'401{le}'
+        if len(event_id_array) < events:
+            if t_id in csv_arr:
+                pr_df = pd.read_csv(f'past_results/2022/dk_points_id_{t_id}.csv')
+                if player in pr_df['Name'].values:
+                    event_id_array.append(t_id)
+            else:
+                print(f'Did not find {t_id}')
+                url = f'https://www.espn.com/golf/leaderboard/_/tournamentId/{t_id}'
+                dk_pastResults = pd.read_html(url)
+                dk_pastResults = dk_pastResults[-1]
+                print(dk_pastResults)
+                dk_pastResults['PLAYER'] = dk_pastResults['PLAYER'].apply(lambda x: series_lower(x))
+                if player in dk_pastResults['PLAYER'].values:
+                    data = dk_pastResults[dk_pastResults['PLAYER'] == player]
+                    if str(data['SCORE'].values[0]) == 'WD' or str(data['SCORE'].values[0]) == 'DQ'  or str(data['SCORE'].values[0]) == 'MDF':
+                        print(f"{player} WD or DQ")
+                    else:
+                        event_id_array.append(t_id)
         else:
             break
-    return event_url_array
+    return event_id_array
 
 def find_csv_filenames(path, suffix='.csv'):
     filenames = listdir(path)
@@ -608,7 +723,7 @@ def tournament_id_from_csv(csv_name):
     id = id[0]
     return(id)
 
-def last_x_majors_dk_points(df_merge, events=6, upper_bound=15):
+def last_x_majors_dk_points(df_merge, events=6, upper_bound=3):
     new_df = pd.DataFrame(columns=['Name',f'L{events}MajPts'])
     cnt = 0
     len_merge = len(df_merge)
@@ -646,10 +761,58 @@ def last_x_majors_dk_points(df_merge, events=6, upper_bound=15):
     df_merge[f'L{events}MajPts'] = df_merge[f'L{events}MajPts'].fillna(0)
     return df_merge
 
+def find_all_events(df_merge, events):
+    master_t_id = []
+    for index, row in df_merge.iterrows():
+        player = row["Name"]
+        t_ids = find_last_x_events(player, events)
+        for t_id in t_ids:
+            if t_id not in master_t_id:
+                master_t_id.append(t_id)    
+    return master_t_id
+
+def find_medians(ev_urls):
+    csv_arr = []
+    ev_median = defaultdict(int)
+    for csv_n in find_csv_filenames('past_results/2022'):
+        csv_arr.append(tournament_id_from_csv(csv_n))
+    for url in ev_urls:
+        t_id = tournament_id(url)
+        if t_id in csv_arr:
+            pr_df = pd.read_csv(f'past_results/2022/dk_points_id_{t_id}.csv')
+        else:
+            print(f'writing {t_id} to past results')
+            pr_df = dk_points_df(url)
+        pr_df['Rank'].dropna()
+        median = pr_df['Rank'].median()
+        ev_median[t_id] = median
+        
+    return ev_median
+
+def dist_medians(medians):
+    medians = list(medians.values())
+    x1 = 0.1
+    x2 = -0.1
+    y1 = min(medians)
+    y2 = max(medians)
+    slope = (y2 - y1) / (x2 - x1)
+    b = y1 - (slope * x1)
+    return slope, b
+
+
 def last_x_events_dk_points(df_merge, events=10, upper_bound=15):
-    new_df = pd.DataFrame(columns=['Name',f'L{events}Pts'])
     cnt = 0
     len_merge = len(df_merge)
+    master_url = []
+    all_events = find_all_events(df_merge, events)
+    medians = find_medians(all_events)
+    column_names = ['Name']
+    for event in all_events:
+        column_names.append(event)
+    new_df = pd.DataFrame(columns=column_names)
+    slope, b = dist_medians(medians)
+    new_df["Name"] = df_merge['Name']
+    new_df = new_df.set_index('Name')
     for index, row in df_merge.iterrows():
         cnt += 1
         tot = 0
@@ -666,24 +829,40 @@ def last_x_events_dk_points(df_merge, events=10, upper_bound=15):
                 else:
                     print(f'writing {t_id} to past results')
                     pr_df = dk_points_df(url)
-                pr_df['Name'] = pr_df['Name'].apply(lambda x: series_lower(x))
+                    raise ValueError('t_id mismatch')
                 nr = pr_df[pr_df["Name"] == player]
-                tot += float(nr.iloc[0,1])
-            if len(urls) > 2:
-                tot = (tot / len(urls))
-            else:
-                tot = tot / 3
+                x_val = (pr_df['Rank'].median() - b)/slope
+                tot = (float(nr.iloc[0,1]) / pr_df['DK Score'].max()) * (1 + (x_val))
+                new_df.loc[player, t_id] = tot
+            if cnt % 5 == 0:
+                print(f'{(cnt/len_merge)*100}% players in events complete')
+    
+    df_merge = pd.merge(df_merge, new_df, how='left',on='Name')
+    df_merge = df_merge.fillna(0)
+    return df_merge
+
+def last_x_event_points_kev(df_merge, events=10):
+    new_df = pd.DataFrame(columns=['Name',f'L{events}Pts'])
+    cnt = 0
+    len_merge = len(df_merge)
+    for index, row in df_merge.iterrows():
+        cnt += 1
+        tot = 0
+        player = row["Name"]
+        urls = find_last_x_events(player, events)
+        if len(urls) > 0:
+            for url in urls:
+                pr_df = past_results_kev(df_merge, f'https://www.espn.com/golf/leaderboard/_/tournamentId/{url}')
+                nr = pr_df[pr_df["Name"] == player]
+                tot = tot + float(nr['Score0'])
             new_row = [player, tot]
             if cnt % 5 == 0:
                 print(f'{(cnt/len_merge)*100}% players in events complete')
             df_len = len(new_df)
             new_df.loc[df_len] = new_row
     df_merge = pd.merge(df_merge, new_df, how='left',on='Name')
-    fitRank = df_merge[f'L{events}Pts'] / df_merge[f'L{events}Pts'].max()
-    df_merge[f'L{events}Pts'] = fitRank * upper_bound
     df_merge[f'L{events}Pts'] = df_merge[f'L{events}Pts'].fillna(0)
     return df_merge
-
 
 def last_x_event_points(df_merge, events=10, upper_bound=15):
     new_df = pd.DataFrame(columns=['Name',f'L{events}Pts'])
@@ -712,10 +891,17 @@ def last_x_event_points(df_merge, events=10, upper_bound=15):
     return df_merge
 
 
-def df_total_and_reformat(df_merge: pd.DataFrame):
+   
+
+
+def df_total_and_reformat(df_merge: pd.DataFrame, pr_multi=1):
     '''reformate dataFrame to be easily exported'''
-    column_list = list(df_merge.columns[3:])
-    df_merge['Total'] = df_merge[column_list].sum(axis=1)
+
+    print(list(df_merge.columns[4:-1]))
+    df_merge["Sum"] = df_merge.iloc[:,4:-1].sum(axis=1)
+    df_merge["Sum"] = df_merge["Sum"].rank(pct=True, ascending=True)
+    df_merge["Sum"] = df_merge["Sum"] * pr_multi
+    df_merge['Total'] = df_merge["Sum"] + df_merge["Odds"]
     df_merge['Value'] = (df_merge['Total'] / df_merge['Salary']) * 1000
     df_merge = df_merge[['Name + ID', 'Salary', 'Total', 'Value']]
     df_merge.sort_values(by='Salary',ascending=False,inplace=True)
