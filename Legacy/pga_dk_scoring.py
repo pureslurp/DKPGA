@@ -8,6 +8,7 @@ import time
 import pandas as pd
 import numpy as np
 import os
+import sys
 
 options = Options()
 
@@ -217,10 +218,115 @@ def round_scores(driver, select2, round):
     scores = driver.page_source
     scores_pd = pd.read_html(scores)
     df_scores = scores_pd[-1]
-    df_scores = df_scores.drop(['Hole', 'Out', 'In', 'Tot'], axis=1)
+    #print(df_scores.columns[0])
+    df_scores = df_scores.drop(df_scores.columns[[0, 10, 20, 21]], axis=1)
+    print(df_scores)
+    #df_scores = df_scores.drop(['Hole', 'Out', 'In', 'Tot'], axis=1)
 
     return df_scores
 
+def world_rank_rewrite(data):
+    pos = data
+    try:
+        if pos[0] == 'T':
+            pos = int(pos[1:])
+        else:
+            pos = int(pos)
+    except:
+        pos = np.nan
+    return pos
+
+def world_rank_rewrite_new(data):
+    pos = data[10:]
+    try:
+        if pos[0] == 'T':
+            pos = int(pos[1:])
+        else:
+            pos = int(pos)
+    except:
+        pos = np.nan
+    return pos
+
+def check_world_rank(df_merge):
+    url = 'https://www.pgatour.com/stats/stat.186.y2023.html'
+    driver = webdriver.Firefox()
+    driver.get(url)
+    driver.implicitly_wait(120)
+    time.sleep(5)
+    result = driver.page_source
+    #print(result)
+    data = pd.read_html(result)[0]
+    driver.close()
+    driver.quit()  
+    data['Name'] = data['Player'].apply(lambda x: series_lower_new(x))
+    print(data.head())
+    data['Rank'] = data["Total Points"].rank(ascending=False)
+    data = data[["Rank", "Name"]]
+    df_merge = pd.merge(df_merge, data, how='left',on='Name')
+    print(df_merge.head())
+    return df_merge
+
+def check_spelling_errors(data: str):
+    '''A function that checks for common misspells'''
+    if data.lower() == 'matthew fitzpatrick':
+        return 'matt fitzpatrick'
+    elif data.lower() == 'tyrell hatton':
+        return 'tyrrell hatton'
+    elif data.lower() == 'taylor gooch':
+        return 'talor gooch'
+    elif data.lower() == 'cam champ':
+        return 'cameron champ'
+    elif data.lower() == 'cam davis':
+        return 'cameron davis'
+    elif data.lower() == 'sung-jae im':
+        return 'sungjae im'
+    elif data.lower() == 'hason kokrak':
+        return 'jason kokrak'
+    elif data.lower() == 'sebastián muñoz':
+        return 'sebastian munoz'
+    elif data.lower() == 'k.h. lee' or data.lower() == 'kyounghoon lee' or data.lower() == 'lee kyoung-hoon':
+        return 'kyoung-hoon lee'
+    elif data.lower() == 'charles howell':
+        return 'charles howell iii'
+    elif data.lower() == 'sung-hoon kang' or data.lower() == 's.h. kang':
+        return 'sung kang'
+    elif data.lower() == 'charl schwarztel':
+        return 'charl schwartzel'
+    elif data.lower() == 'roger slaon':
+        return 'roger sloan'
+    elif data.lower() == 'scott pierce':
+        return 'scott piercy'
+    elif data.lower() == 'vincent whaley':
+        return 'vince whaley'
+    elif data.lower() == 'stephan jaegar':
+        return 'stephan jaeger'
+    elif data.lower() == 'mathhias schwab':
+        return 'matthias schwab'
+    elif data.lower() == 'kang sung-hoon':
+        return 'sung kang'
+    elif data.lower() == 'jorda spieth':
+        return 'jordan spieth'
+    elif data.lower() == 'christopher gotterup':
+        return 'chris gotterup'
+    elif data.lower() == 'louis oosthuzien':
+        return 'louis oosthuizen'
+    elif data.lower() == 'sungmoon bae':
+        return 'sung-moon bae'
+    else:
+        return data.lower()
+
+def series_lower(data: str):
+    '''A function that converts a string to a lower case, while checking for errors'''
+    name_fix = check_spelling_errors(data).strip()
+    return name_fix
+
+def series_lower_new(data: str):
+    
+    try:
+        name_fix = check_spelling_errors(data).strip()
+    except:
+        name_fix = data
+    return name_fix
 
 #MAIN
 
@@ -229,20 +335,19 @@ def round_scores(driver, select2, round):
 ##
 
 def tournament_id(url):
-    url = url.split('/')
+    url = url.split('=')
     id = url[-1]
     return(id)
 
 def dk_points_df(url):
-    
+    url = f'https://www.espn.com/golf/leaderboard?tournamentId={url}'
+    print(url)
     driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver',service_log_path=os.path.devnull, options=options)
-
     raw_data = pd.read_html(url)
     raw_data = raw_data[-1]
     t_id = tournament_id(url)
-
     raw_data['POS'] = raw_data['POS'].apply(lambda x: pos_rewrite(x))
-    raw_data = raw_data.drop(['EARNINGS', 'FEDEX PTS'], axis=1)
+    #raw_data = raw_data.drop(['EARNINGS', 'FEDEX PTS'], axis=1)
     par = find_par(raw_data)
     driver.get(url)
     df_total_points = pd.DataFrame(columns=["Name", "DK Score"])
@@ -267,7 +372,7 @@ def dk_points_df(url):
             r2 = round_scores(driver, select2, "Round 2")
             r3 = round_scores(driver, select2, "Round 3")
             r4 = round_scores(driver, select2, "Round 4")
-            row = {"Name": row['PLAYER'], "DK Score" : round_dk_score(r1, r2, r3, r4, pos, par)}
+            row = {"Name": series_lower(row['PLAYER']), "DK Score" : round_dk_score(r1, r2, r3, r4, pos, par)}
             df_total_points = df_total_points.append(row, ignore_index=True)
         else:
             try:
@@ -277,7 +382,7 @@ def dk_points_df(url):
                 r2 = round_scores(driver, select2, "Round 2")
                 r3 = None
                 r4 = None
-                row = {"Name": row['PLAYER'], "DK Score" : round_dk_score(r1, r2, r3, r4, pos, par)}
+                row = {"Name": series_lower(row['PLAYER']), "DK Score" : round_dk_score(r1, r2, r3, r4, pos, par)}
                 df_total_points = df_total_points.append(row, ignore_index=True)
             except:
                 print(f'Player {row["PLAYER"]} is N/A')
@@ -286,7 +391,7 @@ def dk_points_df(url):
         
         element.click()
 
-    
+    df_total_points = check_world_rank(df_total_points)
     df_total_points.to_csv(f'past_results/2022/dk_points_id_{t_id}.csv', index=False)
     driver.close()
     driver.quit() 

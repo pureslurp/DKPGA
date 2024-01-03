@@ -1,91 +1,91 @@
-Name,DK Score
-Dustin Johnson,142.0
-Cameron Smith,123.5
-Sungjae Im,110.0
-Justin Thomas,107.5
-Rory McIlroy,94.0
-Dylan Frittelli,99.5
-C.T. Pan,87.0
-Brooks Koepka,88.0
-Jon Rahm,96.5
-Webb Simpson,90.0
-Corey Conners,89.0
-Patrick Reed,91.5
-Marc Leishman,87.0
-Hideki Matsuyama,79.0
-Kevin Na,75.5
-Abraham Ancer,80.0
-Xander Schauffele,87.0
-Patrick Cantlay,71.0
-Scottie Scheffler,75.0
-Cameron Champ,93.5
-Tommy Fleetwood,75.5
-Sebastián Muñoz,85.5
-Louis Oosthuizen,73.0
-Justin Rose,75.0
-Danny Willett,81.0
-Charl Schwartzel,79.0
-Shane Lowry,62.0
-Ian Poulter,66.5
-Nick Taylor,72.0
-Bernhard Langer,67.5
-Sung Kang,72.0
-Chez Reavie,66.5
-Rickie Fowler,69.0
-Adam Scott,64.5
-Bryson DeChambeau,81.0
-Si Woo Kim,65.5
-Andy Ogletree (a),63.0
-Lee Westwood,60.0
-Billy Horschel,63.0
-Tiger Woods,73.0
-Paul Casey,65.5
-Tony Finau,66.0
-Christiaan Bezuidenhout,64.5
-Shugo Imahira,53.5
-Collin Morikawa,61.0
-Matt Wallace,73.0
-Charles Howell III,54.0
-Matt Fitzpatrick,58.0
-Victor Perez,53.0
-Jordan Spieth,63.5
-Mike Weir,55.0
-Jazz Janewattananond,54.0
-Zach Johnson,58.0
-Rafa Cabrera Bello,63.0
-John Augenstein (a),64.0
-Phil Mickelson,58.5
-Bubba Watson,56.5
-Bernd Wiesberger,49.0
-Brandt Snedeker,47.5
-Jimmy Walker,45.5
-Adam Hadwin,23.0
-Gary Woodland,29.5
-Graeme McDowell,26.5
-Byeong Hun An,26.5
-Max Homa,36.5
-Andrew Putnam,24.5
-Justin Harding,30.0
-Kevin Kisner,24.5
-Matthew Wolff,24.5
-J.T. Poston,25.5
-Francesco Molinari,21.0
-Fred Couples,21.0
-Sandy Lyle,16.0
-Nate Lashley,17.0
-José María Olazábal,6.5
-Matt Kuchar,32.0
-Henrik Stenson,24.5
-Brendon Todd,28.5
-Larry Mize,30.0
-Lanto Griffin,22.5
-Tyrrell Hatton,21.5
-Jason Kokrak,25.0
-Jason Day,26.5
-Tyler Duncan,23.5
-Lucas Glover,22.5
-Andrew Landry,6.0
-James Sugrue (a),26.5
-Lukas Michel (a),21.5
-Yuxin Lin (a),24.0
-Abel Gallegos (a),12.5
+Name,DK Score,Rank
+dustin johnson,142.0,127.0
+sungjae im,110.0,15.0
+cameron smith,123.5,14.0
+justin thomas,107.5,16.0
+rory mcilroy,94.0,3.0
+dylan frittelli,99.5,221.0
+c.t. pan,87.0,150.0
+brooks koepka,88.0,20.0
+jon rahm,96.5,2.0
+webb simpson,90.0,223.0
+patrick reed,91.5,61.0
+corey conners,89.0,24.0
+kevin na,75.5,201.0
+marc leishman,87.0,196.0
+hideki matsuyama,79.0,29.0
+abraham ancer,80.0,75.0
+xander schauffele,87.0,5.0
+patrick cantlay,71.0,6.0
+sebastian munoz,85.5,144.0
+cameron champ,93.5,239.0
+tommy fleetwood,75.5,21.0
+scottie scheffler,75.0,1.0
+louis oosthuizen,73.0,328.0
+justin rose,75.0,39.0
+charl schwartzel,79.0,325.0
+danny willett,81.0,101.0
+shane lowry,62.0,25.0
+ian poulter,66.5,314.0
+bernhard langer,67.5,
+rickie fowler,69.0,51.0
+nick taylor,72.0,41.0
+sung kang,72.0,545.0
+chez reavie,66.5,100.0
+bryson dechambeau,81.0,135.0
+adam scott,64.5,42.0
+andy ogletree,63.0,393.0
+si woo kim,65.5,26.0
+billy horschel,63.0,37.0
+tony finau,66.0,9.0
+lee westwood,60.0,408.0
+tiger woods,73.0,
+paul casey,65.5,213.0
+christiaan bezuidenhout,64.5,72.5
+collin morikawa,61.0,18.0
+shugo imahira,53.5,147.0
+matt wallace,73.0,110.0
+victor perez,53.0,64.0
+charles howell iii,54.0,457.5
+jordan spieth,63.5,10.0
+matt fitzpatrick,58.0,7.0
+rafa cabrera bello,63.0,214.0
+mike weir,55.0,
+zach johnson,58.0,295.0
+jazz janewattananond,54.0,206.0
+phil mickelson,58.5,112.0
+john augenstein,64.0,521.0
+bubba watson,56.5,353.0
+bernd wiesberger,49.0,312.0
+brandt snedeker,47.5,693.0
+jimmy walker,45.5,293.0
+j.t. poston,25.5,53.0
+francesco molinari,21.0,165.0
+nate lashley,17.0,161.0
+jason day,26.5,33.0
+kevin kisner,24.5,80.0
+matt kuchar,32.0,60.0
+sandy lyle,16.0,
+graeme mcdowell,26.5,534.0
+larry mize,30.0,
+josé maría olazábal,6.5,
+jason kokrak,25.0,188.0
+brendon todd,28.5,72.5
+gary woodland,29.5,77.0
+matthew wolff,24.5,339.0
+andrew landry,6.0,723.0
+byeong hun an,26.5,116.0
+andrew putnam,24.5,55.0
+adam hadwin,23.0,65.0
+tyrrell hatton,21.5,11.0
+henrik stenson,24.5,289.0
+justin harding,30.0,324.0
+lanto griffin,22.5,252.0
+lucas glover,22.5,142.0
+max homa,36.5,8.0
+fred couples,21.0,
+tyler duncan,23.5,173.0
+james sugrue,26.5,
+lukas michel (a),21.5,
+yuxin lin (a),24.0,
+abel gallegos,12.5,966.0
