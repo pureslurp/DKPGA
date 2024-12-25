@@ -1,0 +1,23 @@
+,G1,G2,G3,G4,G5,G6,Salary,TotalPoints
+0,Wyndham Clark (35602485),Rory McIlroy (35602479),Sahith Theegala (35602494),Taylor Pendrith (35602499),Robert Macintyre (35602498),Scottie Scheffler (35602475),50000,28.707
+1,Wyndham Clark (35602485),Sahith Theegala (35602494),Taylor Pendrith (35602499),Robert Macintyre (35602498),Rory McIlroy (35602479),Scottie Scheffler (35602475),50000,28.707
+2,Wyndham Clark (35602485),Taylor Pendrith (35602499),Robert Macintyre (35602498),Scottie Scheffler (35602475),Sahith Theegala (35602494),Rory McIlroy (35602479),50000,28.707
+3,Taylor Pendrith (35602499),Robert Macintyre (35602498),Rory McIlroy (35602479),Wyndham Clark (35602485),Scottie Scheffler (35602475),Sahith Theegala (35602494),50000,28.706999999999997
+4,Robert Macintyre (35602498),Wyndham Clark (35602485),Scottie Scheffler (35602475),Rory McIlroy (35602479),Taylor Pendrith (35602499),Akshay Bhatia (35602495),49900,28.643
+5,Scottie Scheffler (35602475),Akshay Bhatia (35602495),Robert Macintyre (35602498),Wyndham Clark (35602485),Rory McIlroy (35602479),Taylor Pendrith (35602499),49900,28.643
+6,Robert Macintyre (35602498),Taylor Pendrith (35602499),Scottie Scheffler (35602475),Rory McIlroy (35602479),Akshay Bhatia (35602495),Wyndham Clark (35602485),49900,28.643
+7,Justin Thomas (35602496),Robert Macintyre (35602498),Rory McIlroy (35602479),Sepp Straka (35602497),Wyndham Clark (35602485),Scottie Scheffler (35602475),50000,28.642
+8,Scottie Scheffler (35602475),Rory McIlroy (35602479),Robert Macintyre (35602498),Taylor Pendrith (35602499),Justin Thomas (35602496),Wyndham Clark (35602485),49800,28.632
+9,Justin Thomas (35602496),Robert Macintyre (35602498),Wyndham Clark (35602485),Taylor Pendrith (35602499),Scottie Scheffler (35602475),Rory McIlroy (35602479),49800,28.632
+10,Scottie Scheffler (35602475),Wyndham Clark (35602485),Taylor Pendrith (35602499),Justin Thomas (35602496),Robert Macintyre (35602498),Rory McIlroy (35602479),49800,28.632
+11,Sepp Straka (35602497),Rory McIlroy (35602479),Akshay Bhatia (35602495),Taylor Pendrith (35602499),Scottie Scheffler (35602475),Wyndham Clark (35602485),50000,28.617
+12,Scottie Scheffler (35602475),Taylor Pendrith (35602499),Rory McIlroy (35602479),Akshay Bhatia (35602495),Sepp Straka (35602497),Wyndham Clark (35602485),50000,28.617
+13,Rory McIlroy (35602479),Sepp Straka (35602497),Scottie Scheffler (35602475),Robert Macintyre (35602498),Taylor Pendrith (35602499),Wyndham Clark (35602485),49700,28.617
+14,Ludvig Aberg (35602478),Sam Burns (35602483),Xander Schauffele (35602476),Sepp Straka (35602497),Akshay Bhatia (35602495),Sahith Theegala (35602494),50000,15.756
+15,Sepp Straka (35602497),Ludvig Aberg (35602478),Xander Schauffele (35602476),Robert Macintyre (35602498),Sam Burns (35602483),Sahith Theegala (35602494),49700,15.756
+16,Ludvig Aberg (35602478),Xander Schauffele (35602476),Robert Macintyre (35602498),Sepp Straka (35602497),Sam Burns (35602483),Sahith Theegala (35602494),49700,15.756
+17,Ludvig Aberg (35602478),Sepp Straka (35602497),Xander Schauffele (35602476),Sahith Theegala (35602494),Sam Burns (35602483),Akshay Bhatia (35602495),50000,15.756
+18,Ludvig Aberg (35602478),Sepp Straka (35602497),Xander Schauffele (35602476),Sam Burns (35602483),Akshay Bhatia (35602495),Sahith Theegala (35602494),50000,15.756
+19,Ludvig Aberg (35602478),Sahith Theegala (35602494),Akshay Bhatia (35602495),Sam Burns (35602483),Xander Schauffele (35602476),Sepp Straka (35602497),50000,15.756
+20,Sam Burns (35602483),Akshay Bhatia (35602495),Xander Schauffele (35602476),Sepp Straka (35602497),Sahith Theegala (35602494),Ludvig Aberg (35602478),50000,15.756
+21,Sepp Straka (35602497),Xander Schauffele (35602476),Akshay Bhatia (35602495),Ludvig Aberg (35602478),Taylor Pendrith (35602499),Sam Burns (35602483),49500,15.656
