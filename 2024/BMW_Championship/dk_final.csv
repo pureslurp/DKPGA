@@ -1,0 +1,41 @@
+,Position,Name + ID,Name,ID,Roster Position,Salary,Game Info,TeamAbbrev,AvgPointsPerGame,Tournament Winner,Top 5 Finish,Top 10 Finish,Top 20 Finish,Total,Value
+0,G,Scottie Scheffler (35512015),scottie scheffler,35512015,G,12300,BMW Championship,Golf,108.64,8.571,0.0,0.0,0.0,8.571,0.6968292682926829
+1,G,Xander Schauffele (35512016),xander schauffele,35512016,G,11100,BMW Championship,Golf,95.76,5.0,0.0,0.0,0.0,5.0,0.45045045045045046
+2,G,Rory McIlroy (35512017),rory mcilroy,35512017,G,10800,BMW Championship,Golf,86.4,2.143,0.0,0.0,0.0,2.143,0.1984259259259259
+3,G,Hideki Matsuyama (35512018),hideki matsuyama,35512018,G,10500,BMW Championship,Golf,79.67,1.667,0.0,0.0,0.0,1.667,0.15876190476190477
+4,G,Viktor Hovland (35512019),viktor hovland,35512019,G,10400,BMW Championship,Golf,68.03,1.667,0.0,0.0,0.0,1.667,0.16028846153846155
+5,G,Collin Morikawa (35512020),collin morikawa,35512020,G,10100,BMW Championship,Golf,76.03,1.875,0.0,0.0,0.0,1.875,0.18564356435643564
+6,G,Ludvig Aberg (35512021),ludvig aberg,35512021,G,10000,BMW Championship,Golf,77.47,1.364,0.0,0.0,0.0,1.364,0.13640000000000002
+7,G,Patrick Cantlay (35512022),patrick cantlay,35512022,G,9800,BMW Championship,Golf,75.28,1.667,0.0,0.0,0.0,1.667,0.17010204081632654
+8,G,Tony Finau (35512023),tony finau,35512023,G,9700,BMW Championship,Golf,76.8,1.0,0.0,0.0,0.0,1.0,0.10309278350515465
+9,G,Tommy Fleetwood (35512024),tommy fleetwood,35512024,G,9600,BMW Championship,Golf,73.65,1.071,0.0,0.0,0.0,1.071,0.1115625
+10,G,Sam Burns (35512025),sam burns,35512025,G,9400,BMW Championship,Golf,75.74,0.857,0.0,0.0,0.0,0.857,0.09117021276595745
+11,G,Billy Horschel (35512026),billy horschel,35512026,G,9300,BMW Championship,Golf,68.8,0.75,0.0,0.0,0.0,0.75,0.08064516129032258
+12,G,Wyndham Clark (35512027),wyndham clark,35512027,G,9200,BMW Championship,Golf,74.82,1.2,0.0,0.0,0.0,1.2,0.13043478260869565
+13,G,Russell Henley (35512028),russell henley,35512028,G,9100,BMW Championship,Golf,70.76,0.75,0.0,0.0,0.0,0.75,0.08241758241758242
+14,G,Sungjae Im (35512029),sungjae im,35512029,G,9000,BMW Championship,Golf,67.24,0.6,0.0,0.0,0.0,0.6,0.06666666666666667
+15,G,Corey Conners (35512030),corey conners,35512030,G,8900,BMW Championship,Golf,75.1,0.6,0.0,0.0,0.0,0.6,0.06741573033707865
+16,G,Justin Thomas (35512031),justin thomas,35512031,G,8800,BMW Championship,Golf,68.53,0.667,0.0,0.0,0.0,0.667,0.07579545454545455
+17,G,Sahith Theegala (35512032),sahith theegala,35512032,G,8700,BMW Championship,Golf,72.48,0.545,0.0,0.0,0.0,0.545,0.06264367816091954
+18,G,Aaron Rai (35512033),aaron rai,35512033,G,8600,BMW Championship,Golf,73.25,0.6,0.0,0.0,0.0,0.6,0.06976744186046512
+19,G,Cameron Young (35512034),cameron young,35512034,G,8500,BMW Championship,Golf,74.76,0.6,0.0,0.0,0.0,0.6,0.07058823529411765
+20,G,Akshay Bhatia (35512035),akshay bhatia,35512035,G,8400,BMW Championship,Golf,65.58,0.4,0.0,0.0,0.0,0.4,0.04761904761904762
+21,G,Adam Scott (35512036),adam scott,35512036,G,8300,BMW Championship,Golf,70.82,0.545,0.0,0.0,0.0,0.545,0.06566265060240964
+22,G,Jason Day (35512037),jason day,35512037,G,8200,BMW Championship,Golf,70.85,0.5,0.0,0.0,0.0,0.5,0.06097560975609756
+23,G,Shane Lowry (35512038),shane lowry,35512038,G,8100,BMW Championship,Golf,72.63,0.375,0.0,0.0,0.0,0.375,0.046296296296296294
+24,G,Christiaan Bezuidenhout (35512039),christiaan bezuidenhout,35512039,G,8000,BMW Championship,Golf,67.56,0.375,0.0,0.0,0.0,0.375,0.046875
+25,G,Davis Thompson (35512040),davis thompson,35512040,G,7900,BMW Championship,Golf,71.52,0.429,0.0,0.0,0.0,0.429,0.05430379746835443
+26,G,Matt Fitzpatrick (35512041),matt fitzpatrick,35512041,G,7800,BMW Championship,Golf,63.8,0.4,0.0,0.0,0.0,0.4,0.05128205128205129
+27,G,Byeong Hun An (35512042),byeong hun an,35512042,G,7700,BMW Championship,Golf,68.64,0.333,0.0,0.0,0.0,0.333,0.04324675324675325
+28,G,Robert Macintyre (35512043),robert macintyre,35512043,G,7600,BMW Championship,Golf,58.56,0.429,0.0,0.0,0.0,0.429,0.05644736842105263
+29,G,Alex Noren (35512044),alex noren,35512044,G,7500,BMW Championship,Golf,69.48,0.273,0.0,0.0,0.0,0.273,0.0364
+30,G,Denny McCarthy (35512045),denny mccarthy,35512045,G,7400,BMW Championship,Golf,65.34,0.273,0.0,0.0,0.0,0.273,0.0368918918918919
+31,G,Taylor Pendrith (35512046),taylor pendrith,35512046,G,7300,BMW Championship,Golf,68.02,0.333,0.0,0.0,0.0,0.333,0.045616438356164385
+32,G,Brian Harman (35512047),brian harman,35512047,G,7200,BMW Championship,Golf,68.25,0.333,0.0,0.0,0.0,0.333,0.04625
+33,G,Sepp Straka (35512048),sepp straka,35512048,G,7100,BMW Championship,Golf,58.36,0.273,0.0,0.0,0.0,0.273,0.03845070422535212
+34,G,Keegan Bradley (35512049),keegan bradley,35512049,G,7000,BMW Championship,Golf,63.18,0.273,0.0,0.0,0.0,0.273,0.03900000000000001
+35,G,Nick Dunlap (35512050),nick dunlap,35512050,G,6900,BMW Championship,Golf,64.79,0.455,0.0,0.0,0.0,0.455,0.06594202898550725
+36,G,Will Zalatoris (35512051),will zalatoris,35512051,G,6800,BMW Championship,Golf,55.74,0.375,0.0,0.0,0.0,0.375,0.05514705882352942
+37,G,Si Woo Kim (35512052),si woo kim,35512052,G,6700,BMW Championship,Golf,71.25,0.25,0.0,0.0,0.0,0.25,0.0373134328358209
+38,G,Thomas Detry (35512053),thomas detry,35512053,G,6600,BMW Championship,Golf,65.78,0.24,0.0,0.0,0.0,0.24,0.03636363636363636
+39,G,Eric Cole (35512054),eric cole,35512054,G,6500,BMW Championship,Golf,61.68,0.24,0.0,0.0,0.0,0.24,0.03692307692307692

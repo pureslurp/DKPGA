@@ -1,0 +1,56 @@
+,Position,Name + ID,Name,ID,Roster Position,Salary,Game Info,TeamAbbrev,AvgPointsPerGame,Tournament Winner,Top 5 Finish,Top 10 Finish,Top 20 Finish,Total,Value
+0,G,Scottie Scheffler (32993540),scottie scheffler,32993540,G,11300,Arnold Palmer Invitational presented by Mastercard,Golf,112.75,4.615,8.75,7.955,15.136,36.456,3.226194690265487
+1,G,Rory McIlroy (32993541),rory mcilroy,32993541,G,10600,Arnold Palmer Invitational presented by Mastercard,Golf,89.14,3.333,7.0,7.0,11.364,28.697,2.7072641509433963
+2,G,Patrick Cantlay (32993542),patrick cantlay,32993542,G,10000,Arnold Palmer Invitational presented by Mastercard,Golf,87.8,1.667,3.733,4.118,6.818,16.336,1.6335999999999997
+3,G,Viktor Hovland (32993543),viktor hovland,32993543,G,9900,Arnold Palmer Invitational presented by Mastercard,Golf,90.42,1.875,3.889,4.242,6.818,16.824,1.6993939393939397
+4,G,Xander Schauffele (32993544),xander schauffele,32993544,G,9800,Arnold Palmer Invitational presented by Mastercard,Golf,94.58,1.667,3.733,4.118,6.818,16.336,1.666938775510204
+5,G,Ludvig Aberg (32993545),ludvig aberg,32993545,G,9500,Arnold Palmer Invitational presented by Mastercard,Golf,104.65,1.5,3.5,3.889,6.364,15.253,1.605578947368421
+6,G,Jordan Spieth (32993546),jordan spieth,32993546,G,9400,Arnold Palmer Invitational presented by Mastercard,Golf,88.7,1.2,3.111,3.5,5.682,13.493,1.4354255319148936
+7,G,Sam Burns (32993547),sam burns,32993547,G,9300,Arnold Palmer Invitational presented by Mastercard,Golf,97.75,1.071,2.545,2.917,4.773,11.306,1.2156989247311827
+8,G,Max Homa (32993548),max homa,32993548,G,9200,Arnold Palmer Invitational presented by Mastercard,Golf,83.06,1.0,2.333,2.692,5.0,11.025,1.1983695652173914
+9,G,Collin Morikawa (32993549),collin morikawa,32993549,G,9100,Arnold Palmer Invitational presented by Mastercard,Golf,90.0,1.2,3.111,3.333,5.455,13.099,1.4394505494505494
+10,G,Justin Thomas (32993550),justin thomas,32993550,G,9000,Arnold Palmer Invitational presented by Mastercard,Golf,92.79,1.071,2.545,2.8,4.773,11.189,1.2432222222222222
+11,G,Will Zalatoris (32993551),will zalatoris,32993551,G,8900,Arnold Palmer Invitational presented by Mastercard,Golf,75.1,0.857,2.154,2.5,4.348,9.859,1.107752808988764
+12,G,Tommy Fleetwood (32993552),tommy fleetwood,32993552,G,8800,Arnold Palmer Invitational presented by Mastercard,Golf,78.67,1.071,2.545,3.043,5.227,11.886,1.350681818181818
+13,G,Cameron Young (32993553),cameron young,32993553,G,8700,Arnold Palmer Invitational presented by Mastercard,Golf,87.81,1.071,2.545,2.917,4.773,11.306,1.2995402298850574
+14,G,Matt Fitzpatrick (32993554),matt fitzpatrick,32993554,G,8600,Arnold Palmer Invitational presented by Mastercard,Golf,84.09,0.909,2.333,2.692,4.762,10.696,1.243720930232558
+15,G,Wyndham Clark (32993555),wyndham clark,32993555,G,8500,Arnold Palmer Invitational presented by Mastercard,Golf,80.79,0.5,1.4,1.556,2.857,6.313,0.7427058823529411
+16,G,Hideki Matsuyama (32993556),hideki matsuyama,32993556,G,8400,Arnold Palmer Invitational presented by Mastercard,Golf,80.29,0.545,1.556,1.75,3.333,7.184,0.8552380952380952
+17,G,Tom Kim (32993557),tom kim,32993557,G,8300,Arnold Palmer Invitational presented by Mastercard,Golf,85.95,0.455,1.273,1.556,3.03,6.314,0.760722891566265
+18,G,Jason Day (32993558),jason day,32993558,G,8200,Arnold Palmer Invitational presented by Mastercard,Golf,86.42,0.857,2.154,2.5,4.545,10.056,1.2263414634146341
+19,G,Sahith Theegala (32993559),sahith theegala,32993559,G,8100,Arnold Palmer Invitational presented by Mastercard,Golf,81.11,0.4,1.167,1.4,2.5,5.467,0.6749382716049382
+20,G,Sungjae Im (32993560),sungjae im,32993560,G,8000,Arnold Palmer Invitational presented by Mastercard,Golf,66.94,0.429,1.273,1.556,2.857,6.115,0.764375
+21,G,Russell Henley (32993561),russell henley,32993561,G,8000,Arnold Palmer Invitational presented by Mastercard,Golf,80.83,0.429,1.273,1.556,2.941,6.199,0.774875
+22,G,J.T. Poston (32993562),j.t. poston,32993562,G,7900,Arnold Palmer Invitational presented by Mastercard,Golf,90.5,0.273,0.875,1.077,2.174,4.399,0.5568354430379747
+23,G,Matthieu Pavon (32993563),matthieu pavon,32993563,G,7900,Arnold Palmer Invitational presented by Mastercard,Golf,78.14,0.333,1.0,1.273,2.5,5.106,0.6463291139240506
+24,G,Chris Kirk (32993564),chris kirk,32993564,G,7800,Arnold Palmer Invitational presented by Mastercard,Golf,79.62,0.5,1.4,1.75,2.857,6.507,0.8342307692307692
+25,G,Corey Conners (32993565),corey conners,32993565,G,7800,Arnold Palmer Invitational presented by Mastercard,Golf,75.29,0.5,1.556,1.75,3.333,7.139,0.9152564102564102
+26,G,Brian Harman (32993566),brian harman,32993566,G,7700,Arnold Palmer Invitational presented by Mastercard,Golf,81.36,0.15,0.56,0.7,1.429,2.839,0.3687012987012987
+27,G,Si Woo Kim (32993567),si woo kim,32993567,G,7700,Arnold Palmer Invitational presented by Mastercard,Golf,77.06,0.375,1.167,1.4,2.632,5.574,0.7238961038961039
+28,G,Jake Knapp (32993568),jake knapp,32993568,G,7600,Arnold Palmer Invitational presented by Mastercard,Golf,83.79,0.5,1.4,1.556,3.03,6.486,0.853421052631579
+29,G,Byeong Hun An (32993569),byeong hun an,32993569,G,7600,Arnold Palmer Invitational presented by Mastercard,Golf,93.75,0.667,1.647,1.944,3.571,7.829,1.0301315789473684
+30,G,Shane Lowry (32993570),shane lowry,32993570,G,7500,Arnold Palmer Invitational presented by Mastercard,Golf,76.85,0.333,1.0,1.273,2.381,4.987,0.6649333333333333
+31,G,Adam Scott (32993571),adam scott,32993571,G,7500,Arnold Palmer Invitational presented by Mastercard,Golf,82.78,0.545,1.556,1.75,3.125,6.976,0.9301333333333334
+32,G,Eric Cole (32993572),eric cole,32993572,G,7400,Arnold Palmer Invitational presented by Mastercard,Golf,82.0,0.333,1.0,1.167,2.174,4.674,0.6316216216216216
+33,G,Keegan Bradley (32993573),keegan bradley,32993573,G,7400,Arnold Palmer Invitational presented by Mastercard,Golf,75.14,0.5,1.4,1.556,2.941,6.397,0.8644594594594595
+34,G,Kurt Kitayama (32993574),kurt kitayama,32993574,G,7300,Arnold Palmer Invitational presented by Mastercard,Golf,78.42,0.375,1.167,1.273,2.5,5.315,0.7280821917808219
+35,G,Harris English (32993575),harris english,32993575,G,7300,Arnold Palmer Invitational presented by Mastercard,Golf,83.93,0.5,1.4,1.75,3.125,6.775,0.928082191780822
+36,G,Nicolai Hojgaard (32993576),nicolai hojgaard,32993576,G,7200,Arnold Palmer Invitational presented by Mastercard,Golf,83.1,0.333,1.0,1.167,2.174,4.674,0.6491666666666667
+37,G,Stephan Jaeger (32993577),stephan jaeger,32993577,G,7200,Arnold Palmer Invitational presented by Mastercard,Golf,84.3,0.3,1.0,1.167,2.174,4.641,0.6445833333333334
+38,G,Tom Hoge (32993578),tom hoge,32993578,G,7100,Arnold Palmer Invitational presented by Mastercard,Golf,76.35,0.3,1.0,1.167,2.174,4.641,0.653661971830986
+39,G,Rickie Fowler (32993579),rickie fowler,32993579,G,7100,Arnold Palmer Invitational presented by Mastercard,Golf,60.19,0.24,0.7,0.875,1.667,3.482,0.49042253521126766
+40,G,Luke List (32993580),luke list,32993580,G,7000,Arnold Palmer Invitational presented by Mastercard,Golf,82.85,0.273,0.875,1.0,1.818,3.966,0.5665714285714286
+41,G,Christiaan Bezuidenhout (32993581),christiaan bezuidenhout,32993581,G,7000,Arnold Palmer Invitational presented by Mastercard,Golf,71.75,0.24,0.778,1.0,2.0,4.018,0.574
+42,G,Emiliano Grillo (32993582),emiliano grillo,32993582,G,6900,Arnold Palmer Invitational presented by Mastercard,Golf,66.14,0.3,1.0,1.167,2.222,4.689,0.6795652173913043
+43,G,Austin Eckroat (32993583),austin eckroat,32993583,G,6900,Arnold Palmer Invitational presented by Mastercard,Golf,72.46,0.24,0.778,1.0,1.818,3.836,0.5559420289855073
+44,G,Adam Hadwin (32993584),adam hadwin,32993584,G,6800,Arnold Palmer Invitational presented by Mastercard,Golf,82.64,0.375,1.167,1.4,2.778,5.72,0.8411764705882353
+45,G,Justin Rose (32993585),justin rose,32993585,G,6800,Arnold Palmer Invitational presented by Mastercard,Golf,75.8,0.24,0.7,0.875,1.786,3.601,0.5295588235294117
+46,G,Denny McCarthy (32993586),denny mccarthy,32993586,G,6700,Arnold Palmer Invitational presented by Mastercard,Golf,76.36,0.24,0.7,0.933,1.923,3.796,0.5665671641791045
+47,G,Cameron Davis (32993587),cameron davis,32993587,G,6700,Arnold Palmer Invitational presented by Mastercard,Golf,80.95,0.24,0.7,0.933,1.786,3.659,0.5461194029850747
+48,G,Erik Van Rooyen (32993588),erik van rooyen,32993588,G,6600,Arnold Palmer Invitational presented by Mastercard,Golf,88.87,0.375,1.167,1.273,2.5,5.315,0.8053030303030303
+49,G,Min Woo Lee (32993589),min woo lee,32993589,G,6600,Arnold Palmer Invitational presented by Mastercard,Golf,87.71,0.667,1.75,1.75,3.571,7.738,1.1724242424242424
+50,G,Patrick Rodgers (32993590),patrick rodgers,32993590,G,6500,Arnold Palmer Invitational presented by Mastercard,Golf,64.07,0.24,0.875,1.077,2.083,4.275,0.6576923076923077
+51,G,Nick Taylor (32993591),nick taylor,32993591,G,6500,Arnold Palmer Invitational presented by Mastercard,Golf,84.0,0.171,0.56,0.778,1.515,3.024,0.4652307692307692
+52,G,Adam Svensson (32993592),adam svensson,32993592,G,6400,Arnold Palmer Invitational presented by Mastercard,Golf,71.58,0.24,0.7,0.875,1.667,3.482,0.5440625
+53,G,Sepp Straka (32993593),sepp straka,32993593,G,6400,Arnold Palmer Invitational presented by Mastercard,Golf,58.9,0.24,0.7,0.875,1.667,3.482,0.5440625
+54,G,Brendon Todd (32993594),brendon todd,32993594,G,6400,Arnold Palmer Invitational presented by Mastercard,Golf,76.94,0.1,0.4,0.583,1.25,2.333,0.36453125000000003

@@ -9,8 +9,11 @@ import pandas as pd
 from collections import defaultdict
 import sys
 import argparse
+import os
 
-stat_list = ["Passing Yards", "Rushing Yards", "Receiving Yards", "Receptions", "Touchdowns", "Passing TDS", "Interceptions"]
+path = "/Users/seanraymor/Documents/Python Scripts/DKPGA/2024/"
+
+stat_list = ["Tournament Winner", "Top 5 Finish", "Top 10 Finish", "Top 20 Finish"]
 
 def odds_list_row(html):
     name = html.find("div", class_="props-name").text.strip()
@@ -34,24 +37,27 @@ def odds_list_row(html):
     return name, final_line
 
 
-def main(argv):
-    argParser = argparse.ArgumentParser()
-    argParser.add_argument("week", type=int, help="NFL Week")
-    args = argParser.parse_args()
-    WEEK = args.week
+def main():
     driver = webdriver.Firefox()
-    driver.get('https://www.scoresandodds.com/nfl/props')
+    driver.get('https://www.scoresandodds.com/golf')
     driver.implicitly_wait(120)
     data_dict = defaultdict(dict)
     name_list = []
     line_list = []
+    header = ''
+    
     for i in range(0, len(stat_list) - 1):
         result = driver.page_source
         soup = BeautifulSoup(result, "html.parser")
+        if header == '':
+            header = soup.find_all('header', class_="container-header")[0].text.strip()
+            header = header.split(" ")
+            header = "_".join(header[:-2])
         odds_table = soup.find_all('ul', class_="table-list")
-        odds_list = odds_table[i].find_all("li")
+        odds_list = odds_table[0].find_all("li")
         for entry in odds_list:
             name, line = odds_list_row(entry)
+            print(name, line)
             data_dict[f"{stat_list[i]}"][name] = line
         element = driver.find_element(By.XPATH, f"// span[contains(text(), '{stat_list[i]}')]")
         element.click()
@@ -66,8 +72,9 @@ def main(argv):
             result = driver.page_source
             soup = BeautifulSoup(result, "html.parser")
             odds_table = soup.find_all('ul', class_="table-list")
-            odds_list = odds_table[i+1].find_all("li")
+            odds_list = odds_table[0].find_all("li")
             for entry in odds_list:
+                print(name, line)
                 name, line = odds_list_row(entry)
                 data_dict[f"{stat_list[i+1]}"][name] = line
 
@@ -88,10 +95,11 @@ def main(argv):
         entry_dict = pd.DataFrame(data_dict[entry_stat].items(), columns=["Name", f"{entry_stat}"])
         master_df = pd.merge(master_df, entry_dict, how='left', on='Name')
 
-    
-    master_df.to_csv(f"2023/WEEK{WEEK}/NFL_Proj_{WEEK}.csv", index=False)
-    print(f"Successfully wrote file, /NFL_Proj_{WEEK}.csv")
+    if not os.path.exists(path + header):
+        os.makedirs(path + header)
+    master_df.to_csv(f"2024/{header}/odds.csv", index=False)
+    print(f"Successfully wrote file.csv")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

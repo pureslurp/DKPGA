@@ -23,6 +23,10 @@ def per_hole_scoring(score):
     Worse than Double Bogey = -1
     '''
     pts = 0
+    try:
+        score = [0 if n is None else n for n in score]
+    except:
+        score = [0,0]
     for rh in score:
         if rh == -3:
             p = 13
@@ -45,55 +49,67 @@ def streaks_and_bonuses(r1, r2, r3, r4, par):
     Bogey Free Round = 3
     All 4 Rounds Under 70 Strokes = 5
     '''
+    try:
+        if r4 is not None:
+            tot1 = par + sum(r1)
+            tot2 = par + sum(r2)
+            tot3 = par + sum(r3)
+            tot4 = par + sum(r4)
+            r_array = [r1, r2, r3, r4]
 
-    if r3 is not None:
-        tot1 = par + sum(r1)
-        tot2 = par + sum(r2)
-        tot3 = par + sum(r3)
-        tot4 = par + sum(r4)
-        r_array = [r1, r2, r3, r4]
-
-        if tot1 < 70 and tot2 < 70 and tot3 < 70 and tot4 < 70:
-            under_70_pts = 5
-        else:
-            under_70_pts = 0
-    else:
-        tot1 = par + sum(r1)
-        tot2 = par + sum(r2)
-        r_array = [r1, r2]
-
-        if tot1 < 70 and tot2 < 70:
-            under_70_pts = 5
-        else:
-            under_70_pts = 0
-    
-    bogey_free = 0
-    for r in r_array:
-        for h in r:
-            if h > 0:
-                bogey_streak_pts = 0
-                break
+            if tot1 < 70 and tot2 < 70 and tot3 < 70 and tot4 < 70:
+                under_70_pts = 5
             else:
-                bogey_streak_pts = 3
-        bogey_free += bogey_streak_pts
-    
-    birdie_streak = 0
-    for r in r_array:
-        l1 = False
-        l2 = False
-        for h in r:
-            if h < 0 and l1 == False:
-                l1 = True
-            elif h < 0 and l1 == True and l2 == False:
-                l2 = True
-            elif h < 0 and l1 == True and l2 == True:
-                birdie_streak += 3
-                l1 = False
-                l2 = False
+                under_70_pts = 0
+        elif r3 is not None:
+            tot1 = par + sum(r1)
+            tot2 = par + sum(r2)
+            tot3 = par + sum(r3)
+            r_array = [r1, r2, r3]
+
+            if tot1 < 70 and tot2 < 70 and tot3 < 70:
+                under_70_pts = 5
             else:
-                l1 = False
-                l2 = False
-    return bogey_free + birdie_streak + under_70_pts
+                under_70_pts = 0
+        else:
+            tot1 = par + sum(r1)
+            tot2 = par + sum(r2)
+            r_array = [r1, r2]
+
+            if tot1 < 70 and tot2 < 70:
+                under_70_pts = 5
+            else:
+                under_70_pts = 0
+        
+        bogey_free = 0
+        for r in r_array:
+            for h in r:
+                if h > 0:
+                    bogey_streak_pts = 0
+                    break
+                else:
+                    bogey_streak_pts = 3
+            bogey_free += bogey_streak_pts
+        
+        birdie_streak = 0
+        for r in r_array:
+            l1 = False
+            l2 = False
+            for h in r:
+                if h < 0 and l1 == False:
+                    l1 = True
+                elif h < 0 and l1 == True and l2 == False:
+                    l2 = True
+                elif h < 0 and l1 == True and l2 == True:
+                    birdie_streak += 3
+                    l1 = False
+                    l2 = False
+                else:
+                    l1 = False
+                    l2 = False
+        return bogey_free + birdie_streak + under_70_pts
+    except:
+        return 0
 
 def hole_in_one(score):
     hi1 = 0
@@ -179,27 +195,38 @@ def find_par(df):
     return par
 
 def find_net_score(df_score):
+    print(df_score)
     try:
         hole = np.arange(0,18,1)
         par = df_score.iloc[0].values
         score = df_score.iloc[1].values
         r_net_score = []
         for h in hole:
+            print(score[h], par[h])
             h_score = score[h] - par[h]
+            print(h_score)
             r_net_score.append(h_score)
     except:
+        print("except")
         r_net_score = None
+    print(r_net_score)
     return r_net_score
 
 def round_dk_score(r1_score, r2_score, r3_score, r4_score, pos, par):
     '''
 
     '''
+    # r1_score = [4 if n is None else n for n in r1_score]
+    # r2_score = [4 if n is None else n for n in r2_score]
+    
+
     
 
     tot_pts = 0
-    if r3_score is not None:
+    if r4_score is not None:
         tournament_score = [r1_score, r2_score, r3_score, r4_score]
+    elif r3_score is not None:
+        tournament_score = [r1_score, r2_score, r3_score]
     else:
         tournament_score = [r1_score, r2_score]
     for r_score in tournament_score:
@@ -220,7 +247,7 @@ def round_scores(driver, select2, round):
     df_scores = scores_pd[-1]
     #print(df_scores.columns[0])
     df_scores = df_scores.drop(df_scores.columns[[0, 10, 20, 21]], axis=1)
-    print(df_scores)
+    #print(df_scores)
     #df_scores = df_scores.drop(['Hole', 'Out', 'In', 'Tot'], axis=1)
 
     return df_scores
@@ -369,9 +396,14 @@ def dk_points_df(url):
             select = driver.find_element(By.CLASS_NAME, 'Leaderboard__Player__Detail')
             select2 = Select(select.find_element(By.CLASS_NAME, 'dropdown__select'))
             r1 = round_scores(driver, select2, "Round 1")
+            r1 = r1.mask(r1 == "-", 4)
             r2 = round_scores(driver, select2, "Round 2")
             r3 = round_scores(driver, select2, "Round 3")
-            r4 = round_scores(driver, select2, "Round 4")
+            try:
+                r4 = round_scores(driver, select2, "Round 4")
+            except:
+                r4 = None
+                
             row = {"Name": series_lower(row['PLAYER']), "DK Score" : round_dk_score(r1, r2, r3, r4, pos, par)}
             df_total_points = df_total_points.append(row, ignore_index=True)
         else:
@@ -379,6 +411,7 @@ def dk_points_df(url):
                 select = driver.find_element(By.CLASS_NAME, 'Leaderboard__Player__Detail')
                 select2 = Select(select.find_element(By.CLASS_NAME, 'dropdown__select'))
                 r1 = round_scores(driver, select2, "Round 1")
+                r1 = r1.mask(r1 == "-", 4)
                 r2 = round_scores(driver, select2, "Round 2")
                 r3 = None
                 r4 = None
@@ -392,7 +425,7 @@ def dk_points_df(url):
         element.click()
 
     df_total_points = check_world_rank(df_total_points)
-    df_total_points.to_csv(f'past_results/2022/dk_points_id_{t_id}.csv', index=False)
+    df_total_points.to_csv(f'past_results/2024/dk_points_id_{t_id}.csv', index=False)
     driver.close()
     driver.quit() 
     return df_total_points
