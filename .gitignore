@@ -5,4 +5,8 @@ __pycache__/
 # ignore text files
 *.txt
 # ignore files in legacy folder
-legacy/
+Legacy/
+# ignore geckodriver
+geckodriver.log
+# ignore log folder
+log/
