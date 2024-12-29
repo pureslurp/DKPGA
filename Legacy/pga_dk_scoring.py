@@ -274,24 +274,52 @@ def world_rank_rewrite_new(data):
         pos = np.nan
     return pos
 
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
+from selenium import webdriver
+import pandas as pd
+import time
+
 def check_world_rank(df_merge):
-    url = 'https://www.pgatour.com/stats/stat.186.y2023.html'
+    # Open the website
+    url = 'https://www.pgatour.com/stats/detail/186'
     driver = webdriver.Firefox()
     driver.get(url)
-    driver.implicitly_wait(120)
-    time.sleep(5)
+    time.sleep(5)  # Wait for the page to load
+
+    # Find the "Season" button using text
+    season_button = driver.find_element(By.XPATH, "//button[contains(@aria-label, 'Season')]")
+    season_button.click()
+    time.sleep(2)
+
+    # Select the "2022-2023" season
+    season_option = driver.find_element(By.XPATH, "//button[text()='2022-2023']")
+    season_option.click()
+    time.sleep(5)  # Wait for the page to update with the correct data
+    
+    # Get the page source after selecting the season
     result = driver.page_source
-    #print(result)
-    data = pd.read_html(result)[0]
+    
+    # Close the driver
     driver.close()
-    driver.quit()  
+    driver.quit()
+    
+    # Parse the data from the page
+    data = pd.read_html(result)[0]
+    
+    # Process the data
     data['Name'] = data['Player'].apply(lambda x: series_lower_new(x))
     print(data.head())
+    
     data['Rank'] = data["Total Points"].rank(ascending=False)
     data = data[["Rank", "Name"]]
-    df_merge = pd.merge(df_merge, data, how='left',on='Name')
+    
+    # Merge with the existing dataframe
+    df_merge = pd.merge(df_merge, data, how='left', on='Name')
     print(df_merge.head())
+    
     return df_merge
+
 
 def check_spelling_errors(data: str):
     '''A function that checks for common misspells'''
@@ -339,6 +367,8 @@ def check_spelling_errors(data: str):
         return 'louis oosthuizen'
     elif data.lower() == 'sungmoon bae':
         return 'sung-moon bae'
+    elif data.lower() == 'ludvig åberg':
+        return 'ludvig aberg'
     else:
         return data.lower()
 
@@ -404,8 +434,9 @@ def dk_points_df(url):
             except:
                 r4 = None
                 
-            row = {"Name": series_lower(row['PLAYER']), "DK Score" : round_dk_score(r1, r2, r3, r4, pos, par)}
-            df_total_points = df_total_points.append(row, ignore_index=True)
+            row_data = pd.DataFrame([{"Name": series_lower(row['PLAYER']), 
+                                    "DK Score": round_dk_score(r1, r2, r3, r4, pos, par)}])
+            df_total_points = pd.concat([df_total_points, row_data], ignore_index=True)
         else:
             try:
                 select = driver.find_element(By.CLASS_NAME, 'Leaderboard__Player__Detail')
@@ -415,8 +446,9 @@ def dk_points_df(url):
                 r2 = round_scores(driver, select2, "Round 2")
                 r3 = None
                 r4 = None
-                row = {"Name": series_lower(row['PLAYER']), "DK Score" : round_dk_score(r1, r2, r3, r4, pos, par)}
-                df_total_points = df_total_points.append(row, ignore_index=True)
+                row_data = pd.DataFrame([{"Name": series_lower(row['PLAYER']), 
+                                        "DK Score": round_dk_score(r1, r2, r3, r4, pos, par)}])
+                df_total_points = pd.concat([df_total_points, row_data], ignore_index=True)
             except:
                 print(f'Player {row["PLAYER"]} is N/A')
                 pass
@@ -425,7 +457,7 @@ def dk_points_df(url):
         element.click()
 
     df_total_points = check_world_rank(df_total_points)
-    df_total_points.to_csv(f'past_results/2024/dk_points_id_{t_id}.csv', index=False)
+    df_total_points.to_csv(f'past_results/2023/dk_points_id_{t_id}.csv', index=False)
     driver.close()
     driver.quit() 
     return df_total_points
