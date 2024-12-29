@@ -11,6 +11,13 @@ import sys
 import argparse
 import os
 
+'''
+Script that parses odds from scoresandodds.com
+
+Output:
+- /202X/{tournament_name}/odds.csv: the odds for each golfer for each stat
+'''
+
 path = "/Users/seanraymor/Documents/Python Scripts/DKPGA/2024/"
 
 stat_list = ["Tournament Winner", "Top 5 Finish", "Top 10 Finish", "Top 20 Finish"]

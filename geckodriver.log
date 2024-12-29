@@ -5607,3 +5607,1010 @@ console.warn: SearchSettings: "get: No settings file exists, new profile?" (new 
 DevTools listening on ws://localhost:61841/devtools/browser/804cfa2a-558d-4afb-9a31-488696362d77
 UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
 1724885260052	Marionette	INFO	Stopped listening on port 61851
+1735153414253	geckodriver	INFO	Listening on 127.0.0.1:54386
+1735153414774	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileKKdcRt"
+1735153415348	Marionette	INFO	Marionette enabled
+1735153415381	Marionette	INFO	Listening on port 54394
+WebDriver BiDi listening on ws://localhost:54387
+1735153415607	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileKKdcRt/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:54387/devtools/browser/fe7d8807-78fe-48fa-8008-e0986121fb83
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 6545 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://a.espncdn.com/prod/scripts/moat/yield.js, line 308: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 3191 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://player.aniview.com/ssync/621cca388ba47d78a102e506/ssync.html?pid=621cca388ba47d78a102e506&gdpr=0&consent=&ccpa=1YNY&r=https%3A%2F%2Fsync.taboola.com%2Fsg%2Faniviewrtb-network%2F1%2Frtb-h%2F%3Ftaboola_hm%3D%5BAV_UID%5D, line 100: unreachable code after return statement
+JavaScript warning: https://player.aniview.com/ssync/621cca388ba47d78a102e506/ssync.html?pid=621cca388ba47d78a102e506&gdpr=0&consent=&ccpa=1YNY&r=https%3A%2F%2Fsync.taboola.com%2Fsg%2Faniviewrtb-network%2F1%2Frtb-h%2F%3Ftaboola_hm%3D%5BAV_UID%5D, line 100: unreachable code after return statement
+1735153499101	Marionette	INFO	Stopped listening on port 54394
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+1735153500735	geckodriver	INFO	Listening on 127.0.0.1:54840
+1735153501252	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXUbnUz"
+1735153501664	Marionette	INFO	Marionette enabled
+1735153501690	Marionette	INFO	Listening on port 54848
+WebDriver BiDi listening on ws://localhost:54841
+1735153501841	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXUbnUz/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:54841/devtools/browser/1d4acfdb-82e0-4142-ba18-77db603013ff
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+1735153505591	Marionette	INFO	Stopped listening on port 54848
+1735154180259	geckodriver	INFO	Listening on 127.0.0.1:56161
+1735154180771	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileNlcuvL"
+1735154181209	Marionette	INFO	Marionette enabled
+1735154181238	Marionette	INFO	Listening on port 56169
+WebDriver BiDi listening on ws://localhost:56162
+1735154181468	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileNlcuvL/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:56162/devtools/browser/46c2be87-73d7-4445-9593-04f7a000453f
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735154193429	Marionette	INFO	Stopped listening on port 56169
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileNlcuvL/protections.sqlite
+1735154536814	geckodriver	INFO	Listening on 127.0.0.1:56894
+1735154537320	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilenbvAjt"
+1735154537695	Marionette	INFO	Marionette enabled
+1735154537721	Marionette	INFO	Listening on port 56902
+WebDriver BiDi listening on ws://localhost:56895
+1735154537834	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilenbvAjt/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:56895/devtools/browser/a7014f23-c688-4826-8b8e-eaffa36db5c5
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735154549678	Marionette	INFO	Stopped listening on port 56902
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilenbvAjt/protections.sqlite
+1735162407887	geckodriver	INFO	Listening on 127.0.0.1:60744
+1735162408392	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilesXumUS"
+1735162408848	Marionette	INFO	Marionette enabled
+1735162409028	Marionette	INFO	Listening on port 60754
+WebDriver BiDi listening on ws://localhost:60745
+1735162409233	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilesXumUS/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:60745/devtools/browser/8cac14b8-1e8a-421b-a5cc-f9808ce98a79
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735162420454	Marionette	INFO	Stopped listening on port 60754
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilesXumUS/protections.sqlite
+1735162731499	geckodriver	INFO	Listening on 127.0.0.1:61737
+1735162732004	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXfse8u"
+1735162732432	Marionette	INFO	Marionette enabled
+1735162732625	Marionette	INFO	Listening on port 61745
+WebDriver BiDi listening on ws://localhost:61738
+1735162732709	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXfse8u/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:61738/devtools/browser/a68f313f-8d24-4710-98a5-07924c587ffe
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735162744310	Marionette	INFO	Stopped listening on port 61745
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXfse8u/protections.sqlite
+1735162884890	geckodriver	INFO	Listening on 127.0.0.1:62506
+1735162885396	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilePGazL4"
+1735162885756	Marionette	INFO	Marionette enabled
+1735162885936	Marionette	INFO	Listening on port 62514
+WebDriver BiDi listening on ws://localhost:62507
+1735162886143	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilePGazL4/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:62507/devtools/browser/669a7520-263c-4000-908c-d80559c1f07f
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript error: https://www.pgatour.com/stats/detail/186 line 1 > injectedScript, line 1: ReferenceError: permutive is not defined
+1735162898112	Marionette	INFO	Stopped listening on port 62514
+1735162984130	geckodriver	INFO	Listening on 127.0.0.1:63200
+1735162984619	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileAyy7WJ"
+1735162984995	Marionette	INFO	Marionette enabled
+1735162985148	Marionette	INFO	Listening on port 63208
+WebDriver BiDi listening on ws://localhost:63201
+1735162985353	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileAyy7WJ/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:63201/devtools/browser/d7213249-ba76-4227-a38d-a115e03bfd53
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735162996626	Marionette	INFO	Stopped listening on port 63208
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileAyy7WJ/protections.sqlite
+1735163432600	geckodriver	INFO	Listening on 127.0.0.1:64302
+1735163433110	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilegewfjj"
+1735163433665	Marionette	INFO	Marionette enabled
+1735163433824	Marionette	INFO	Listening on port 64310
+WebDriver BiDi listening on ws://localhost:64303
+1735163433931	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilegewfjj/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:64303/devtools/browser/2395d52a-c4fa-4144-8434-5e81eab41b42
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735163436085	Marionette	INFO	Stopped listening on port 64310
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+JavaScript error: resource://services-settings/Utils.jsm, line 237: TypeError: NetworkError: Network request failed
+1735163486270	geckodriver	INFO	Listening on 127.0.0.1:64438
+1735163486779	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilevKFCkq"
+1735163487318	Marionette	INFO	Marionette enabled
+1735163487344	Marionette	INFO	Listening on port 64446
+WebDriver BiDi listening on ws://localhost:64439
+1735163487480	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilevKFCkq/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:64439/devtools/browser/2bdd5b34-ef57-4592-b2fb-f42d13a608fe
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 725 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://a.espncdn.com/prod/scripts/moat/yield.js, line 308: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript error: , line 0: NotSupportedError: The media resource indicated by the src attribute or assigned media provider object was not suitable.
+Exiting due to channel error.
+Exiting due to channel error.
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1735163582544	geckodriver	INFO	Listening on 127.0.0.1:65180
+1735163583064	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileu6Raum"
+1735163583599	Marionette	INFO	Marionette enabled
+1735163583746	Marionette	INFO	Listening on port 65189
+WebDriver BiDi listening on ws://localhost:65181
+1735163583841	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileu6Raum/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:65181/devtools/browser/92b043a1-b3ea-4cf5-96d8-05290725a2ef
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+JavaScript warning: https://a.espncdn.com/prod/scripts/moat/yield.js, line 308: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 5525 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735163606545	Marionette	INFO	Stopped listening on port 65189
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+1735163666998	geckodriver	INFO	Listening on 127.0.0.1:49467
+1735163667516	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile0eqENH"
+1735163668003	Marionette	INFO	Marionette enabled
+1735163668149	Marionette	INFO	Listening on port 49479
+WebDriver BiDi listening on ws://localhost:49468
+1735163668366	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile0eqENH/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:49468/devtools/browser/1de98c72-ec01-4c85-9d6b-8bfa9003fca3
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735163670336	Marionette	INFO	Stopped listening on port 49479
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+JavaScript error: resource://services-settings/Utils.jsm, line 237: TypeError: NetworkError: Network request failed
+1735163685905	geckodriver	INFO	Listening on 127.0.0.1:49648
+1735163686420	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileJzkYqD"
+1735163686850	Marionette	INFO	Marionette enabled
+1735163687003	Marionette	INFO	Listening on port 49657
+WebDriver BiDi listening on ws://localhost:49649
+1735163687101	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileJzkYqD/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:49649/devtools/browser/2a63a264-20a4-4953-b667-7c8773f1f478
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735163689023	Marionette	INFO	Stopped listening on port 49657
+JavaScript error: resource://services-settings/Utils.jsm, line 237: TypeError: NetworkError: Network request failed
+[GFX1-]: Failed to connect WebRenderBridgeChild. isParent=false
+1735165718233	geckodriver	INFO	Listening on 127.0.0.1:59482
+1735165718745	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileAibwb9"
+1735165719375	Marionette	INFO	Marionette enabled
+1735165719527	Marionette	INFO	Listening on port 59496
+WebDriver BiDi listening on ws://localhost:59483
+1735165719623	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileAibwb9/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:59483/devtools/browser/f8de8a1f-6409-4d43-bc39-6c7ab3554012
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+1735165722408	Marionette	INFO	Stopped listening on port 59496
+[GFX1-]: Failed to connect WebRenderBridgeChild. isParent=false
+1735166001781	geckodriver	INFO	Listening on 127.0.0.1:60969
+1735166002308	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilenC0dV8"
+1735166002843	Marionette	INFO	Marionette enabled
+1735166002997	Marionette	INFO	Listening on port 60981
+WebDriver BiDi listening on ws://localhost:60970
+1735166003097	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilenC0dV8/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:60970/devtools/browser/e2a82b85-96e1-46d5-93d2-f6176fb214f8
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+1735166006052	Marionette	INFO	Stopped listening on port 60981
+1735166032513	geckodriver	INFO	Listening on 127.0.0.1:61237
+1735166033031	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileErshlR"
+1735166033564	Marionette	INFO	Marionette enabled
+1735166033717	Marionette	INFO	Listening on port 61251
+WebDriver BiDi listening on ws://localhost:61238
+1735166033818	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileErshlR/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:61238/devtools/browser/32e4e809-b2e7-4041-9173-4a562cb09a88
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735166036110	Marionette	INFO	Stopped listening on port 61251
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+JavaScript error: resource://services-settings/Utils.jsm, line 237: TypeError: NetworkError: Network request failed
+1735166043604	geckodriver	INFO	Listening on 127.0.0.1:61372
+1735166044113	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiletVTTeV"
+1735166044512	Marionette	INFO	Marionette enabled
+1735166044668	Marionette	INFO	Listening on port 61380
+WebDriver BiDi listening on ws://localhost:61373
+1735166044808	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiletVTTeV/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:61373/devtools/browser/10957647-0644-4c33-b5e3-d8fce4fe002d
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+1735166047604	Marionette	INFO	Stopped listening on port 61380
+1735166069824	geckodriver	INFO	Listening on 127.0.0.1:61589
+1735166070333	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexgu32e"
+1735166070897	Marionette	INFO	Marionette enabled
+1735166070936	Marionette	INFO	Listening on port 61597
+WebDriver BiDi listening on ws://localhost:61590
+1735166071059	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexgu32e/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:61590/devtools/browser/b3513cc9-e359-4718-825c-8ad4fdafd5dd
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+1735166074062	Marionette	INFO	Stopped listening on port 61597
+1735166350824	geckodriver	INFO	Listening on 127.0.0.1:63092
+1735166351332	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileo8HnzQ"
+1735166351850	Marionette	INFO	Marionette enabled
+1735166352004	Marionette	INFO	Listening on port 63100
+WebDriver BiDi listening on ws://localhost:63093
+1735166352113	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileo8HnzQ/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:63093/devtools/browser/1a52e486-f999-4c49-bd7d-e3ab54204982
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://a.espncdn.com/prod/scripts/analytics/ESPN_at_v2.rs.min.js, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://cdn.registerdisney.go.com/v4/bundle/web/ESPN-ONESITE.WEB/en-US?cssOverride=https%3A%2F%2Fsecure.espncdn.com%2Fcombiner%2Fc%3Fcss%3Ddisneyid%2Fcorev4.css&logLevel=INFO, line 13: unreachable code after return statement
+1735166356490	Marionette	INFO	Stopped listening on port 63100
+1735166825113	geckodriver	INFO	Listening on 127.0.0.1:49627
+1735166825614	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile2ReSpJ"
+1735166826053	Marionette	INFO	Marionette enabled
+1735166826093	Marionette	INFO	Listening on port 49636
+WebDriver BiDi listening on ws://localhost:49628
+1735166826271	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile2ReSpJ/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:49628/devtools/browser/49e9d55a-ab12-41d1-992c-a800dd77c471
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735166838602	Marionette	INFO	Stopped listening on port 49636
+1735167463866	geckodriver	INFO	Listening on 127.0.0.1:54043
+1735167464369	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile9fGw5X"
+1735167464844	Marionette	INFO	Marionette enabled
+1735167464893	Marionette	INFO	Listening on port 54055
+WebDriver BiDi listening on ws://localhost:54044
+1735167465072	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile9fGw5X/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:54044/devtools/browser/1d6e63c8-e421-4a24-95af-442baaa3282d
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735167477939	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 2025 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript error: https://s0.2mdn.net/dfp/228427/14962267/1706284055974/index.html, line 1110: TypeError: studio.Enabler is undefined
+1735167636251	geckodriver	INFO	Listening on 127.0.0.1:55296
+1735167636762	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilewESekZ"
+1735167637145	Marionette	INFO	Marionette enabled
+1735167637306	Marionette	INFO	Listening on port 55308
+WebDriver BiDi listening on ws://localhost:55297
+1735167637470	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilewESekZ/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:55297/devtools/browser/9829ca26-5130-4512-a4f8-2566c6f6babc
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735167642301	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 1044 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735167694142	geckodriver	INFO	Listening on 127.0.0.1:56253
+1735167694655	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileyrMwgD"
+1735167695164	Marionette	INFO	Marionette enabled
+1735167695349	Marionette	INFO	Listening on port 56264
+WebDriver BiDi listening on ws://localhost:56254
+1735167695450	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileyrMwgD/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:56254/devtools/browser/9b78bb57-bd4e-4b09-8d8e-d48d516615a4
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 7303 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735167711231	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'interactive'.
+1735167711252	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'loading'.
+1735167711677	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 4751 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript error: , line 0: uncaught exception: 7
+1735167714781	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+1735167714794	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+1735167755230	geckodriver	INFO	Listening on 127.0.0.1:56998
+1735167755749	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXF8prw"
+1735167756144	Marionette	INFO	Marionette enabled
+1735167756300	Marionette	INFO	Listening on port 57006
+WebDriver BiDi listening on ws://localhost:56999
+1735167756392	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXF8prw/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:56999/devtools/browser/89fd345f-587a-4cda-bd9b-38158f75aec2
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 5124 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 80 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript error: , line 0: uncaught exception: 7
+1735167860918	geckodriver	INFO	Listening on 127.0.0.1:57993
+1735167861438	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiley3DYS9"
+1735167861948	Marionette	INFO	Marionette enabled
+1735167862136	Marionette	INFO	Listening on port 58001
+WebDriver BiDi listening on ws://localhost:57994
+1735167862219	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiley3DYS9/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:57994/devtools/browser/5c2d3bbc-086a-4385-beb3-cee973c97026
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 2615 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript error: https://s0.2mdn.net/dfp/228427/14962267/1710874696479/index.html, line 671: TypeError: studio.Enabler is undefined
+1735167931977	geckodriver	INFO	Listening on 127.0.0.1:58805
+1735167932497	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileMtPI4Q"
+1735167932943	Marionette	INFO	Marionette enabled
+1735167933102	Marionette	INFO	Listening on port 58817
+WebDriver BiDi listening on ws://localhost:58806
+1735167933179	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileMtPI4Q/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:58806/devtools/browser/eedd4454-f1b3-46bc-9402-42b9d249d580
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript error: https://www.pgatour.com/stats/detail/186 line 1 > injectedScript, line 1: ReferenceError: permutive is not defined
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 474 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735167945548	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'interactive'.
+1735167945557	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'loading'.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 4379 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript error: , line 0: uncaught exception: 7
+SourceActor threw an exception: [Exception... "Failed to open input source 'chrome://browser/content/certerror/aboutNetErrorCodes.js'"  nsresult: "0x805303f4 (<unknown>)"  location: "JS frame :: resource://devtools/shared/DevToolsUtils.js :: mainThreadFetch/< :: line 699"  data: yes]
+Stack: mainThreadFetch/<@resource://devtools/shared/DevToolsUtils.js:699:15
+mainThreadFetch@resource://devtools/shared/DevToolsUtils.js:545:10
+_fetchURLContents@resource://devtools/server/actors/utils/sources-manager.js:446:22
+urlContents@resource://devtools/server/actors/utils/sources-manager.js:410:17
+_resurrectSource@resource://devtools/server/actors/thread.js:2121:35
+addAllSources@resource://devtools/server/actors/thread.js:1482:14
+watch@resource://devtools/server/actors/resources/sources.js:62:17
+watchResources@resource://devtools/server/actors/resources/index.js:288:19
+_watchTargetResources@resource://devtools/server/actors/targets/target-actor-mixin.js:161:24
+addSessionDataEntry@resource://devtools/server/actors/targets/target-actor-mixin.js:53:20
+_addSessionDataEntry@resource://devtools/server/connectors/js-window-actor/DevToolsFrameChild.jsm:556:24
+receiveMessage@resource://devtools/server/connectors/js-window-actor/DevToolsFrameChild.jsm:465:21
+Line: 699, column: 0
+console.error: ({})
+JavaScript error: resource://devtools/shared/DevToolsUtils.js, line 699: Failed to open input source 'chrome://browser/content/certerror/aboutNetErrorCodes.js'
+JavaScript error: resource://devtools/server/actors/utils/sources-manager.js, line 432: TypeError: channel is null
+SourceActor threw an exception: [Exception... "Component returned failure code: 0x80470002 (NS_BASE_STREAM_CLOSED) [nsIInputStream.available]"  nsresult: "0x80470002 (NS_BASE_STREAM_CLOSED)"  location: "JS frame :: resource://devtools/shared/DevToolsUtils.js :: onResponse :: line 596"  data: no]
+Stack: onResponse@resource://devtools/shared/DevToolsUtils.js:596:34
+onStopRequest@resource://gre/modules/NetUtil.jsm:128:18
+Line: 596, column: 0
+console.error: ({})
+JavaScript error: resource://devtools/shared/DevToolsUtils.js, line 596: NS_BASE_STREAM_CLOSED: Component returned failure code: 0x80470002 (NS_BASE_STREAM_CLOSED) [nsIInputStream.available]
+SourceActor threw an exception: [Exception... "Component returned failure code: 0x80470002 (NS_BASE_STREAM_CLOSED) [nsIInputStream.available]"  nsresult: "0x80470002 (NS_BASE_STREAM_CLOSED)"  location: "JS frame :: resource://devtools/shared/DevToolsUtils.js :: onResponse :: line 596"  data: no]
+Stack: onResponse@resource://devtools/shared/DevToolsUtils.js:596:34
+onStopRequest@resource://gre/modules/NetUtil.jsm:128:18
+Line: 596, column: 0
+console.error: ({})
+JavaScript error: resource://devtools/shared/DevToolsUtils.js, line 596: NS_BASE_STREAM_CLOSED: Component returned failure code: 0x80470002 (NS_BASE_STREAM_CLOSED) [nsIInputStream.available]
+SourceActor threw an exception: [Exception... "Component returned failure code: 0x80470002 (NS_BASE_STREAM_CLOSED) [nsIInputStream.available]"  nsresult: "0x80470002 (NS_BASE_STREAM_CLOSED)"  location: "JS frame :: resource://devtools/shared/DevToolsUtils.js :: onResponse :: line 596"  data: no]
+Stack: onResponse@resource://devtools/shared/DevToolsUtils.js:596:34
+onStopRequest@resource://gre/modules/NetUtil.jsm:128:18
+Line: 596, column: 0
+console.error: ({})
+JavaScript error: resource://devtools/shared/DevToolsUtils.js, line 596: NS_BASE_STREAM_CLOSED: Component returned failure code: 0x80470002 (NS_BASE_STREAM_CLOSED) [nsIInputStream.available]
+console.error: "Error when attaching target:" (new Error("Connection closed, pending request to server0.conn0.windowGlobal38654705672/thread1, type isAttached failed\n\nRequest stack:\nrequest@resource://devtools/shared/protocol/Front.js:292:14\ngenerateRequestMethods/</frontProto[name]@resource://devtools/shared/protocol/Front/FrontClassWithSpec.js:46:19\nattachThread@resource://devtools/client/fronts/targets/target-mixin.js:552:49\n", "resource://devtools/shared/protocol/Front.js", 106))
+console.error: "Error when attaching target:" (new Error("Connection closed, pending request to server0.conn0.windowGlobal38654705673/thread1, type isAttached failed\n\nRequest stack:\nrequest@resource://devtools/shared/protocol/Front.js:292:14\ngenerateRequestMethods/</frontProto[name]@resource://devtools/shared/protocol/Front/FrontClassWithSpec.js:46:19\nattachThread@resource://devtools/client/fronts/targets/target-mixin.js:552:49\n", "resource://devtools/shared/protocol/Front.js", 106))
+1735168035687	Marionette	INFO	Stopped listening on port 58817
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: , line 0: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 575: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 575: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 575: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 575: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 575: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 575: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 575: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 575: NotFoundError: No such JSWindowActor 'DevToolsFrame'
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileMtPI4Q/protections.sqlite
+1735168038047	Marionette	INFO	Stopped listening on port 58001
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiley3DYS9/protections.sqlite
+1735168040403	Marionette	INFO	Stopped listening on port 57006
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXF8prw/protections.sqlite
+1735168047031	geckodriver	INFO	Listening on 127.0.0.1:59915
+1735168047547	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexkyZbT"
+1735168047918	Marionette	INFO	Marionette enabled
+1735168048068	Marionette	INFO	Listening on port 59923
+WebDriver BiDi listening on ws://localhost:59916
+1735168048262	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexkyZbT/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:59916/devtools/browser/501491b7-e04c-452b-8488-badfbb158d70
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 772 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735168061318	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+1735168062154	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+1735168066332	Marionette	INFO	Stopped listening on port 59923
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexkyZbT/protections.sqlite
+1735168467148	geckodriver	INFO	Listening on 127.0.0.1:62762
+1735168467654	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileSp2DyB"
+1735168468036	Marionette	INFO	Marionette enabled
+1735168468071	Marionette	INFO	Listening on port 62770
+WebDriver BiDi listening on ws://localhost:62763
+1735168468257	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileSp2DyB/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:62763/devtools/browser/4d2d371f-4615-4d9e-a7af-6286ec3dc4fa
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+JavaScript warning: https://pagead2.googlesyndication.com/bg/SpkypshKgSogYQ2K2Rf8n1LXP_m6U7d6Y-cIlE_Kkgg.js line 2 > eval line 1397 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://pix.adrta.com/cdnf.js?v=23.000, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735168482522	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+1735168484601	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+1735168484870	Marionette	WARN	Ignoring event 'pageshow' because document has an invalid readyState of 'uninitialized'.
+1735168487847	Marionette	INFO	Stopped listening on port 62770
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileSp2DyB/protections.sqlite
+1735318000688	geckodriver	INFO	Listening on 127.0.0.1:62087
+1735318001196	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiles8bNzE"
+*** You are running in headless mode.
+1735318001645	Marionette	INFO	Marionette enabled
+1735318001677	Marionette	INFO	Listening on port 62099
+WebDriver BiDi listening on ws://localhost:62088
+1735318001846	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiles8bNzE/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:62088/devtools/browser/dbef7909-6414-4e11-a105-7738e6d84ac2
+JavaScript error: , line 0: TypeError: error loading dynamically imported module
+JavaScript error: https://cdn.cookielaw.org/scripttemplates/202411.1.0/otBannerSdk.js, line 7: TypeError: i is undefined
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1735318125503	geckodriver	INFO	Listening on 127.0.0.1:62814
+1735318126025	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileqsf26N"
+*** You are running in headless mode.
+1735318126600	Marionette	INFO	Marionette enabled
+1735318126639	Marionette	INFO	Listening on port 62826
+WebDriver BiDi listening on ws://localhost:62815
+1735318126776	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileqsf26N/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:62815/devtools/browser/bab412cf-7cc8-4b17-a3cc-a5f61c6995de
+JavaScript error: , line 0: TypeError: error loading dynamically imported module
+JavaScript error: https://zn03f7m80qsrnw1gc-pgatour.siteintercept.qualtrics.com/SIE/?Q_ZID=ZN_03f7M80qsrNW1GC, line 39: Error: Loading chunk 8 failed.
+(error: https://siteintercept.qualtrics.com/dxjsmodule/8.372e3f9662e7442947d8.chunk.js?Q_CLIENTVERSION=2.22.0&Q_CLIENTTYPE=web&Q_BRANDID=www.pgatour.com)
+JavaScript error: https://zn03f7m80qsrnw1gc-pgatour.siteintercept.qualtrics.com/SIE/?Q_ZID=ZN_03f7M80qsrNW1GC, line 39: Error: Loading chunk 8 failed.
+(error: https://siteintercept.qualtrics.com/dxjsmodule/8.372e3f9662e7442947d8.chunk.js?Q_CLIENTVERSION=2.22.0&Q_CLIENTTYPE=web&Q_BRANDID=www.pgatour.com)
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+Exiting due to channel error.
+1735318141784	geckodriver	INFO	Listening on 127.0.0.1:63024
+1735318142292	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileX1zGeI"
+*** You are running in headless mode.
+1735318142628	Marionette	INFO	Marionette enabled
+1735318142664	Marionette	INFO	Listening on port 63036
+WebDriver BiDi listening on ws://localhost:63025
+1735318142813	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileX1zGeI/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:63025/devtools/browser/f8a70530-e9ea-4e3e-a3cf-8fe753793fe9
+JavaScript error: https://cdn.cookielaw.org/scripttemplates/202411.1.0/otBannerSdk.js, line 7: TypeError: i is undefined
+JavaScript error: , line 0: TypeError: error loading dynamically imported module
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1735324101433	geckodriver	INFO	Listening on 127.0.0.1:57128
+1735324101949	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexCLC1L"
+*** You are running in headless mode.
+1735324102354	Marionette	INFO	Marionette enabled
+1735324102388	Marionette	INFO	Listening on port 57136
+WebDriver BiDi listening on ws://localhost:57129
+1735324102527	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexCLC1L/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:57129/devtools/browser/4303a4ee-0ffa-4028-ad18-7ba2458fe6fa
+JavaScript error: , line 0: TypeError: error loading dynamically imported module
+JavaScript error: https://zn03f7m80qsrnw1gc-pgatour.siteintercept.qualtrics.com/SIE/?Q_ZID=ZN_03f7M80qsrNW1GC, line 39: Error: Loading chunk 8 failed.
+(error: https://siteintercept.qualtrics.com/dxjsmodule/8.372e3f9662e7442947d8.chunk.js?Q_CLIENTVERSION=2.22.0&Q_CLIENTTYPE=web&Q_BRANDID=www.pgatour.com)
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
+JavaScript error: https://zn03f7m80qsrnw1gc-pgatour.siteintercept.qualtrics.com/SIE/?Q_ZID=ZN_03f7M80qsrNW1GC, line 39: Error: Loading chunk 8 failed.
+(error: https://siteintercept.qualtrics.com/dxjsmodule/8.372e3f9662e7442947d8.chunk.js?Q_CLIENTVERSION=2.22.0&Q_CLIENTTYPE=web&Q_BRANDID=www.pgatour.com)
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+JavaScript error: https://cdn.cookielaw.org/scripttemplates/202411.1.0/otBannerSdk.js, line 7: TypeError: this.selector is null
+JavaScript error: https://zn03f7m80qsrnw1gc-pgatour.siteintercept.qualtrics.com/SIE/?Q_ZID=ZN_03f7M80qsrNW1GC, line 39: Error: Loading chunk 8 failed.
+(error: https://siteintercept.qualtrics.com/dxjsmodule/8.372e3f9662e7442947d8.chunk.js?Q_CLIENTVERSION=2.22.0&Q_CLIENTTYPE=web&Q_BRANDID=www.pgatour.com)
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1735324190838	geckodriver	INFO	Listening on 127.0.0.1:57790
+1735324191349	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilekWgXUM"
+*** You are running in headless mode.
+1735324191720	Marionette	INFO	Marionette enabled
+1735324191754	Marionette	INFO	Listening on port 57802
+WebDriver BiDi listening on ws://localhost:57791
+1735324191902	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilekWgXUM/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:57791/devtools/browser/4f243347-a43c-490b-a009-cb571f299da5
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+JavaScript error: , line 0: TypeError: error loading dynamically imported module
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1735324267329	geckodriver	INFO	Listening on 127.0.0.1:58254
+1735324267841	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile6PkTJB"
+*** You are running in headless mode.
+1735324268206	Marionette	INFO	Marionette enabled
+1735324268241	Marionette	INFO	Listening on port 58266
+WebDriver BiDi listening on ws://localhost:58255
+1735324268394	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile6PkTJB/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:58255/devtools/browser/99423153-c8db-44a1-9ad0-7ff054073b8c
+JavaScript error: , line 0: TypeError: error loading dynamically imported module
+JavaScript error: https://cdn.cookielaw.org/scripttemplates/202411.1.0/otBannerSdk.js, line 7: TypeError: i is undefined
+Exiting due to channel error.
+Exiting due to channel error.
+[GFX1-]: Receive IPC close with reason=AbnormalShutdown
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1735324326808	geckodriver	INFO	Listening on 127.0.0.1:58654
+1735324327319	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilerBXrQh"
+*** You are running in headless mode.
+1735324327679	Marionette	INFO	Marionette enabled
+1735324327781	Marionette	INFO	Listening on port 58663
+WebDriver BiDi listening on ws://localhost:58655
+1735324328014	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilerBXrQh/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:58655/devtools/browser/53605529-1ab7-4626-9307-cf70ba20a0d7
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+1735324473693	geckodriver	INFO	Listening on 127.0.0.1:59436
+1735324474194	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileJKLlR4"
+*** You are running in headless mode.
+1735324474522	Marionette	INFO	Marionette enabled
+1735324474531	Marionette	INFO	Listening on port 59444
+WebDriver BiDi listening on ws://localhost:59437
+1735324474714	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileJKLlR4/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:59437/devtools/browser/04ca0c81-8023-434c-9980-c60ed88a651e
+JavaScript error: https://cdn.cookielaw.org/scripttemplates/202411.1.0/otBannerSdk.js, line 7: TypeError: i is undefined
+1735324496151	Marionette	INFO	Stopped listening on port 59444
+1735324537924	geckodriver	INFO	Listening on 127.0.0.1:59914
+1735324538434	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileLsfGKq"
+*** You are running in headless mode.
+1735324538773	Marionette	INFO	Marionette enabled
+1735324538793	Marionette	INFO	Listening on port 59928
+WebDriver BiDi listening on ws://localhost:59915
+1735324538964	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileLsfGKq/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:59915/devtools/browser/f5e0f955-3472-40eb-8d6e-f08c4af61354
+JavaScript error: https://www.pgatour.com/stats/detail/02567 line 1 > injectedScript, line 1: ReferenceError: permutive is not defined
+1735324563128	Marionette	INFO	Stopped listening on port 59928
+1735335232327	geckodriver	INFO	Listening on 127.0.0.1:60079
+1735335232854	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileoRBCjC"
+*** You are running in headless mode.
+1735335233283	Marionette	INFO	Marionette enabled
+1735335233290	Marionette	INFO	Listening on port 60091
+WebDriver BiDi listening on ws://localhost:60080
+1735335233470	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileoRBCjC/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:60080/devtools/browser/b82fd750-4cb0-4033-8223-fd817ed7998b
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TC4BVF9V, line 397: SyntaxError: An invalid or illegal string was specified
+1735335260114	Marionette	INFO	Stopped listening on port 60091
+[GFX1-]: Failed to connect WebRenderBridgeChild. isParent=false
+1735397193502	geckodriver	INFO	Listening on 127.0.0.1:62300
+1735397194028	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilecipcLu"
+*** You are running in headless mode.
+1735397194550	Marionette	INFO	Marionette enabled
+1735397194565	Marionette	INFO	Listening on port 62312
+WebDriver BiDi listening on ws://localhost:62301
+1735397194741	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilecipcLu/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:62301/devtools/browser/f795b6f5-0384-404d-817e-b345bf013853
+JavaScript error: https://www.pgatour.com/stats/detail/02567 line 1 > injectedScript, line 1: ReferenceError: permutive is not defined
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
+1735397222599	Marionette	INFO	Stopped listening on port 62312
+1735430707226	geckodriver	INFO	Listening on 127.0.0.1:55994
+1735430707743	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile4lBrzp"
+1735430708448	Marionette	INFO	Marionette enabled
+1735430708603	Marionette	INFO	Listening on port 56005
+WebDriver BiDi listening on ws://localhost:55995
+1735430708836	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile4lBrzp/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:55995/devtools/browser/db10be6b-4286-4614-a05a-ab0cc8f0aa2c
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+1735431443918	geckodriver	INFO	Listening on 127.0.0.1:58733
+1735431444434	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile0WjDFV"
+*** You are running in headless mode.
+1735431444775	Marionette	INFO	Marionette enabled
+1735431444785	Marionette	INFO	Listening on port 58746
+WebDriver BiDi listening on ws://localhost:58734
+1735431445000	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile0WjDFV/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:58734/devtools/browser/0b294634-2de0-4356-bc38-7af13b382147
+1735431448491	Marionette	INFO	Stopped listening on port 58746
+1735431646129	geckodriver	INFO	Listening on 127.0.0.1:59744
+1735431646637	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileHzf9YO"
+*** You are running in headless mode.
+1735431646960	Marionette	INFO	Marionette enabled
+1735431646971	Marionette	INFO	Listening on port 59756
+WebDriver BiDi listening on ws://localhost:59745
+1735431647147	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileHzf9YO/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:59745/devtools/browser/7a27472a-cc7b-41e1-8f6b-866b68a9052d
+1735431651458	Marionette	INFO	Stopped listening on port 59756
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileHzf9YO/protections.sqlite
+1735431670696	geckodriver	INFO	Listening on 127.0.0.1:60023
+1735431671205	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexKu1Xu"
+*** You are running in headless mode.
+1735431671572	Marionette	INFO	Marionette enabled
+1735431671609	Marionette	INFO	Listening on port 60036
+WebDriver BiDi listening on ws://localhost:60024
+1735431671759	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexKu1Xu/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:60024/devtools/browser/ffc25742-cb23-4079-8f6f-e6231cb13d98
+1735431674372	Marionette	INFO	Stopped listening on port 60036
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexKu1Xu/protections.sqlite
+1735431704128	geckodriver	INFO	Listening on 127.0.0.1:60308
+1735431704640	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileJRClrC"
+*** You are running in headless mode.
+1735431704970	Marionette	INFO	Marionette enabled
+1735431704979	Marionette	INFO	Listening on port 60320
+WebDriver BiDi listening on ws://localhost:60309
+1735431705160	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileJRClrC/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:60309/devtools/browser/66162db4-9a7d-4d09-bc46-71e94579b77d
+1735431709189	Marionette	INFO	Stopped listening on port 60320
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileJRClrC/protections.sqlite
+1735431886872	geckodriver	INFO	Listening on 127.0.0.1:61288
+1735431887386	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilex0RsSt"
+*** You are running in headless mode.
+1735431887766	Marionette	INFO	Marionette enabled
+1735431887774	Marionette	INFO	Listening on port 61296
+WebDriver BiDi listening on ws://localhost:61289
+1735431887951	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilex0RsSt/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:61289/devtools/browser/575546d3-683c-4160-9498-30b444bfb3f8
+1735431891820	Marionette	INFO	Stopped listening on port 61296
+1735431905924	geckodriver	INFO	Listening on 127.0.0.1:61535
+1735431906437	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilefDScTD"
+*** You are running in headless mode.
+1735431906759	Marionette	INFO	Marionette enabled
+1735431906794	Marionette	INFO	Listening on port 61547
+WebDriver BiDi listening on ws://localhost:61536
+1735431906943	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilefDScTD/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:61536/devtools/browser/6ec1551f-e6d2-408a-8857-c49c0c4f103c
+1735431909689	Marionette	INFO	Stopped listening on port 61547
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilefDScTD/protections.sqlite
+1735431935131	geckodriver	INFO	Listening on 127.0.0.1:61791
+1735431935642	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileofTijj"
+*** You are running in headless mode.
+1735431936014	Marionette	INFO	Marionette enabled
+1735431936023	Marionette	INFO	Listening on port 61803
+WebDriver BiDi listening on ws://localhost:61792
+1735431936197	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileofTijj/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:61792/devtools/browser/2ea949fb-0305-4fc0-947d-ea5596e7476b
+1735431940347	Marionette	INFO	Stopped listening on port 61803
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 718: Error: Phase "Sqlite.jsm: wait until all connections are closed" is finished, it is too late to register completion condition "protections.sqlite#0: waiting for shutdown"
+1735439022188	geckodriver	INFO	Listening on 127.0.0.1:58558
+1735439022699	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileOF8Wy0"
+*** You are running in headless mode.
+1735439023245	Marionette	INFO	Marionette enabled
+1735439023256	Marionette	INFO	Listening on port 58566
+WebDriver BiDi listening on ws://localhost:58559
+1735439023444	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileOF8Wy0/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:58559/devtools/browser/93ba870b-6aea-4b0e-b102-7e9f065247f0
+1735439027884	Marionette	INFO	Stopped listening on port 58566
+1735439132268	geckodriver	INFO	Listening on 127.0.0.1:58804
+1735439132792	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexcfDjZ"
+*** You are running in headless mode.
+1735439133115	Marionette	INFO	Marionette enabled
+1735439133149	Marionette	INFO	Listening on port 58812
+WebDriver BiDi listening on ws://localhost:58805
+1735439133315	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilexcfDjZ/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:58805/devtools/browser/3495a602-722c-46c4-86be-e2c6b90f3822
+1735439136541	Marionette	INFO	Stopped listening on port 58812
+JavaScript error: resource:///modules/FaviconLoader.jsm, line 598: InvalidStateError: JSWindowActorChild.sendAsyncMessage: JSWindowActorChild cannot send at the moment
+JavaScript error: resource:///modules/FaviconLoader.jsm, line 598: InvalidStateError: JSWindowActorChild.sendAsyncMessage: JSWindowActorChild cannot send at the moment
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 718: Error: Phase "Sqlite.jsm: wait until all connections are closed" is finished, it is too late to register completion condition "protections.sqlite#0: waiting for shutdown"
+1735439164033	geckodriver	INFO	Listening on 127.0.0.1:58990
+1735439164544	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile2HAYd0"
+*** You are running in headless mode.
+1735439164865	Marionette	INFO	Marionette enabled
+1735439164899	Marionette	INFO	Listening on port 59000
+WebDriver BiDi listening on ws://localhost:58991
+1735439165047	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile2HAYd0/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:58991/devtools/browser/df020f13-a769-4dba-97ac-32a5d482eaa2
+1735439168141	Marionette	INFO	Stopped listening on port 59000
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 718: Error: Phase "Sqlite.jsm: wait until all connections are closed" is finished, it is too late to register completion condition "protections.sqlite#0: waiting for shutdown"
+1735439178382	geckodriver	INFO	Listening on 127.0.0.1:59161
+1735439178893	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile2ipBFV"
+*** You are running in headless mode.
+1735439179212	Marionette	INFO	Marionette enabled
+1735439179255	Marionette	INFO	Listening on port 59169
+WebDriver BiDi listening on ws://localhost:59162
+1735439179427	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile2ipBFV/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:59162/devtools/browser/ed8a3cf5-0e25-4f59-9eb1-eab2d8162cdc
+1735439182283	Marionette	INFO	Stopped listening on port 59169
+JavaScript error: resource://gre/modules/Sqlite.jsm, line 1105: Error: Sqlite.jsm has been shutdown. Cannot open connection to: /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile2ipBFV/protections.sqlite
+1735439232019	geckodriver	INFO	Listening on 127.0.0.1:59349
+1735439232532	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiletpqAsr"
+*** You are running in headless mode.
+1735439232861	Marionette	INFO	Marionette enabled
+1735439232869	Marionette	INFO	Listening on port 59357
+WebDriver BiDi listening on ws://localhost:59350
+1735439233033	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiletpqAsr/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:59350/devtools/browser/cdd7036a-27e5-45e0-9a2d-f10738c23b11
+JavaScript warning: https://pagead2.googlesyndication.com/bg/pyMTr0nkmN6cL6IgtDyOeR9sHSfyHchE6TDXG14OT6s.js line 2 > eval line 3800 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735439303080	geckodriver	INFO	Listening on 127.0.0.1:59847
+1735439303592	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiletENVdn"
+*** You are running in headless mode.
+1735439303890	Marionette	INFO	Marionette enabled
+1735439303925	Marionette	INFO	Listening on port 59855
+WebDriver BiDi listening on ws://localhost:59848
+1735439304069	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofiletENVdn/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:59848/devtools/browser/e511ca8c-d2bf-45a8-b784-b94001574b53
+JavaScript warning: https://pagead2.googlesyndication.com/bg/pyMTr0nkmN6cL6IgtDyOeR9sHSfyHchE6TDXG14OT6s.js line 2 > eval line 7709 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735439333897	geckodriver	INFO	Listening on 127.0.0.1:60299
+1735439334410	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileNz0NwM"
+*** You are running in headless mode.
+1735439335051	Marionette	INFO	Marionette enabled
+1735439335073	Marionette	INFO	Listening on port 60307
+WebDriver BiDi listening on ws://localhost:60300
+1735439335257	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileNz0NwM/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:60300/devtools/browser/18d50616-731e-4c74-9f25-a59d75c63817
+JavaScript warning: https://pagead2.googlesyndication.com/bg/pyMTr0nkmN6cL6IgtDyOeR9sHSfyHchE6TDXG14OT6s.js line 2 > eval line 7422 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735439451352	geckodriver	INFO	Listening on 127.0.0.1:60877
+1735439451862	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileuXsJ3Y"
+*** You are running in headless mode.
+1735439452207	Marionette	INFO	Marionette enabled
+1735439452216	Marionette	INFO	Listening on port 60885
+WebDriver BiDi listening on ws://localhost:60878
+1735439452389	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileuXsJ3Y/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:60878/devtools/browser/a7dc47f8-1d29-458b-aa96-15ee5e02d78e
+JavaScript warning: https://pagead2.googlesyndication.com/bg/pyMTr0nkmN6cL6IgtDyOeR9sHSfyHchE6TDXG14OT6s.js line 2 > eval line 796 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735439537129	geckodriver	INFO	Listening on 127.0.0.1:61403
+1735439537682	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXoF4LN"
+*** You are running in headless mode.
+1735439538031	Marionette	INFO	Marionette enabled
+1735439538039	Marionette	INFO	Listening on port 61411
+WebDriver BiDi listening on ws://localhost:61404
+1735439538225	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXoF4LN/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:61404/devtools/browser/ba9f45dd-65d3-4bb6-8dfb-a9762f964226
+JavaScript warning: https://pagead2.googlesyndication.com/bg/pyMTr0nkmN6cL6IgtDyOeR9sHSfyHchE6TDXG14OT6s.js line 2 > eval line 3040 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735439556073	geckodriver	INFO	Listening on 127.0.0.1:61815
+1735439556583	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilecYKIZ9"
+*** You are running in headless mode.
+1735439556890	Marionette	INFO	Marionette enabled
+1735439556932	Marionette	INFO	Listening on port 61823
+WebDriver BiDi listening on ws://localhost:61816
+1735439557102	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilecYKIZ9/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:61816/devtools/browser/232a7c66-97cf-4e73-96de-9c3e186130a6
+JavaScript warning: https://pagead2.googlesyndication.com/bg/pyMTr0nkmN6cL6IgtDyOeR9sHSfyHchE6TDXG14OT6s.js line 2 > eval line 6754 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735439588435	geckodriver	INFO	Listening on 127.0.0.1:62255
+1735439588947	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilepZB8jW"
+*** You are running in headless mode.
+1735439589304	Marionette	INFO	Marionette enabled
+1735439589341	Marionette	INFO	Listening on port 62263
+WebDriver BiDi listening on ws://localhost:62256
+1735439589488	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilepZB8jW/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:62256/devtools/browser/ddc192ed-c774-4795-ab81-fe9560a78b9e
+1735439592574	Marionette	INFO	Stopped listening on port 62263
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 718: Error: Phase "Sqlite.jsm: wait until all connections are closed" is finished, it is too late to register completion condition "protections.sqlite#0: waiting for shutdown"
+1735439616298	geckodriver	INFO	Listening on 127.0.0.1:62452
+1735439616894	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilerMjeun"
+*** You are running in headless mode.
+1735439617633	Marionette	INFO	Marionette enabled
+1735439617644	Marionette	INFO	Listening on port 62460
+WebDriver BiDi listening on ws://localhost:62453
+1735439617872	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilerMjeun/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:62453/devtools/browser/ab20daa9-bb22-443c-bcff-8bc661be87d5
+1735439622365	Marionette	INFO	Stopped listening on port 62460
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+1735439641876	geckodriver	INFO	Listening on 127.0.0.1:62659
+1735439642394	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileNlxH4j"
+*** You are running in headless mode.
+1735439642733	Marionette	INFO	Marionette enabled
+1735439642770	Marionette	INFO	Listening on port 62667
+WebDriver BiDi listening on ws://localhost:62660
+1735439642920	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileNlxH4j/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:62660/devtools/browser/db311415-3c3d-4bf5-a278-c39cd4e4f16a
+JavaScript warning: https://pagead2.googlesyndication.com/bg/pyMTr0nkmN6cL6IgtDyOeR9sHSfyHchE6TDXG14OT6s.js line 2 > eval line 2008 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1735439667862	geckodriver	INFO	Listening on 127.0.0.1:63099
+1735439668375	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilelQsnlb"
+*** You are running in headless mode.
+1735439668680	Marionette	INFO	Marionette enabled
+1735439668718	Marionette	INFO	Listening on port 63107
+WebDriver BiDi listening on ws://localhost:63100
+1735439668871	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilelQsnlb/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:63100/devtools/browser/cb884da6-95af-4af1-91ed-903be8c4d2c5
+JavaScript warning: https://pagead2.googlesyndication.com/bg/pyMTr0nkmN6cL6IgtDyOeR9sHSfyHchE6TDXG14OT6s.js line 2 > eval line 7563 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+1735439775325	geckodriver	INFO	Listening on 127.0.0.1:63647
+1735439775835	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileazr38v"
+*** You are running in headless mode.
+1735439776349	Marionette	INFO	Marionette enabled
+1735439776376	Marionette	INFO	Listening on port 63656
+WebDriver BiDi listening on ws://localhost:63648
+1735439776604	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileazr38v/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:63648/devtools/browser/76f0bf29-79ee-46df-806f-aba8d246f8c4
+JavaScript warning: https://pagead2.googlesyndication.com/bg/pyMTr0nkmN6cL6IgtDyOeR9sHSfyHchE6TDXG14OT6s.js line 2 > eval line 5727 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+1735439912586	geckodriver	INFO	Listening on 127.0.0.1:64251
+1735439913093	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileqWvoxz"
+*** You are running in headless mode.
+1735439913465	Marionette	INFO	Marionette enabled
+1735439913475	Marionette	INFO	Listening on port 64259
+WebDriver BiDi listening on ws://localhost:64252
+1735439913654	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileqWvoxz/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:64252/devtools/browser/577f3804-cb73-457d-9980-a356b5ef5b18
+JavaScript warning: https://pagead2.googlesyndication.com/bg/pyMTr0nkmN6cL6IgtDyOeR9sHSfyHchE6TDXG14OT6s.js line 2 > eval line 2403 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+[GFX1-]: Unrecognized feature ACCELERATED_CANVAS2D
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: JSON.parse: unexpected character at line 1 column 1 of the JSON data
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: JSON.parse: unexpected character at line 1 column 1 of the JSON data
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: timed out after 10000ms
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: JSON.parse: unexpected character at line 1 column 1 of the JSON data
