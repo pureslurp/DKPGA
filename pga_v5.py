@@ -27,11 +27,11 @@ The model will take into considereation the following:
    - PGATour.com has a new site that has past 5 (same) event finishes
 - Course Attributes (dg_course_table.cvs) against Player Attributes -- DONE
    - Player Attributes
-      - Strokes Gained (golfers/pga_stats_{date}.csv or current_form_{date}.csv)
+      - Strokes Gained (golfers/pga_stats_{date}.csv or golfers/current_form_{date}.csv)
          - Off the tee, Approach, Around the green, Putting
-      - Driving Accuracy (pga_stats_{date}.csv)
-      - Green in Regulation (pga_stats_{date}.csv)
-      - Scrambling from Sand (pga_stats_{date}.csv)
+      - Driving Accuracy (golfers/pga_stats_{date}.csv)
+      - Green in Regulation (golfers/pga_stats_{date}.csv)
+      - Scrambling from Sand (golfers/pga_stats_{date}.csv)
    - Need to create a mapping table for course attributes to player attributes -- DONE
 - Weighted Optimizion (weight_optimization_results.csv) -- DONE
    - Win, Top 5, Top 10, Top 20
@@ -332,22 +332,22 @@ class DKLineupOptimizer:
         self.lineup_size = lineup_size
         
     def generate_lineups(self, df: pd.DataFrame, num_lineups: int = 20, 
-                        min_salary: int = 45000, overlap_limit: int = 4) -> List[Dict]:
+                        min_salary: int = 45000, exposure_limit: float = 0.66,
+                        overlap_limit: int = 4) -> List[Dict]:
         """
-        Generate optimal lineups using Integer Linear Programming
+        Generate optimal lineups using Integer Linear Programming with exposure and overlap limits
         
         Args:
             df: DataFrame with columns ['Name + ID', 'Salary', 'Total']
             num_lineups: Number of lineups to generate
             min_salary: Minimum total salary to use
+            exposure_limit: Maximum percentage of lineups a player can appear in (0.0 to 1.0)
             overlap_limit: Maximum number of players that can overlap between lineups
         """
         lineups = []
         players = df.to_dict('records')
         
-        # Keep track of previously selected player combinations
-        previous_selections = []
-        
+        # First generate all lineups with overlap constraint
         for i in range(num_lineups):
             # Create the model
             prob = pulp.LpProblem(f"DraftKings_Lineup_{i}", pulp.LpMaximize)
@@ -379,10 +379,12 @@ class DKLineupOptimizer:
             cheap_players = [p for p in players if p['Salary'] <= cheap_threshold]
             if cheap_players:
                 prob += pulp.lpSum([decisions[p['Name + ID']] for p in cheap_players]) <= 1
-                
-            # Constraint 6: Limit overlap with previous lineups
-            for prev_lineup in previous_selections:
-                prob += pulp.lpSum([decisions[p] for p in prev_lineup]) <= overlap_limit
+            
+            # Constraint 6: Overlap constraint with previous lineups
+            if i > 0:
+                for prev_lineup in lineups:
+                    prev_players = [p['Name + ID'] for p in [prev_lineup[f'G{j}'] for j in range(1, 7)]]
+                    prob += pulp.lpSum([decisions[p] for p in prev_players]) <= overlap_limit
             
             # Solve the optimization problem
             prob.solve(pulp.PULP_CBC_CMD(msg=False))
@@ -396,22 +398,85 @@ class DKLineupOptimizer:
                     'TotalPoints': 0
                 }
                 
-                selected_players = []
                 idx = 0
                 for p in players:
                     if decisions[p['Name + ID']].value() == 1:
                         lineup[f'G{idx+1}'] = p
                         lineup['Salary'] += p['Salary']
                         lineup['TotalPoints'] += p['Total']
-                        selected_players.append(p['Name + ID'])
                         idx += 1
                 
                 lineups.append(lineup)
-                previous_selections.append(selected_players)
             else:
                 print(f"Could not find optimal solution for lineup {i+1}")
                 break
+        
+        # Calculate player exposures
+        player_counts = {}
+        for lineup in lineups:
+            for pos in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6']:
+                player = lineup[pos]['Name + ID']
+                player_counts[player] = player_counts.get(player, 0) + 1
+        
+        # Sort lineups by total points (ascending) to modify worst lineups first
+        lineups.sort(key=lambda x: x['TotalPoints'])
+        
+        # Identify overexposed players
+        max_appearances = int(num_lineups * exposure_limit)
+        overexposed = {player: count for player, count in player_counts.items() 
+                      if count > max_appearances}
+        
+        if overexposed:
+            print("\nAdjusting lineups for exposure limits...")
+            print(f"Players over {exposure_limit*100}% exposure:")
+            for player, count in overexposed.items():
+                print(f"- {player}: {count}/{num_lineups} lineups ({count/num_lineups*100:.1f}%)")
+            
+            # Create pool of replacement players (sorted by Total, excluding overexposed)
+            replacement_pool = sorted(
+                [p for p in players if p['Name + ID'] not in overexposed],
+                key=lambda x: x['Total'],
+                reverse=True
+            )
+            
+            # Adjust lineups to meet exposure limits
+            for lineup in lineups:
+                changes_made = False
+                used_players = set()  # Track players already in this lineup
                 
+                # First, add all valid players to used_players set
+                for pos in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6']:
+                    player = lineup[pos]['Name + ID']
+                    if player not in overexposed or player_counts[player] <= max_appearances:
+                        used_players.add(player)
+                
+                # Then make replacements
+                for pos in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6']:
+                    player = lineup[pos]['Name + ID']
+                    if player in overexposed and player_counts[player] > max_appearances:
+                        # Find best replacement that fits salary constraints and isn't already in lineup
+                        current_salary = lineup['Salary'] - lineup[pos]['Salary']
+                        for replacement in replacement_pool:
+                            replacement_id = replacement['Name + ID']
+                            if (current_salary + replacement['Salary'] <= self.salary_cap and 
+                                player_counts.get(replacement_id, 0) < max_appearances and
+                                replacement_id not in used_players):
+                                # Make the swap
+                                player_counts[player] -= 1
+                                player_counts[replacement_id] = player_counts.get(replacement_id, 0) + 1
+                                lineup[pos] = replacement
+                                lineup['Salary'] = current_salary + replacement['Salary']
+                                lineup['TotalPoints'] = sum(lineup[f'G{i+1}']['Total'] for i in range(6))
+                                used_players.add(replacement_id)  # Add to used players
+                                changes_made = True
+                                break
+                
+                if changes_made:
+                    # Re-sort lineups after modifications
+                    lineups.sort(key=lambda x: x['TotalPoints'])
+        
+        # Final sort by total points (descending)
+        lineups.sort(key=lambda x: x['TotalPoints'], reverse=True)
         return lineups
 
 def optimize_dk_lineups(dk_merge: pd.DataFrame, num_lineups: int = 20) -> pd.DataFrame:
@@ -422,6 +487,29 @@ def optimize_dk_lineups(dk_merge: pd.DataFrame, num_lineups: int = 20) -> pd.Dat
         dk_merge: DataFrame with merged odds and salary data
         num_lineups: Number of lineups to generate
     """
+    # First, check for and handle NaN values
+    critical_columns = ['Name + ID', 'Salary', 'Total']
+    
+    # Print initial stats
+    print(f"\nInitial dataset size: {len(dk_merge)}")
+    
+    # Check for NaN values in each column
+    for col in critical_columns:
+        nan_count = dk_merge[col].isna().sum()
+        if nan_count > 0:
+            print(f"Found {nan_count} NaN values in {col}")
+            if col == 'Total':
+                # Fill NaN totals with 0
+                dk_merge[col] = dk_merge[col].fillna(0)
+                print(f"Filled NaN values in {col} with 0")
+            else:
+                # For other critical columns, we need to drop these rows
+                dk_merge = dk_merge.dropna(subset=[col])
+                print(f"Dropped rows with NaN in {col}")
+    
+    print(f"Final dataset size after handling NaN values: {len(dk_merge)}\n")
+    
+    # Create the optimizer and generate lineups
     optimizer = DKLineupOptimizer()
     lineups = optimizer.generate_lineups(dk_merge, num_lineups)
     
@@ -586,11 +674,12 @@ class PGATourStatsScraper:
             
             # First load or fetch PGA stats as base data
             pga_stats_path = f'golfers/pga_stats_{timestamp}.csv'
-            if os.path.exists(pga_stats_path) and not force_refresh:
-                print("Loading existing PGA stats...")
+            
+            if not force_refresh and not should_refresh_stats(pga_stats_path):
+                print("Loading existing PGA stats from this week...")
                 base_df = pd.read_csv(pga_stats_path)
             else:
-                print("Fetching new PGA stats...")
+                print("Fetching new PGA stats (last update was before this week's Tuesday's...)...")
                 base_df = None
                 for stat_name in self.STAT_URLS.keys():
                     print(f"Fetching {stat_name}...")
@@ -606,7 +695,7 @@ class PGATourStatsScraper:
                     
             if use_current_form:
                 # Load current form data
-                form_path = f'golfers/current_form_{timestamp}.csv'
+                form_path = f'golfers/current_form_20241228.csv' # TODO: Make this dynamic once season starts
                 if os.path.exists(form_path):
                     print("Loading and merging current form data...")
                     form_df = pd.read_csv(form_path)
@@ -1038,14 +1127,141 @@ class CoursePlayerFit:
         
         return key_stats
 
-def main(tourney: str, num_lineups: int = 20):
+def calculate_tournament_history_score(name: str, history_df: pd.DataFrame) -> float:
+    """
+    Calculate a tournament history score based on past performance.
+    Players with only old history (>3 years ago) are treated similar to new players.
+    """
+    # Get player's history
+    player_history = history_df[history_df['Name'].apply(fix_names) == fix_names(name)]
+    
+    # Get median score from players with recent history
+    def has_recent_history(player):
+        recent_years = ['24', '2022-23', '2021-22']  # Last 3 years
+        for year in recent_years:
+            if year in history_df.columns and pd.notna(player[year]):
+                return True
+        return False
+    
+    # Get players with recent history for median calculation
+    players_with_recent = history_df[history_df.apply(has_recent_history, axis=1)]
+    median_score = 0.0
+    if len(players_with_recent) > 0:
+        history_scores = []
+        for _, player in players_with_recent.iterrows():
+            temp_df = pd.DataFrame([player])
+            score = calculate_tournament_history_score_internal(temp_df.iloc[0], history_df)
+            history_scores.append(score)
+        median_score = np.median(history_scores)
+    
+    # If player has no history or only old history, return median
+    if len(player_history) == 0 or player_history['measured_years'].iloc[0] == 0:
+        return median_score
+        
+    # Check if player has only old history
+    has_only_old_history = True
+    recent_years = ['24', '2022-23', '2021-22']  # Last 3 years
+    for year in recent_years:
+        if year in history_df.columns and pd.notna(player_history[year].iloc[0]):
+            has_only_old_history = False
+            break
+    
+    if has_only_old_history:
+        return median_score
+    
+    return calculate_tournament_history_score_internal(player_history.iloc[0], history_df)
+
+def calculate_tournament_history_score_internal(player_history: pd.Series, history_df: pd.DataFrame) -> float:
+    """Internal function to calculate tournament history score for a player with history"""
+    years = ['24', '2022-23', '2021-22', '2020-21', '2019-20']
+    weights = [1.0, 0.8, 0.6, 0.4, 0.2]  # More recent years weighted higher
+    
+    finish_points = 0.0
+    max_possible_points = 0.0
+    appearances = 0
+    avg_finish = 0.0
+    
+    for year, weight in zip(years, weights):
+        if year in history_df.columns:
+            finish = player_history[year]
+            if pd.notna(finish):
+                # Track number of appearances and average finish
+                appearances += 1
+                avg_finish += finish
+                
+                # Convert finish position to points (1st = 100, 60th = 0)
+                points = max(0, 100 - ((finish - 1) * (100/60)))
+                finish_points += points * weight
+                max_possible_points += 100 * weight
+    
+    # Calculate average finish position
+    avg_finish = avg_finish / appearances if appearances > 0 else 0
+    
+    # Apply consistency penalty for multiple poor performances
+    if appearances > 1:
+        # Penalty increases with number of appearances and average finish position
+        consistency_penalty = (avg_finish / 60) * (appearances / 5)  # 5 is max years tracked
+        finish_points *= (1 - consistency_penalty)
+    
+    # Normalize finish points (50% of total score)
+    finish_score = (finish_points / max_possible_points) * 50 if max_possible_points > 0 else 0
+    
+    # Calculate strokes gained score (30% of total)
+    sg_stats = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting']
+    sg_weights = [0.25, 0.35, 0.25, 0.15]  # Must sum to 1
+    
+    sg_score = 0.0
+    for stat, weight in zip(sg_stats, sg_weights):
+        if stat in history_df.columns:
+            sg_val = player_history[stat]
+            if pd.notna(sg_val):
+                # Convert SG to 0-100 scale (-2 to +2 range)
+                normalized_sg = min(100, max(0, (sg_val + 2) * 25))
+                sg_score += normalized_sg * weight
+    
+    # Scale SG score to 30% of total
+    sg_score *= 0.3
+    
+    # Calculate consistency score (20% of total)
+    consistency_score = player_history['made_cuts_pct'] * 20 if 'made_cuts_pct' in history_df.columns else 0
+    # Combine all components
+    total_score = finish_score + sg_score + consistency_score
+    
+    return total_score
+
+def get_current_tuesday() -> datetime:
+    """Get the date of the current week's Tuesday"""
+    today = datetime.now()
+    days_since_tuesday = (today.weekday() - 1) % 7  # Tuesday is 1
+    return today - pd.Timedelta(days=days_since_tuesday)
+
+def should_refresh_stats(stats_path: str) -> bool:
+    """
+    Check if stats should be refreshed based on file existence and date
+    Returns True if:
+    - File doesn't exist
+    - File is from before current week's Tuesday
+    """
+    if not os.path.exists(stats_path):
+        return True
+        
+    file_timestamp = datetime.fromtimestamp(os.path.getmtime(stats_path))
+    current_tuesday = get_current_tuesday()
+    
+    return file_timestamp < current_tuesday
+
+def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False):
     print(f"\n{'='*50}")
     print(f"Running optimization for {tourney}")
     print(f"{'='*50}\n")
 
     # Read odds data and DraftKings salaries
-    odds_df = pd.read_csv(f'2024/{tourney}/odds.csv')
-    dk_salaries = pd.read_csv(f'2024/{tourney}/DKSalaries.csv')
+    odds_df = pd.read_csv(f'2025/{tourney}/odds.csv')
+    dk_salaries = pd.read_csv(f'2025/{tourney}/DKSalaries.csv')
+    if tournament_history:
+        tourney_history = pd.read_csv(f'tournaments/{tourney}/tournament_history.csv')
+    else:
+        tourney_history = pd.DataFrame()
     
     print(f"Loaded {len(odds_df)} players from odds data")
     print(f"Loaded {len(dk_salaries)} players from DraftKings data\n")
@@ -1094,41 +1310,67 @@ def main(tourney: str, num_lineups: int = 20):
 
     # Calculate fit scores for all golfers and create DataFrame
     fit_scores_data = []
+    history_scores = []
     for golfer in golfers:
+        if tournament_history:
+            history_score = calculate_tournament_history_score(golfer.get_clean_name, tourney_history)
+        else:
+            history_score = 0
         fit_score = analyzer.calculate_fit_score(golfer)
         golfer.set_fit_score(fit_score['overall_fit'])
         fit_scores_data.append({
             'Name': golfer.get_clean_name,
             'Fit Score': fit_score['overall_fit']
         })
-    
+        history_scores.append({
+            'Name': golfer.get_clean_name,
+            'History Score': history_score
+        })
+    history_scores_df = pd.DataFrame(history_scores)
     fit_scores_df = pd.DataFrame(fit_scores_data)
     
 
-    # Merge fit scores with dk_data
+    # Merge fit scores and history scores with dk_data
     dk_data = pd.merge(dk_data, fit_scores_df, on='Name', how='left')
+    dk_data = pd.merge(dk_data, history_scores_df, on='Name', how='left')
+
 
     # Load weights from optimization results
-    weights_df = pd.read_csv('optimization_results/fit_odds_final_weights.csv')
-    odds_weight = weights_df['odds_weight'].iloc[0]
-    fit_weight = weights_df['fit_weight'].iloc[0]
+    
+    if len(tourney_history) > 0:
+        odds_weight = 0.5
+        fit_weight = 0.3
+        history_weight = 0.2
+    else:
+        weights_df = pd.read_csv('optimization_results/fit_odds_final_weights.csv')
+        odds_weight = weights_df['odds_weight'].iloc[0]
+        fit_weight = weights_df['fit_weight'].iloc[0]
+        history_weight = 0.0
+
+    
     
     print("Optimization Weights:")
     print(f"Odds Weight: {odds_weight:.3f}")
     print(f"Fit Weight:  {fit_weight:.3f}\n")
+    print(f"History Weight: {history_weight:.3f}\n")
 
     # Normalize Odds Total and Fit Score using min-max scaling
     dk_data['Normalized Odds'] = (dk_data['Odds Total'] - dk_data['Odds Total'].min()) / (dk_data['Odds Total'].max() - dk_data['Odds Total'].min())
     dk_data['Normalized Fit'] = (dk_data['Fit Score'] - dk_data['Fit Score'].min()) / (dk_data['Fit Score'].max() - dk_data['Fit Score'].min())
+    if tournament_history:
+        dk_data['Normalized History'] = (dk_data['History Score'] - dk_data['History Score'].min()) / \
+        (dk_data['History Score'].max() - dk_data['History Score'].min())
+    else:
+        dk_data['Normalized History'] = 0
     
     # Calculate Total using normalized values
-    dk_data['Total'] = dk_data['Normalized Odds'] * odds_weight + dk_data['Normalized Fit'] * fit_weight
+    dk_data['Total'] = dk_data['Normalized Odds'] * odds_weight + dk_data['Normalized Fit'] * fit_weight + dk_data['Normalized History'] * history_weight
     
     dk_data['Value'] = dk_data['Total'] / dk_data['Salary'] * 100000
 
     print("Top 5 Players by Value:")
     print("-" * 80)
-    print(dk_data[['Name', 'Salary', 'Odds Total', 'Fit Score', 'Total', 'Value']]
+    print(dk_data[['Name', 'Salary', 'Odds Total', 'Fit Score', 'History Score', 'Total', 'Value']]
           .sort_values(by='Value', ascending=False)
           .head(5)
           .to_string())
@@ -1136,7 +1378,7 @@ def main(tourney: str, num_lineups: int = 20):
 
     print("Top 5 Players by Total Points:")
     print("-" * 80) 
-    print(dk_data[['Name', 'Salary', 'Odds Total', 'Fit Score', 'Total', 'Value']]
+    print(dk_data[['Name', 'Salary', 'Odds Total', 'Fit Score', 'History Score', 'Total', 'Value']]
           .sort_values(by='Total', ascending=False)
           .head(5)
           .to_string())
@@ -1146,7 +1388,7 @@ def main(tourney: str, num_lineups: int = 20):
     optimized_lineups = optimize_dk_lineups(dk_data, num_lineups)
     
     # Save the lineups
-    output_path = f"2024/{tourney}/dk_lineups_optimized.csv"
+    output_path = f"2025/{tourney}/dk_lineups_optimized.csv"
     optimized_lineups.to_csv(output_path, index=False)
     print(f"Generated {len(optimized_lineups)} optimized lineups")
     print(f"Saved to: {output_path}\n")
@@ -1166,5 +1408,16 @@ def main(tourney: str, num_lineups: int = 20):
     print(f"\nTotal Salary: ${total_salary:,}")
     print(f"Total Points: {total_points:.2f}")
     
+    # Save detailed player data
+    output_data_path = f"2025/{tourney}/player_data.csv"
+    columns_to_save = [
+        'Name', 'Salary', 'Odds Total', 'Normalized Odds',
+        'Fit Score', 'Normalized Fit',
+        'History Score', 'Normalized History',
+        'Total', 'Value'
+    ]
+    dk_data[columns_to_save].sort_values('Total', ascending=False).to_csv(output_data_path, index=False)
+    print(f"Saved detailed player data to: {output_data_path}")
+
 if __name__ == "__main__":
-    main("TOUR_Championship")
+    main("The_Sentry", num_lineups=10,tournament_history=True)
