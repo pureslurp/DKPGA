@@ -6614,3 +6614,104 @@ JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3
 JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: JSON.parse: unexpected character at line 1 column 1 of the JSON data
 JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: timed out after 10000ms
 JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: JSON.parse: unexpected character at line 1 column 1 of the JSON data
+1735492927247	geckodriver	INFO	Listening on 127.0.0.1:51044
+1735492927757	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileTCQWPG"
+*** You are running in headless mode.
+1735492928259	Marionette	INFO	Marionette enabled
+1735492928267	Marionette	INFO	Listening on port 51053
+WebDriver BiDi listening on ws://localhost:51045
+1735492928433	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileTCQWPG/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:51045/devtools/browser/d218721d-a40f-4684-a678-fecacfae6df3
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+1735492957087	Marionette	INFO	Stopped listening on port 51053
+1735593753191	geckodriver	INFO	Listening on 127.0.0.1:49358
+1735593753712	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileh4Pkzt"
+1735593754319	Marionette	INFO	Marionette enabled
+1735593754352	Marionette	INFO	Listening on port 49366
+WebDriver BiDi listening on ws://localhost:49359
+1735593754489	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileh4Pkzt/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:49359/devtools/browser/0c31c314-3c12-4353-b289-82c30d230a62
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735593761864	Marionette	INFO	Stopped listening on port 49366
+1735593806495	geckodriver	INFO	Listening on 127.0.0.1:49581
+1735593807010	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilenF5R0D"
+1735593807454	Marionette	INFO	Marionette enabled
+1735593807607	Marionette	INFO	Listening on port 49589
+WebDriver BiDi listening on ws://localhost:49582
+1735593807723	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilenF5R0D/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:49582/devtools/browser/3b0f27e1-92c8-4344-a828-39f9bf443d98
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735593814567	Marionette	INFO	Stopped listening on port 49589
+1735593847175	geckodriver	INFO	Listening on 127.0.0.1:49784
+1735593847690	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileuHKv6z"
+1735593848141	Marionette	INFO	Marionette enabled
+1735593848176	Marionette	INFO	Listening on port 49792
+WebDriver BiDi listening on ws://localhost:49785
+1735593848349	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileuHKv6z/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:49785/devtools/browser/ac5650e9-d4e0-48b6-9c56-52c87ad6aa50
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735593856380	Marionette	INFO	Stopped listening on port 49792
+1735593963560	geckodriver	INFO	Listening on 127.0.0.1:50037
+1735593964072	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilei9Ypb7"
+1735593964489	Marionette	INFO	Marionette enabled
+1735593964525	Marionette	INFO	Listening on port 50046
+WebDriver BiDi listening on ws://localhost:50038
+1735593964703	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilei9Ypb7/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:50038/devtools/browser/aa8e27a1-8e79-430b-8bd2-c48c5584c0b0
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735593971199	Marionette	INFO	Stopped listening on port 50046
+1735594019037	geckodriver	INFO	Listening on 127.0.0.1:50259
+1735594019540	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile1iCxoF"
+1735594019997	Marionette	INFO	Marionette enabled
+1735594020161	Marionette	INFO	Listening on port 50267
+WebDriver BiDi listening on ws://localhost:50260
+1735594020384	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile1iCxoF/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:50260/devtools/browser/bf35d0d5-1b5f-4b99-aef0-ec83c29a6f05
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735594027069	Marionette	INFO	Stopped listening on port 50267
+1735594169668	geckodriver	INFO	Listening on 127.0.0.1:50529
+1735594170173	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilem3LJ4J"
+1735594170667	Marionette	INFO	Marionette enabled
+1735594170829	Marionette	INFO	Listening on port 50537
+WebDriver BiDi listening on ws://localhost:50530
+1735594170919	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofilem3LJ4J/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:50530/devtools/browser/f9c7ce53-9fa7-444f-8eae-62912d80aa51
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735594177727	Marionette	INFO	Stopped listening on port 50537
+1735594217455	geckodriver	INFO	Listening on 127.0.0.1:50739
+1735594217970	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileMVtkw2"
+1735594218447	Marionette	INFO	Marionette enabled
+1735594218471	Marionette	INFO	Listening on port 50747
+WebDriver BiDi listening on ws://localhost:50740
+1735594218604	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileMVtkw2/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:50740/devtools/browser/fe6fad8d-989e-4540-a0cb-98151a9db8cd
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735594225147	Marionette	INFO	Stopped listening on port 50747
+1735594450478	geckodriver	INFO	Listening on 127.0.0.1:51335
+1735594450986	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile97hpy9"
+*** You are running in headless mode.
+1735594451333	Marionette	INFO	Marionette enabled
+1735594451376	Marionette	INFO	Listening on port 51343
+WebDriver BiDi listening on ws://localhost:51336
+1735594451526	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofile97hpy9/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:51336/devtools/browser/179dda94-4dad-45e6-8a8f-49ceda82ab77
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
+JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
+1735594478081	Marionette	INFO	Stopped listening on port 51343
