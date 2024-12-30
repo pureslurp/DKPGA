@@ -18,7 +18,7 @@ Output:
 - /202X/{tournament_name}/odds.csv: the odds for each golfer for each stat
 '''
 
-path = "/Users/seanraymor/Documents/Python Scripts/DKPGA/2024/"
+path = "/Users/seanraymor/Documents/PythonScripts/DKPGA/2025/"
 
 stat_list = ["Tournament Winner", "Top 5 Finish", "Top 10 Finish", "Top 20 Finish"]
 
@@ -102,10 +102,12 @@ def main():
         entry_dict = pd.DataFrame(data_dict[entry_stat].items(), columns=["Name", f"{entry_stat}"])
         master_df = pd.merge(master_df, entry_dict, how='left', on='Name')
 
-    if not os.path.exists(path + header):
-        os.makedirs(path + header)
-    master_df.to_csv(f"2024/{header}/odds.csv", index=False)
-    print(f"Successfully wrote file.csv")
+    full_path = path + header
+    print(full_path)
+    if not os.path.exists(full_path):
+        os.makedirs(full_path)
+    master_df.to_csv(f"{full_path}/odds.csv", index=False)
+    print(f"Successfully wrote odds.csv")
 
 
 if __name__ == "__main__":
