@@ -10,3 +10,5 @@ Legacy/
 geckodriver.log
 # ignore log folder
 log/
+# ignore the dK_lineups_optimized csvs in each tournament folder
+*/dK_lineups_optimized.csv
