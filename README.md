@@ -14,6 +14,8 @@ A comprehensive model for optimizing DraftKings PGA Tour lineups using historica
 #### Course Attributes
 - Reference data stored in: `dg_course_table.csv`
 - Mapped against player performance metrics
+- Weights optimized through backtesting against 2024 tournament results
+- Optimized weights loaded from: `optimization_results/final_weights.csv`
 
 #### Player Statistics
 Data sourced from: `golfers/pga_stats_{date}.csv` or `golfers/current_form_{date}.csv`
@@ -37,7 +39,9 @@ Key Metrics:
   - Top 10 Finish
   - Top 20 Finish
 
-#### Default Weights
+#### Optimized Weights
+The following weights were derived from backtesting 2024 tournament results:
+
 | Finish Position | Weight |
 |----------------|--------|
 | Winner         | 0.6    |
