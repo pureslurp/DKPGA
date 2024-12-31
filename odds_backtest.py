@@ -273,7 +273,7 @@ class WeightOptimizer:
                     'top10_weight': [r['optimal_weights'][2] for r in results],
                     'top20_weight': [r['optimal_weights'][3] for r in results]
                 })
-                results_df.to_csv('weight_optimization_results.csv', index=False)
+                results_df.to_csv('optimization_results/weight_optimization_results.csv', index=False)
                 
         self.analyze_results(results)
         return results
