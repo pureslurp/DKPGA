@@ -6715,3 +6715,39 @@ JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3
 JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
 JavaScript error: https://www.pgatour.com/_next/static/chunks/pages/_app-408ada3420eed27d.js, line 372: Error: NetworkError when attempting to fetch resource.
 1735594478081	Marionette	INFO	Stopped listening on port 51343
+1735663522332	geckodriver	INFO	Listening on 127.0.0.1:64814
+1735663522850	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileiR2td2"
+1735663523556	Marionette	INFO	Marionette enabled
+1735663523582	Marionette	INFO	Listening on port 64823
+WebDriver BiDi listening on ws://localhost:64815
+1735663523745	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileiR2td2/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:64815/devtools/browser/3a4b8fde-bdcb-41e6-af70-ab2b41a37d99
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+1735663531127	Marionette	INFO	Stopped listening on port 64823
+1735664291778	geckodriver	INFO	Listening on 127.0.0.1:49974
+1735664292299	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileqOKlI6"
+*** You are running in headless mode.
+1735664292598	Marionette	INFO	Marionette enabled
+1735664292633	Marionette	INFO	Listening on port 49982
+WebDriver BiDi listening on ws://localhost:49975
+1735664292818	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileqOKlI6/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:49975/devtools/browser/1da41d03-8f2a-4be9-be8c-322e38141ad2
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+1735664321594	Marionette	INFO	Stopped listening on port 49982
+1735669306821	geckodriver	INFO	Listening on 127.0.0.1:54453
+1735669307341	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXFGFF7"
+*** You are running in headless mode.
+1735669307823	Marionette	INFO	Marionette enabled
+1735669307834	Marionette	INFO	Listening on port 54461
+WebDriver BiDi listening on ws://localhost:54454
+1735669308012	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/0w/vxw7b1215nb21hjt8wb_tdt00000gn/T/rust_mozprofileXFGFF7/search.json.mozlz4", (void 0)))
+DevTools listening on ws://localhost:54454/devtools/browser/53308b2c-306c-4868-b8ff-baa19be100f1
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+1735669335343	Marionette	INFO	Stopped listening on port 54461

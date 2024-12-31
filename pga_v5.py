@@ -690,29 +690,40 @@ class PGATourStatsScraper:
                     else:
                         base_df = pd.merge(base_df, df, on='Name', how='outer')
             
-                    # Save PGA stats
-                    base_df.to_csv(pga_stats_path, index=False)
-                    
+                # Save PGA stats
+                base_df.to_csv(pga_stats_path, index=False)
+                
             if use_current_form:
                 # Load current form data
                 form_path = f'golfers/current_form_20241228.csv' # TODO: Make this dynamic once season starts
                 if os.path.exists(form_path):
-                    print("Loading and merging current form data...")
+                    print("Loading and merging current form data with 70/30 weighting...")
                     form_df = pd.read_csv(form_path)
                     
                     # Keep only the strokes gained columns from current form
                     sg_columns = ['Name', 'sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
                     form_df = form_df[sg_columns]
                     
-                    # Merge with base_df, preferring current form SG stats where available
-                    final_df = pd.merge(base_df, form_df, on='Name', how='left', suffixes=('_pga', ''))
+                    # Merge with base_df
+                    final_df = pd.merge(base_df, form_df, on='Name', how='left', suffixes=('_pga', '_form'))
                     
-                    # For each SG stat, use current form value if available, otherwise keep PGA value
+                    # For each SG stat, apply weighted average (70% current form, 30% PGA stats)
                     for sg_stat in ['sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']:
                         pga_col = f'{sg_stat}_pga'
-                        if pga_col in final_df.columns:
-                            final_df[sg_stat] = final_df[sg_stat].fillna(final_df[pga_col])
-                            final_df = final_df.drop(columns=[pga_col])
+                        form_col = f'{sg_stat}_form'
+                        
+                        # Fill NaN values with the other source if available
+                        final_df[pga_col] = final_df[pga_col].fillna(final_df[form_col])
+                        final_df[form_col] = final_df[form_col].fillna(final_df[pga_col])
+                        
+                        # Calculate weighted average
+                        final_df[sg_stat] = (
+                            final_df[form_col] * 0.7 + 
+                            final_df[pga_col] * 0.3
+                        )
+                        
+                        # Drop the temporary columns
+                        final_df = final_df.drop(columns=[pga_col, form_col])
                 else:
                     print("Current form data not found, using PGA stats only")
                     final_df = base_df
