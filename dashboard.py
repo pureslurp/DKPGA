@@ -18,6 +18,9 @@ def load_tournament_data(tournament: str) -> tuple:
 def main():
     st.set_page_config(layout="wide", page_title="PGA DFS Dashboard")
     
+    # Main title
+    st.title(f"PGA DFS Dashboard")
+
     # Add mobile warning with CSS media query
     st.markdown(
         """
@@ -25,9 +28,12 @@ def main():
             #mobile-warning {
                 display: none;
                 padding: 10px;
-                background-color: #ffebee;
+                background-color: #ff4444;
+                color: white;
                 border-radius: 5px;
                 margin-bottom: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
             
             @media screen and (max-width: 768px) {
@@ -42,9 +48,6 @@ def main():
         """,
         unsafe_allow_html=True
     )
-    
-    # Main title
-    st.title(f"PGA DFS Dashboard")
     
     # Sidebar
     st.sidebar.title("PGA DFS Dashboard")
