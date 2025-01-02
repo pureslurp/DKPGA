@@ -1,0 +1,8 @@
+streamlit>=1.31.0
+pandas>=2.0.0
+numpy>=1.24.0
+pulp>=2.7.0
+selenium>=4.11.0
+python-dotenv>=1.0.0
+dataclasses>=0.6
+typing>=3.7.4
