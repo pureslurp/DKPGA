@@ -18,46 +18,35 @@ def load_tournament_data(tournament: str) -> tuple:
 def main():
     st.set_page_config(layout="wide", page_title="PGA DFS Dashboard")
     
-    # Inject JavaScript to detect device type
-    device_detector = """
-        <script>
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            document.querySelector('section[data-testid="stSidebar"]').style.display = 'none';
-            const element = document.createElement('div');
-            element.id = 'mobile-detected';
-            document.body.appendChild(element);
-        }
-        </script>
-    """
-    st.components.v1.html(device_detector, height=0)
-    
-    # Check if mobile device was detected
-    st.components.v1.html(
-        """
-        <script>
-        if (document.getElementById('mobile-detected')) {
-            window.parent.document.querySelector('#mobile-warning').style.display = 'block';
-        }
-        </script>
-        """,
-        height=0
-    )
-    
-    # Mobile warning (hidden by default)
+    # Inject JavaScript to detect device type and show warning
     st.markdown(
         """
-        <div id="mobile-warning" style="display: none; padding: 10px; background-color: #ffebee; border-radius: 5px; margin-bottom: 20px;">
-            ⚠️ This dashboard is optimized for desktop viewing. Mobile users may experience limited functionality.
-        </div>
+        <script>
+            function isMobileDevice() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            }
+            
+            if (isMobileDevice()) {
+                document.addEventListener('DOMContentLoaded', function() {
+                    const warning = document.createElement('div');
+                    warning.innerHTML = '⚠️ This dashboard is optimized for desktop viewing. Mobile users may experience limited functionality.';
+                    warning.style.padding = '10px';
+                    warning.style.backgroundColor = '#ffebee';
+                    warning.style.borderRadius = '5px';
+                    warning.style.marginBottom = '20px';
+                    document.body.insertBefore(warning, document.body.firstChild);
+                });
+            }
+        </script>
         """,
         unsafe_allow_html=True
     )
     
-    # Sidebar
-    st.sidebar.title("PGA DFS Dashboard")
-    
     # Main title
     st.title(f"PGA DFS Dashboard")
+    
+    # Sidebar
+    st.sidebar.title("PGA DFS Dashboard")
     
     # Tournament selection
     selected_tournament = st.sidebar.selectbox(
