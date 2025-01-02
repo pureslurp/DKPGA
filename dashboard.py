@@ -15,6 +15,15 @@ def load_tournament_data(tournament: str) -> tuple:
     except FileNotFoundError:
         return None, None
 
+def get_available_tournaments():
+    """Get list of tournaments that have data in the 2025 folder"""
+    try:
+        # Get all subdirectories in the 2025 folder
+        tournaments = [d for d in os.listdir("2025") if os.path.isdir(os.path.join("2025", d))]
+        return sorted(tournaments) if tournaments else ["No tournaments available"]
+    except FileNotFoundError:
+        return ["No tournaments available"]
+
 def main():
     st.set_page_config(layout="wide", page_title="PGA DFS Dashboard")
     
@@ -52,10 +61,10 @@ def main():
     # Sidebar
     st.sidebar.title("PGA DFS Dashboard")
     
-    # Tournament selection
+    # Tournament selection using available tournaments
     selected_tournament = st.sidebar.selectbox(
         "Select Tournament",
-        TOURNAMENT_LIST_2024
+        get_available_tournaments()
     )
     
     # Run model button
