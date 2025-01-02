@@ -28,7 +28,7 @@ def main():
             #mobile-warning {
                 display: none;
                 padding: 10px;
-                background-color: #ff4444;
+                background-color: #ff9800;
                 color: white;
                 border-radius: 5px;
                 margin-bottom: 20px;
