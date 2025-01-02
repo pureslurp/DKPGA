@@ -18,26 +18,27 @@ def load_tournament_data(tournament: str) -> tuple:
 def main():
     st.set_page_config(layout="wide", page_title="PGA DFS Dashboard")
     
-    # Inject JavaScript to detect device type and show warning
+    # Add mobile warning with CSS media query
     st.markdown(
         """
-        <script>
-            function isMobileDevice() {
-                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        <style>
+            #mobile-warning {
+                display: none;
+                padding: 10px;
+                background-color: #ffebee;
+                border-radius: 5px;
+                margin-bottom: 20px;
             }
             
-            if (isMobileDevice()) {
-                document.addEventListener('DOMContentLoaded', function() {
-                    const warning = document.createElement('div');
-                    warning.innerHTML = '⚠️ This dashboard is optimized for desktop viewing. Mobile users may experience limited functionality.';
-                    warning.style.padding = '10px';
-                    warning.style.backgroundColor = '#ffebee';
-                    warning.style.borderRadius = '5px';
-                    warning.style.marginBottom = '20px';
-                    document.body.insertBefore(warning, document.body.firstChild);
-                });
+            @media screen and (max-width: 768px) {
+                #mobile-warning {
+                    display: block;
+                }
             }
-        </script>
+        </style>
+        <div id="mobile-warning">
+            ⚠️ This dashboard is optimized for desktop viewing. Mobile users may experience limited functionality.
+        </div>
         """,
         unsafe_allow_html=True
     )
