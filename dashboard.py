@@ -18,8 +18,46 @@ def load_tournament_data(tournament: str) -> tuple:
 def main():
     st.set_page_config(layout="wide", page_title="PGA DFS Dashboard")
     
+    # Inject JavaScript to detect device type
+    device_detector = """
+        <script>
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            document.querySelector('section[data-testid="stSidebar"]').style.display = 'none';
+            const element = document.createElement('div');
+            element.id = 'mobile-detected';
+            document.body.appendChild(element);
+        }
+        </script>
+    """
+    st.components.v1.html(device_detector, height=0)
+    
+    # Check if mobile device was detected
+    is_mobile = st.components.v1.html(
+        """
+        <script>
+        if (document.getElementById('mobile-detected')) {
+            window.parent.document.querySelector('#mobile-warning').style.display = 'block';
+        }
+        </script>
+        """,
+        height=0
+    )
+    
+    # Mobile warning (hidden by default)
+    st.markdown(
+        """
+        <div id="mobile-warning" style="display: none; padding: 10px; background-color: #ffebee; border-radius: 5px; margin-bottom: 20px;">
+            ⚠️ This dashboard is optimized for desktop viewing. Mobile users may experience limited functionality.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
     # Sidebar
     st.sidebar.title("PGA DFS Dashboard")
+    
+    # Main title
+    st.title(f"PGA DFS Dashboard")
     
     # Tournament selection
     selected_tournament = st.sidebar.selectbox(
