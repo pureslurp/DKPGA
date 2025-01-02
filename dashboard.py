@@ -32,7 +32,7 @@ def main():
     st.components.v1.html(device_detector, height=0)
     
     # Check if mobile device was detected
-    is_mobile = st.components.v1.html(
+    st.components.v1.html(
         """
         <script>
         if (document.getElementById('mobile-detected')) {
