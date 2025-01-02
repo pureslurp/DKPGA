@@ -1,7 +1,7 @@
 # DraftKings PGA Tour Optimization Model
 
 ## Overview
-A comprehensive model for optimizing DraftKings PGA Tour lineups using historical data, course attributes, and player statistics.
+A comprehensive model for optimizing DraftKings PGA Tour lineups using betting odds, historical data, course attributes, and player statistics.
 
 ## Data Sources & Features
 
