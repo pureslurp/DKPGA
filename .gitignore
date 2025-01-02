@@ -2,8 +2,6 @@
 __pycache__/
 # ignore .DS_Store
 .DS_Store
-# ignore text files
-*.txt
 # ignore files in legacy folder
 Legacy/
 # ignore geckodriver
