@@ -123,9 +123,14 @@ def format_tournament_history(df: pd.DataFrame) -> pd.DataFrame:
     finish_cols = ['24', '2022-23', '2021-22', '2020-21', '2019-20']
     df['avg_finish'] = df[finish_cols].mean(axis=1, skipna=True)
     
-    # Calculate made cuts percentage
+    # Calculate measured years (number of tournaments played)
     df['measured_years'] = df[finish_cols].notna().sum(axis=1)
-    df['made_cuts_pct'] = df[finish_cols].notna().sum(axis=1) / len(finish_cols)
+    
+    # Calculate made cuts percentage based on measured years
+    df['made_cuts_pct'] = df[finish_cols].apply(lambda x: 
+        sum((~pd.isna(x)) & (x <= 65)) / sum(~pd.isna(x)) 
+        if sum(~pd.isna(x)) > 0 else 0
+    )
     
     # Sort by strokes gained total and average finish
     df = df.sort_values(['sg_total', 'avg_finish'], ascending=[False, True])
@@ -215,7 +220,7 @@ if __name__ == "__main__":
         # Save to CSV with tournament name
         tournament_name = df['tournament'].iloc[0]
         # Create directory if it doesn't exist
-        os.makedirs(f'tournaments/{tournament_name}', exist_ok=True)
-        df.to_csv(f'tournaments/{tournament_name}/tournament_history.csv', index=False)
+        os.makedirs(f'2025/{tournament_name}', exist_ok=True)
+        df.to_csv(f'2025/{tournament_name}/tournament_history.csv', index=False)
     else:
         print("Failed to retrieve tournament history data")

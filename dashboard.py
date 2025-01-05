@@ -157,6 +157,110 @@ def main():
         #     })
         # )
         
+        # New Player Odds section
+        st.subheader("Player Odds")
+        try:
+            odds_data = pd.read_csv(f"2025/{selected_tournament}/odds.csv")
+            # Format the odds columns to show plus sign for positive values
+            odds_columns = ['Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish']
+            for col in odds_columns:
+                odds_data[col] = odds_data[col].apply(lambda x: f"+{x}" if x > 0 else str(x))
+            
+            # Display the odds data
+            st.dataframe(
+                odds_data,
+                height=400,
+                use_container_width=True
+            )
+        except FileNotFoundError:
+            st.warning("No odds data available for this tournament.")
+        
+        # After odds section but before optimized lineups
+        st.subheader("Course Fit Analysis")
+        
+        try:
+            fit_data = pd.read_csv(f"2025/{selected_tournament}/fit_details.csv")
+            
+            # Part 1: Course Stats Weights
+            st.markdown("#### Course Statistics Weights")
+            
+            # Get unique course stats and their weights (take first occurrence since weights are same for all players)
+            course_stats = fit_data.drop_duplicates('Course Stat')[['Course Stat', 'Base Weight', 'Adjusted Weight']]
+            # Include all stats (removing the filter for non-zero weights)
+            
+            # Display weights table
+            st.dataframe(
+                course_stats.style.format({
+                    'Base Weight': '{:.3f}',
+                    'Adjusted Weight': '{:.3f}'
+                }),
+                height=200,
+                use_container_width=True
+            )
+            
+            # Part 2: Individual Player Fit Scores
+            st.markdown("#### Player Fit Details")
+            
+            # Add search/filter box for players
+            search_fit = st.text_input("Search Players (Fit Analysis)")
+            
+            # Prepare player fit data
+            player_fits = fit_data[['Name', 'Course Stat', 'Fit Score']].pivot(
+                index='Name',
+                columns='Course Stat',
+                values='Fit Score'
+            ).reset_index()
+            
+            # Filter based on search
+            if search_fit:
+                player_fits = player_fits[player_fits['Name'].str.contains(search_fit, case=False)]
+            
+            # Display player fit scores
+            st.dataframe(
+                player_fits.style.format({
+                    col: '{:.3f}' for col in player_fits.columns if col != 'Name'
+                }),
+                height=400,
+                use_container_width=True
+            )
+            
+        except FileNotFoundError:
+            st.warning("No course fit data available for this tournament.")
+        
+        # After Player Fit section
+        
+        # Tournament History section
+        st.subheader("Tournament History")
+        try:
+            history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
+            
+            # Format the columns for better display
+            display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 
+                             'sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
+                             'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
+            
+            # Format numeric columns to show fewer decimal places
+            numeric_cols = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
+                          'avg_finish', 'made_cuts_pct']
+            
+            # Create formatted dataframe
+            display_df = history_data[display_columns].copy()
+            for col in numeric_cols:
+                display_df[col] = display_df[col].apply(lambda x: f"{x:.3f}" if pd.notna(x) else "")
+            
+            # Sort by most recent year's finish
+            display_df = display_df.sort_values('24', na_position='last')
+            
+            # Display the history data
+            st.dataframe(
+                display_df,
+                height=400,
+                use_container_width=True
+            )
+            
+        except FileNotFoundError:
+            st.warning("No tournament history data available for this tournament.")
+        
         # Optimized Lineups section
         st.subheader("Optimized Lineups")
         

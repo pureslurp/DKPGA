@@ -43,6 +43,8 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
+TOURNEY = "The_Sentry"
+
 def fix_names(name):
     if name == "Si Woo":
         return "si woo kim"
@@ -670,10 +672,7 @@ class PGATourStatsScraper:
             use_current_form: Whether to use current form data for strokes gained stats
         """
         try:
-            timestamp = datetime.now().strftime('%Y%m%d')
-            
-            # First load or fetch PGA stats as base data
-            pga_stats_path = f'golfers/pga_stats_{timestamp}.csv'
+            pga_stats_path = get_stats_filename()
             
             if not force_refresh and not should_refresh_stats(pga_stats_path):
                 print("Loading existing PGA stats from this week...")
@@ -946,11 +945,12 @@ class StrokesGainedMapping(StatMapping):
         max_val = np.percentile(values, 95)  # 95th percentile
         return (min_val, max_val)
 
-    def calculate_fit(self, course_val: float, player_val: float, tournament_range: tuple = None) -> float:
+    def calculate_fit(self, course_val: float, player_val: float, tournament_range: tuple = None) -> tuple:
         """
         For Strokes Gained:
         - Score directly correlates to player's percentile in tournament field
         - Apply weight adjustments based on course importance
+        Returns: (fit_score, adjusted_weight)
         """
         if tournament_range:
             min_player, max_player = tournament_range
@@ -961,25 +961,26 @@ class StrokesGainedMapping(StatMapping):
         min_course, max_course = self.course_range
         normalized_course_val = 2 * (course_val - min_course) / (max_course - min_course) - 1
 
-        # Adjust weight based on both raw and normalized values
+        # Calculate adjusted weight (but don't modify self.weight)
+        adjusted_weight = self.original_weight
         if course_val < 0:
             # Stronger penalty for actually negative values
             penalty = min(0.7, abs(normalized_course_val))  # Up to 70% penalty
-            self.weight = self.original_weight * (1.0 - penalty)
+            adjusted_weight = self.original_weight * (1.0 - penalty)
         elif normalized_course_val < 0:
             # Milder penalty for positive values that normalize to negative
             penalty = min(0.2, abs(normalized_course_val))  # Up to 20% penalty
-            self.weight = self.original_weight * (1.0 - penalty)
-        else:
-            self.weight = self.original_weight
+            adjusted_weight = self.original_weight * (1.0 - penalty)
 
         # Calculate percentile directly (0 to 1 range)
         if player_val <= min_player:
-            return 0.0
+            fit_score = 0.0
         elif player_val >= max_player:
-            return 1.0
+            fit_score = 1.0
         else:
-            return (player_val - min_player) / (max_player - min_player)
+            fit_score = (player_val - min_player) / (max_player - min_player)
+
+        return fit_score, adjusted_weight
 
 class CoursePlayerFit:
     """Analyzes how well a player's stats fit a course's characteristics"""
@@ -1010,6 +1011,7 @@ class CoursePlayerFit:
         self.course = course
         self.verbose = verbose
         self.STAT_MAPPINGS = mappings if mappings is not None else self.STAT_MAPPINGS
+        self.fit_details = []  # Add this line to store all fit details
         
         # Calculate tournament-specific ranges
         self.tournament_ranges = {}
@@ -1062,7 +1064,12 @@ class CoursePlayerFit:
                 original_weight = mapping.weight if isinstance(mapping, StrokesGainedMapping) else None
                 
                 # Calculate fit score using appropriate mapping
-                fit_score = mapping.calculate_fit(course_val, player_val) * mapping.weight
+                if isinstance(mapping, StrokesGainedMapping):
+                    fit_value, adjusted_weight = mapping.calculate_fit(course_val, player_val)
+                    fit_score = fit_value * adjusted_weight
+                else:
+                    fit_score = mapping.calculate_fit(course_val, player_val) * mapping.weight
+                    adjusted_weight = mapping.weight
                 
                 scores[f"{mapping.course_stat}-{mapping.player_stat}"] = fit_score
                 total_score += fit_score
@@ -1085,6 +1092,18 @@ class CoursePlayerFit:
                     if mapping.is_inverse:
                         print("  (Inverse correlation)")
                 
+                # Add to fit_details list
+                self.fit_details.append({
+                    'Name': golfer.get_clean_name,
+                    'Course Stat': mapping.course_stat,
+                    'Player Stat': mapping.player_stat,
+                    'Course Value': course_val,
+                    'Player Value': player_val,
+                    'Base Weight': mapping.original_weight if isinstance(mapping, StrokesGainedMapping) else mapping.weight,
+                    'Adjusted Weight': adjusted_weight,
+                    'Fit Score': fit_score
+                })
+                
             except (AttributeError, KeyError, TypeError) as e:
                 if verbose:
                     print(f"Warning: Couldn't calculate {mapping.course_stat}-{mapping.player_stat} "
@@ -1100,6 +1119,12 @@ class CoursePlayerFit:
             'overall_fit': overall_score,
             'component_scores': scores
         }
+
+    def save_fit_details(self):
+        """Save all collected fit details to CSV"""
+        if self.fit_details:
+            fit_df = pd.DataFrame(self.fit_details)
+            fit_df.to_csv(f'2025/{TOURNEY}/fit_details.csv', index=False)
 
     def get_key_stats(self, golfer: 'Golfer', verbose: bool = None) -> List[str]:
         """Returns list of key stats for this course based on the golfer's profile."""
@@ -1244,33 +1269,47 @@ def get_current_tuesday() -> datetime:
     """Get the date of the current week's Tuesday"""
     today = datetime.now()
     days_since_tuesday = (today.weekday() - 1) % 7  # Tuesday is 1
-    return today - pd.Timedelta(days=days_since_tuesday)
+    tuesday = today - pd.Timedelta(days=days_since_tuesday)
+    return tuesday
+
+def get_stats_filename() -> str:
+    """Get the standardized filename using the current week's Tuesday date"""
+    tuesday = get_current_tuesday()
+    return f'golfers/pga_stats_{tuesday.strftime("%Y%m%d")}.csv'
 
 def should_refresh_stats(stats_path: str) -> bool:
     """
-    Check if stats should be refreshed based on file existence and date
-    Returns True if:
-    - File doesn't exist
-    - File is from before current week's Tuesday
+    Check if stats should be refreshed.
+    Returns True only if:
+    - File doesn't exist, OR
+    - It's Tuesday AND the file is from before this week's Tuesday
     """
     if not os.path.exists(stats_path):
         return True
         
+    # Check if today is Tuesday
+    today = datetime.now()
+    if today.weekday() != 1:  # Tuesday is 1
+        return False
+        
+    # If it's Tuesday, check if file is from before this week's Tuesday
     file_timestamp = datetime.fromtimestamp(os.path.getmtime(stats_path))
     current_tuesday = get_current_tuesday()
     
     return file_timestamp < current_tuesday
 
 def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False):
+    global TOURNEY
+    TOURNEY = tourney
     print(f"\n{'='*50}")
-    print(f"Running optimization for {tourney}")
+    print(f"Running optimization for {TOURNEY}")
     print(f"{'='*50}\n")
 
     # Read odds data and DraftKings salaries
-    odds_df = pd.read_csv(f'2025/{tourney}/odds.csv')
-    dk_salaries = pd.read_csv(f'2025/{tourney}/DKSalaries.csv')
+    odds_df = pd.read_csv(f'2025/{TOURNEY}/odds.csv')
+    dk_salaries = pd.read_csv(f'2025/{TOURNEY}/DKSalaries.csv')
     if tournament_history:
-        tourney_history = pd.read_csv(f'tournaments/{tourney}/tournament_history.csv')
+        tourney_history = pd.read_csv(f'2025/{TOURNEY}/tournament_history.csv')
     else:
         tourney_history = pd.DataFrame()
     
@@ -1314,8 +1353,8 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False):
     # Update all golfers at once
     scraper.update_golfer_list(golfers, use_current_form=True)
 
-    print(f"Loading course stats for {tourney}...")
-    course_stats = load_course_stats(tourney)
+    print(f"Loading course stats for {TOURNEY}...")
+    course_stats = load_course_stats(TOURNEY)
     analyzer = CoursePlayerFit(course_stats, golfers)
     print("Course stats loaded successfully\n")
 
@@ -1399,7 +1438,7 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False):
     optimized_lineups = optimize_dk_lineups(dk_data, num_lineups)
     
     # Save the lineups
-    output_path = f"2025/{tourney}/dk_lineups_optimized.csv"
+    output_path = f"2025/{TOURNEY}/dk_lineups_optimized.csv"
     optimized_lineups.to_csv(output_path, index=False)
     print(f"Generated {len(optimized_lineups)} optimized lineups")
     print(f"Saved to: {output_path}\n")
@@ -1420,7 +1459,7 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False):
     print(f"Total Points: {total_points:.2f}")
     
     # Save detailed player data
-    output_data_path = f"2025/{tourney}/player_data.csv"
+    output_data_path = f"2025/{TOURNEY}/player_data.csv"
     columns_to_save = [
         'Name', 'Salary', 'Odds Total', 'Normalized Odds',
         'Fit Score', 'Normalized Fit',
@@ -1430,5 +1469,6 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False):
     dk_data[columns_to_save].sort_values('Total', ascending=False).to_csv(output_data_path, index=False)
     print(f"Saved detailed player data to: {output_data_path}")
 
+
 if __name__ == "__main__":
-    main("The_Sentry", num_lineups=10,tournament_history=True)
+    main(TOURNEY, num_lineups=10,tournament_history=True)
