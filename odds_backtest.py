@@ -11,8 +11,9 @@ from scipy.optimize import minimize
 from tqdm import tqdm
 
 # Local imports
-from utils import TOURNAMENT_LIST_2024
-from Legacy.pga_v4 import fix_names, odds_to_score, DKLineupOptimizer, optimize_dk_lineups
+from utils import TOURNAMENT_LIST_2025
+# update imports from pga_v4
+from pga_v5 import fix_names, odds_to_score, DKLineupOptimizer, optimize_dk_lineups
 from Legacy.pga_dk_scoring import dk_points_df
 
 '''
@@ -29,7 +30,7 @@ warnings.filterwarnings('ignore')
 class WeightOptimizer:
     def __init__(self, tournaments=None):
         """Initialize the optimizer with a list of tournaments to analyze"""
-        self.tournaments = tournaments or list(TOURNAMENT_LIST_2024.keys())
+        self.tournaments = tournaments or list(TOURNAMENT_LIST_2025.keys())
         self.results_cache = {}
         
     def validate_data(self, df):
@@ -69,20 +70,20 @@ class WeightOptimizer:
     def load_tournament_data(self, tournament):
         """Load and prepare data for a single tournament"""
         try:
-            sal_df = pd.read_csv(f'2024/{tournament}/DKSalaries.csv')
-            odds_df = pd.read_csv(f'2024/{tournament}/odds.csv')
+            sal_df = pd.read_csv(f'2025/{tournament}/DKSalaries.csv')
+            odds_df = pd.read_csv(f'2025/{tournament}/odds.csv')
             
             sal_df = sal_df[['Name', 'Name + ID', 'Salary']]
             odds_cols = ["Name", "Tournament Winner", "Top 5 Finish", "Top 10 Finish", "Top 20 Finish"]
             odds_df = odds_df[odds_cols]
             
             try:
-                results_df = pd.read_csv(f'past_results/2024/dk_points_id_{TOURNAMENT_LIST_2024[tournament]["ID"]}.csv')
+                results_df = pd.read_csv(f'past_results/2025/dk_points_id_{TOURNAMENT_LIST_2025[tournament]["ID"]}.csv')
                 results_df = results_df[['Name', 'DK Score']]
             except FileNotFoundError:
                 print(f"Results not found for {tournament}, generating them...")
-                dk_points_df(TOURNAMENT_LIST_2024[tournament]["ID"])
-                results_df = pd.read_csv(f'past_results/2024/dk_points_id_{TOURNAMENT_LIST_2024[tournament]["ID"]}.csv')
+                dk_points_df(TOURNAMENT_LIST_2025[tournament]["ID"])
+                results_df = pd.read_csv(f'past_results/2025/dk_points_id_{TOURNAMENT_LIST_2025[tournament]["ID"]}.csv')
                 results_df = results_df[['Name', 'DK Score']]
             
             sal_df["Name"] = sal_df["Name"].apply(fix_names)
@@ -266,7 +267,7 @@ class WeightOptimizer:
                 print(results)
                 results_df = pd.DataFrame({
                     'tournament': [r['tournament'] for r in results],
-                    'course': [TOURNAMENT_LIST_2024[r['tournament']]['Course'] for r in results],
+                    'course': [TOURNAMENT_LIST_2025[r['tournament']]['Course'] for r in results],
                     'score': [r['score'] for r in results],
                     'win_weight': [r['optimal_weights'][0] for r in results],
                     'top5_weight': [r['optimal_weights'][1] for r in results],

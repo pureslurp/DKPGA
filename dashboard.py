@@ -1,19 +1,65 @@
 import streamlit as st
 import pandas as pd
 import os
-from pga_v5 import main as run_pga_model, fix_names
-from utils import TOURNAMENT_LIST_2024
+from course_info import load_course_stats
+from pga_v5 import StrokesGained, main as run_pga_model, fix_names, CoursePlayerFit, Golfer
+from typing import List
 
-def load_tournament_data(tournament: str) -> tuple:
-    """Load data for a specific tournament"""
-    try:
-        # Load player data
-        player_data = pd.read_csv(f"2025/{tournament}/player_data.csv")
-        # Load lineup data
-        lineups = pd.read_csv(f"2025/{tournament}/dk_lineups_optimized.csv")
-        return player_data, lineups
-    except FileNotFoundError:
-        return None, None
+class DataManager:
+    """Manages data and session state for the dashboard"""
+    
+    def __init__(self):
+        # Initialize session state if needed
+        if 'custom_weights' not in st.session_state:
+            st.session_state.custom_weights = CoursePlayerFit.DEFAULT_WEIGHTS_DICT.copy()
+        if 'player_data_adjustments' not in st.session_state:
+            st.session_state.player_data_adjustments = {}
+
+    def load_tournament_data(self, tournament: str) -> tuple:
+        """Load and process tournament data with any user adjustments"""
+        try:
+            # Load base data
+            player_data = pd.read_csv(f"2025/{tournament}/player_data.csv")
+            lineups = pd.read_csv(f"2025/{tournament}/dk_lineups_optimized.csv")
+            
+            # Apply any stored adjustments
+            if tournament in st.session_state.player_data_adjustments:
+                adjustments = st.session_state.player_data_adjustments[tournament]
+                for player_name, values in adjustments.items():
+                    if player_name in player_data['Name'].values:
+                        for column, value in values.items():
+                            player_data.loc[player_data['Name'] == player_name, column] = value
+            
+            return player_data, lineups
+        except FileNotFoundError:
+            return None, None
+    
+    def update_player_adjustment(self, tournament: str, player_name: str, column: str, value: float):
+        """Store a player data adjustment"""
+        if tournament not in st.session_state.player_data_adjustments:
+            st.session_state.player_data_adjustments[tournament] = {}
+        if player_name not in st.session_state.player_data_adjustments[tournament]:
+            st.session_state.player_data_adjustments[tournament][player_name] = {}
+        st.session_state.player_data_adjustments[tournament][player_name][column] = value
+    
+    def reset_player_adjustments(self, tournament: str = None):
+        """Reset player adjustments for a specific tournament or all tournaments"""
+        if tournament:
+            st.session_state.player_data_adjustments[tournament] = {}
+        else:
+            st.session_state.player_data_adjustments = {}
+    
+    def get_custom_weights(self):
+        """Get current custom weights"""
+        return st.session_state.custom_weights
+    
+    def update_custom_weight(self, stat_name: str, value: float):
+        """Update a specific custom weight"""
+        st.session_state.custom_weights[stat_name] = value
+    
+    def reset_custom_weights(self):
+        """Reset custom weights to defaults"""
+        st.session_state.custom_weights = CoursePlayerFit.DEFAULT_WEIGHTS_DICT.copy()
 
 def get_available_tournaments():
     """Get list of tournaments that have data in the 2025 folder"""
@@ -24,11 +70,58 @@ def get_available_tournaments():
     except FileNotFoundError:
         return ["No tournaments available"]
 
+def create_golfers_from_fit_details(filtered_data: pd.DataFrame, fit_details: pd.DataFrame) -> List[Golfer]:
+    """
+    Create list of Golfer objects from filtered data and fit details
+    
+    Args:
+        filtered_data: DataFrame containing player data including names and salaries
+        fit_details: DataFrame containing detailed fit statistics for each player
+        
+    Returns:
+        List[Golfer]: List of initialized Golfer objects with their stats
+    """
+    golfers = []
+    fit_details_player = fit_details.pivot(
+        index='Name',
+        columns='Course Stat',
+        values='Player Value'
+    ).reset_index()
+    
+    for _, row in filtered_data.iterrows():
+        if len(fit_details_player[fit_details_player['Name'] == row['Name']]) > 0:
+            player_stats = fit_details_player[fit_details_player['Name'] == row['Name']].iloc[0]
+            player = Golfer({
+                'Name + ID': row['Name'],
+                'Salary': row['Salary']
+            })
+            player.stats = {
+                'current': {
+                    'driving_distance': player_stats['adj_driving_distance'],
+                    'driving_accuracy': player_stats['adj_driving_accuracy'],
+                    'scrambling_sand': player_stats['arg_bunker_sg'],
+                    'strokes_gained': StrokesGained(
+                        off_tee=player_stats['ott_sg'],
+                        approach=player_stats['app_sg'],
+                        around_green=player_stats['arg_sg'],
+                        putting=player_stats['putt_sg']
+                    )
+                }
+            }
+            golfers.append(player)
+    
+    return golfers
+
 def main():
-    st.set_page_config(layout="wide", page_title="PGA DFS Dashboard")
+    st.set_page_config(layout="wide", page_title="PGA DFS Dashboard", page_icon=":golf:")
+    
+    # Initialize the DataManager at the start
+    data_manager = DataManager()
     
     # Main title
-    st.title(f"PGA DFS Dashboard")
+    st.title(f":golf: PGA DFS Dashboard")
+    st.write("This dashboard is designed to help you make informed decisions about which golfers to draft for your PGA DFS lineup. It also has a built in optimizer to help build your lineups.")
+    st.write("**Quick Start:** Select a tournament, use the sliders to adjust the weights (both in the left sidebar and in the Course Fit section), and run the model. The Optimized Lineups at the bottom will update automatically.")
 
     # Add mobile warning with CSS media query
     st.markdown(
@@ -67,19 +160,27 @@ def main():
         get_available_tournaments()
     )
     
-    # Run model button
+    # Run model button (now data_manager is available)
     if st.sidebar.button("Run Model"):
         with st.spinner(f"Running model for {selected_tournament}..."):
-            run_pga_model(selected_tournament, num_lineups=20, tournament_history=True)
+            run_pga_model(selected_tournament, num_lineups=20, tournament_history=True, 
+                         custom_weights=data_manager.get_custom_weights())
         st.sidebar.success("Model run complete!")
     
     # Main content
-    st.title(f"PGA DFS Analysis: {selected_tournament}")
+    st.title(f"{selected_tournament}")
     
-    # Load data
-    player_data, lineups = load_tournament_data(selected_tournament)
+    # Load data using DataManager
+    player_data, lineups = data_manager.load_tournament_data(selected_tournament)
     
-    if player_data is not None and lineups is not None:
+    if player_data is not None:
+        # Load fit details at the start
+        try:
+            fit_details = pd.read_csv(f"2025/{selected_tournament}/fit_details.csv")
+        except FileNotFoundError:
+            st.error("No fit details data available for this tournament.")
+            return
+        
         # Weight adjustment section
         st.sidebar.subheader("Adjust Weights")
         
@@ -110,6 +211,26 @@ def main():
         
         # Recalculate Total based on weights
         filtered_data = player_data.copy()
+        
+        # Use the function in the main code
+        golfers = create_golfers_from_fit_details(filtered_data, fit_details)
+        course_stats = load_course_stats(selected_tournament)
+        analyzer = CoursePlayerFit(course_stats, golfers, custom_weights=data_manager.get_custom_weights())
+        
+        # Calculate fit scores for all players
+        new_fit_scores = []
+        for player in golfers:
+            fit_score = analyzer.calculate_fit_score(player)
+            new_fit_scores.append({
+                'Name': player.name,
+                'Normalized Fit': fit_score['overall_fit'] / 100  # Convert to 0-1 scale
+            })
+        
+        # Update filtered_data with new fit scores
+        new_fit_scores_df = pd.DataFrame(new_fit_scores)
+        filtered_data = pd.merge(filtered_data, new_fit_scores_df, on='Name', how='left', suffixes=('_old', ''))
+
+        # Recalculate Total based on weights
         filtered_data['Total'] = (
             filtered_data['Normalized Odds'] * odds_weight +
             filtered_data['Normalized Fit'] * fit_weight +
@@ -121,6 +242,7 @@ def main():
         
         # Player Analysis section
         st.subheader("Player Analysis")
+        st.write("This section summarizes each golfer's odds, fit, and history scores. This section updates dynamically as you make adjustements in the dashboard. It is the source-of-truth for running the model.")
         
         # Add search/filter box
         search = st.text_input("Search Players")
@@ -141,24 +263,10 @@ def main():
             use_container_width=True
         )
         
-        # # Add some basic stats
-        # st.subheader("Value Plays")
-        # value_threshold = st.slider("Value Threshold", 
-        #                          min_value=1.0, 
-        #                          max_value=3.0, 
-        #                          value=2.0,
-        #                          step=0.1)
-        # value_plays = player_data[player_data['Value'] >= value_threshold]
-        # st.dataframe(
-        #     value_plays[['Name', 'Salary', 'Total', 'Value']].style.format({
-        #         'Salary': '${:,.0f}',
-        #         'Total': '{:.2f}',
-        #         'Value': '{:.2f}'
-        #     })
-        # )
-        
         # New Player Odds section
         st.subheader("Player Odds")
+        st.write("This section summarizes each golfer's odds for the tournament. The odds are based on the lines from https://www.scoresandodds.com/golf and are used to calculate the normalized odds score.")
+        st.write("TODO: Add adjustment sliders for weighting each line.")
         try:
             odds_data = pd.read_csv(f"2025/{selected_tournament}/odds.csv")
             # Format the odds columns to show plus sign for positive values
@@ -177,48 +285,149 @@ def main():
         
         # After odds section but before optimized lineups
         st.subheader("Course Fit Analysis")
+        st.write("This section details the course and player fit, and combines them into a score that is shown in the anlaysis table in the beginning of the dashboard.")
         
+        # After the Course Fit Analysis header but before displaying the data
+        st.markdown("#### Adjust Course Fit Weights")
+        st.write("These sliders allow you to adjust the weights of the course fit stats. The weights are used to calculate the fit score for each player. The values are by default set to what worked the best last year.")
+
+        # Create columns for the sliders
+        col1, col2 = st.columns(2)
+
+        # Define callback function for each slider
+        def update_weight(stat_name):
+            data_manager.update_custom_weight(stat_name, st.session_state[f"{stat_name.lower().replace(' ', '_')}_weight"])
+
+        # Add sliders for each weight in the first column
+        with col1:
+            st.slider(
+                "Driving Distance Weight", 0.0, 2.0, 
+                data_manager.get_custom_weights()['Driving Distance'], 0.1,
+                key='driving_distance_weight',
+                on_change=update_weight,
+                args=('Driving Distance',)
+            )
+            st.slider(
+                "Driving Accuracy Weight", 0.0, 2.0, 
+                data_manager.get_custom_weights()['Driving Accuracy'], 0.1,
+                key='driving_accuracy_weight',
+                on_change=update_weight,
+                args=('Driving Accuracy',)
+            )
+            st.slider(
+                "Fairway Width Weight", 0.0, 2.0, 
+                data_manager.get_custom_weights()['Fairway Width'], 0.1,
+                key='fairway_width_weight',
+                on_change=update_weight,
+                args=('Fairway Width',)
+            )
+            st.slider(
+                "Off the Tee SG Weight", 0.0, 2.0, 
+                data_manager.get_custom_weights()['Off the Tee SG'], 0.1,
+                key='off_the_tee_sg_weight',
+                on_change=update_weight,
+                args=('Off the Tee SG',)
+            )
+
+        # Add sliders for remaining weights in the second column
+        with col2:
+            st.slider(
+                "Approach SG Weight", 0.0, 2.0, 
+                data_manager.get_custom_weights()['Approach SG'], 0.1,
+                key='approach_sg_weight',
+                on_change=update_weight,
+                args=('Approach SG',)
+            )
+            st.slider(
+                "Around Green SG Weight", 0.0, 2.0, 
+                data_manager.get_custom_weights()['Around Green SG'], 0.1,
+                key='around_green_sg_weight',
+                on_change=update_weight,
+                args=('Around Green SG',)
+            )
+            st.slider(
+                "Putting SG Weight", 0.0, 2.0, 
+                data_manager.get_custom_weights()['Putting SG'], 0.1,
+                key='putting_sg_weight',
+                on_change=update_weight,
+                args=('Putting SG',)
+            )
+            st.slider(
+                "Sand Save Weight", 0.0, 2.0, 
+                data_manager.get_custom_weights()['Sand Save'], 0.1,
+                key='sand_save_weight',
+                on_change=update_weight,
+                args=('Sand Save',)
+            )
+
+        # Add a button to reset weights to defaults
+        if st.button("Reset Weights to Defaults"):
+            data_manager.reset_custom_weights()
+            st.rerun()
+
+        # After the weight adjustment section but before the next section
         try:
-            fit_data = pd.read_csv(f"2025/{selected_tournament}/fit_details.csv")
+            # Define column mapping once
+            column_mapping = {
+                'adj_driving_distance': 'Driving Distance',
+                'adj_driving_accuracy': 'Driving Accuracy',
+                'fw_width': 'Fairway Width',
+                'ott_sg': 'Off the Tee SG',
+                'app_sg': 'Approach SG',
+                'arg_sg': 'Around Green SG',
+                'putt_sg': 'Putting SG',
+                'arg_bunker_sg': 'Sand Save %'
+            }
             
-            # Part 1: Course Stats Weights
-            st.markdown("#### Course Statistics Weights")
+            # Course Stats Table
+            course_stats_df = fit_details[['Course Stat', 'Course Value', 'Base Weight']].drop_duplicates()
+            course_stats_df['Course Stat'] = course_stats_df['Course Stat'].map(column_mapping)
+            course_stats_df = course_stats_df.drop_duplicates(subset=['Course Stat'])
+
+            # Update Base Weight with current slider values
+            reverse_mapping = {v: k for k, v in column_mapping.items()}
+            for stat, weight in data_manager.get_custom_weights().items():
+                original_stat = reverse_mapping.get(stat)
+                if original_stat:
+                    course_stats_df.loc[course_stats_df['Course Stat'] == stat, 'Base Weight'] = weight
             
-            # Get unique course stats and their weights (take first occurrence since weights are same for all players)
-            course_stats = fit_data.drop_duplicates('Course Stat')[['Course Stat', 'Base Weight', 'Adjusted Weight']]
-            # Include all stats (removing the filter for non-zero weights)
-            
-            # Display weights table
+            # Display course stats
+            st.markdown("#### Course Statistics")
+            st.write("This table shows the course stats and their base weights from the sliders above.")
             st.dataframe(
-                course_stats.style.format({
-                    'Base Weight': '{:.3f}',
-                    'Adjusted Weight': '{:.3f}'
+                course_stats_df.style.format({
+                    'Course Value': '{:.3f}',
+                    'Base Weight': '{:.3f}'
                 }),
                 height=200,
                 use_container_width=True
             )
             
-            # Part 2: Individual Player Fit Scores
-            st.markdown("#### Player Fit Details")
-            
-            # Add search/filter box for players
-            search_fit = st.text_input("Search Players (Fit Analysis)")
-            
-            # Prepare player fit data
-            player_fits = fit_data[['Name', 'Course Stat', 'Fit Score']].pivot(
+            st.markdown("---")  # Add a separator between tables
+            st.markdown("#### Player Statistics")
+            st.write("This table shows golfer's stats which is used to calculate the fit score based on the course stats and weights.")
+            st.write("TODO: Allow user's to adjust short-term stats vs. long-term stats.\nCurrent weight is 0.7 short, 0.3 long.")
+            # Player Fit Details
+            display_df = fit_details.pivot(
                 index='Name',
                 columns='Course Stat',
-                values='Fit Score'
+                values='Player Value'
             ).reset_index()
             
-            # Filter based on search
-            if search_fit:
-                player_fits = player_fits[player_fits['Name'].str.contains(search_fit, case=False)]
-            
-            # Display player fit scores
+            # Rename columns to be more readable
+            display_df.columns = [column_mapping.get(col, col) for col in display_df.columns]
+
+            # Display the data
             st.dataframe(
-                player_fits.style.format({
-                    col: '{:.3f}' for col in player_fits.columns if col != 'Name'
+                display_df.style.format({
+                    'Driving Distance': '{:.1f}',
+                    'Driving Accuracy': '{:.3f}',
+                    'Fairway Width': '{:.3f}',
+                    'Off the Tee SG': '{:.3f}',
+                    'Approach SG': '{:.3f}',
+                    'Around Green SG': '{:.3f}',
+                    'Putting SG': '{:.3f}',
+                    'Sand Save %': '{:.3f}',
                 }),
                 height=400,
                 use_container_width=True
@@ -227,10 +436,10 @@ def main():
         except FileNotFoundError:
             st.warning("No course fit data available for this tournament.")
         
-        # After Player Fit section
-        
         # Tournament History section
         st.subheader("Tournament History")
+        st.write("This section shows the golfer's history at this specific tournament. The history is used to calculate the normalized history score.")
+        st.write("TODO: Clean up 'make cuts' column to be more accurate, currently uses T65 or better.")
         try:
             history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
             

@@ -14,7 +14,7 @@ Output:
 driver = webdriver.Firefox()
 
 # Open the target URL
-url = "https://www.espn.com/golf/schedule/_/season/2023"
+url = "https://www.espn.com/golf/schedule/_/season/2025"
 driver.get(url)
 
 try:

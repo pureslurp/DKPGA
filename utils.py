@@ -150,3 +150,198 @@ TOURNAMENT_LIST_2024 = {
         "Course": "East_Lake_Golf_Club"
     }
 }
+
+TOURNAMENT_LIST_2025 = {
+    "The_Sentry": {
+        "ID": 401703489,
+        "Course": "Kapalua_Resort_(Plantation_Course)"
+    },
+    "Sony_Open_in_Hawaii": {
+        "ID": 401703490,
+        "Course": None
+    },
+    "The_American_Express": {
+        "ID": 401703491,
+        "Course": None
+    },
+    "Farmers_Insurance_Open": {
+        "ID": 401703492,
+        "Course": None
+    },
+    "AT&T_Pebble_Beach_Pro-Am": {
+        "ID": 401703493,
+        "Course": None
+    },
+    "WM_Phoenix_Open": {
+        "ID": 401703494,
+        "Course": None
+    },
+    "The_Genesis_Invitational": {
+        "ID": 401703495,
+        "Course": None
+    },
+    "Mexico_Open_at_VidantaWorld": {
+        "ID": 401703496,
+        "Course": None
+    },
+    "Cognizant_Classic_in_The_Palm_Beaches": {
+        "ID": 401703497,
+        "Course": None
+    },
+    "Arnold_Palmer_Invitational_pres._by_Mastercard": {
+        "ID": 401703498,
+        "Course": None
+    },
+    "Puerto_Rico_Open": {
+        "ID": 401703499,
+        "Course": None
+    },
+    "THE_PLAYERS_Championship": {
+        "ID": 401703500,
+        "Course": None
+    },
+    "Valspar_Championship": {
+        "ID": 401703501,
+        "Course": None
+    },
+    "Texas_Children's_Houston_Open": {
+        "ID": 401703502,
+        "Course": None
+    },
+    "Valero_Texas_Open": {
+        "ID": 401703503,
+        "Course": None
+    },
+    "Masters_Tournament": {
+        "ID": 401703504,
+        "Course": None
+    },
+    "RBC_Heritage": {
+        "ID": 401703505,
+        "Course": None
+    },
+    "Corales_Puntacana_Championship": {
+        "ID": 401703506,
+        "Course": None
+    },
+    "Zurich_Classic_of_New_Orleans": {
+        "ID": 401703507,
+        "Course": None
+    },
+    "THE_CJ_CUP_Byron_Nelson": {
+        "ID": 401703508,
+        "Course": None
+    },
+    "Truist_Championship": {
+        "ID": 401703509,
+        "Course": None
+    },
+    "Myrtle_Beach_Classic": {
+        "ID": 401703510,
+        "Course": None
+    },
+    "PGA_Championship": {
+        "ID": 401703511,
+        "Course": None
+    },
+    "Charles_Schwab_Challenge": {
+        "ID": 401703512,
+        "Course": None
+    },
+    "the_Memorial_Tournament_pres._by_Workday": {
+        "ID": 401703513,
+        "Course": None
+    },
+    "RBC_Canadian_Open": {
+        "ID": 401703514,
+        "Course": None
+    },
+    "U.S._Open": {
+        "ID": 401703515,
+        "Course": None
+    },
+    "Travelers_Championship": {
+        "ID": 401703516,
+        "Course": None
+    },
+    "Rocket_Mortgage_Classic": {
+        "ID": 401703517,
+        "Course": None
+    },
+    "John_Deere_Classic": {
+        "ID": 401703518,
+        "Course": None
+    },
+    "Genesis_Scottish_Open": {
+        "ID": 401703519,
+        "Course": None
+    },
+    "ISCO_Championship": {
+        "ID": 401703520,
+        "Course": None
+    },
+    "The_Open": {
+        "ID": 401703521,
+        "Course": None
+    },
+    "Barracuda_Championship": {
+        "ID": 401703522,
+        "Course": None
+    },
+    "3M_Open": {
+        "ID": 401703523,
+        "Course": None
+    },
+    "Wyndham_Championship": {
+        "ID": 401703524,
+        "Course": None
+    },
+    "FedEx_St._Jude_Championship": {
+        "ID": 401703525,
+        "Course": None
+    },
+    "BMW_Championship": {
+        "ID": 401703530,
+        "Course": None
+    },
+    "TOUR_Championship": {
+        "ID": 401703531,
+        "Course": None
+    },
+    "Procore_Championship": {
+        "ID": 401738553,
+        "Course": None
+    },
+    "Ryder_Cup": {
+        "ID": 401734110,
+        "Course": None
+    },
+    "Sanderson_Farms_Championship": {
+        "ID": 401738554,
+        "Course": None
+    },
+    "Baycurrent_Classic": {
+        "ID": 401738555,
+        "Course": None
+    },
+    "Black_Desert_Championship": {
+        "ID": 401738556,
+        "Course": None
+    },
+    "World_Wide_Technology_Championship": {
+        "ID": 401738557,
+        "Course": None
+    },
+    "Butterfield_Bermuda_Championship": {
+        "ID": 401738558,
+        "Course": None
+    },
+    "The_RSM_Classic": {
+        "ID": 401738559,
+        "Course": None
+    },
+    "Hero_World_Challenge": {
+        "ID": 401738560,
+        "Course": None
+    }
+}
