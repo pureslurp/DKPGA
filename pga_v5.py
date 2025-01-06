@@ -985,52 +985,42 @@ class StrokesGainedMapping(StatMapping):
 class CoursePlayerFit:
     """Analyzes how well a player's stats fit a course's characteristics"""
     
-    # The mapping weights are in the optimization_results/final_weights.csv file
-    # Load weights from CSV
-    weights_df = pd.read_csv('optimization_results/final_weights.csv')
-    weights = {row['Stat']: row['Weight'] * 4 for _, row in weights_df.iterrows()}
+    # Load default weights from CSV
+    DEFAULT_WEIGHTS = pd.read_csv('optimization_results/final_weights.csv')
+    DEFAULT_WEIGHTS_DICT = {row['Stat']: row['Weight'] * 4 for _, row in DEFAULT_WEIGHTS.iterrows()}
         
-    STAT_MAPPINGS = [
-        # Distance correlations
-        DistanceMapping('adj_driving_distance', 'driving_distance', weights['Driving Distance']),
-        # Accuracy correlations
-        AccuracyMapping('adj_driving_accuracy', 'driving_accuracy', weights['Driving Accuracy']),
-        AccuracyMapping('fw_width', 'driving_accuracy', weights['Fairway Width'], is_inverse=True),
-        
-        # Strokes Gained correlations
-        StrokesGainedMapping('ott_sg', 'sg_off_tee', weights['Off the Tee SG']),
-        StrokesGainedMapping('app_sg', 'sg_approach', weights['Approach SG']),
-        StrokesGainedMapping('arg_sg', 'sg_around_green', weights['Around Green SG']),
-        StrokesGainedMapping('putt_sg', 'sg_putting', weights['Putting SG']),
-        
-        # Specific situation correlations
-        AccuracyMapping('arg_bunker_sg', 'scrambling_sand', weights['Sand Save'])
-    ]
-
-    def __init__(self, course: CourseStats, golfers: List['Golfer'], mappings: List[StatMapping] = None, verbose: bool = False):
+    def __init__(self, course: CourseStats, golfers: List['Golfer'], 
+                 custom_weights: Dict[str, float] = None, 
+                 mappings: List[StatMapping] = None, 
+                 verbose: bool = False):
         self.course = course
         self.verbose = verbose
-        self.STAT_MAPPINGS = mappings if mappings is not None else self.STAT_MAPPINGS
-        self.fit_details = []  # Add this line to store all fit details
         
-        # Calculate tournament-specific ranges
-        self.tournament_ranges = {}
-        if self.verbose:
-            print("\nCalculating Tournament-Specific Ranges:")
-            print("----------------------------------------")
-            print("Stat             Default Range          Tournament Range")
-            print("----------------------------------------")
-            
-        for mapping in self.STAT_MAPPINGS:
-            if isinstance(mapping, StrokesGainedMapping):
-                tournament_range = mapping.calculate_tournament_ranges(golfers)
-                self.tournament_ranges[mapping.course_stat] = tournament_range
+        # Use custom weights if provided, otherwise use defaults
+        weights = custom_weights if custom_weights is not None else self.DEFAULT_WEIGHTS_DICT
+        
+        # Create stat mappings with the appropriate weights
+        if mappings is None:
+            self.STAT_MAPPINGS = [
+                # Distance correlations
+                DistanceMapping('adj_driving_distance', 'driving_distance', weights.get('Driving Distance', self.DEFAULT_WEIGHTS_DICT['Driving Distance'])),
+                # Accuracy correlations
+                AccuracyMapping('adj_driving_accuracy', 'driving_accuracy', weights.get('Driving Accuracy', self.DEFAULT_WEIGHTS_DICT['Driving Accuracy'])),
+                AccuracyMapping('fw_width', 'driving_accuracy', weights.get('Fairway Width', self.DEFAULT_WEIGHTS_DICT['Fairway Width']), is_inverse=True),
                 
-                if self.verbose:
-                    # Access DEFAULT_RANGES from StrokesGainedMapping class
-                    default_range = StrokesGainedMapping.DEFAULT_RANGES[mapping.course_stat]['player']
-                    print(f"{mapping.course_stat:<15} ({default_range[0]:6.3f}, {default_range[1]:6.3f})    "
-                          f"({tournament_range[0]:6.3f}, {tournament_range[1]:6.3f})")
+                # Strokes Gained correlations
+                StrokesGainedMapping('ott_sg', 'sg_off_tee', weights.get('Off the Tee SG', self.DEFAULT_WEIGHTS_DICT['Off the Tee SG'])),
+                StrokesGainedMapping('app_sg', 'sg_approach', weights.get('Approach SG', self.DEFAULT_WEIGHTS_DICT['Approach SG'])),
+                StrokesGainedMapping('arg_sg', 'sg_around_green', weights.get('Around Green SG', self.DEFAULT_WEIGHTS_DICT['Around Green SG'])),
+                StrokesGainedMapping('putt_sg', 'sg_putting', weights.get('Putting SG', self.DEFAULT_WEIGHTS_DICT['Putting SG'])),
+                
+                # Specific situation correlations
+                AccuracyMapping('arg_bunker_sg', 'scrambling_sand', weights.get('Sand Save', self.DEFAULT_WEIGHTS_DICT['Sand Save']))
+            ]
+        else:
+            self.STAT_MAPPINGS = mappings
+            
+        self.fit_details = []  # Store all fit details
 
     def calculate_fit_score(self, golfer: 'Golfer', verbose: bool = None) -> Dict[str, float]:
         """Calculate how well a golfer's stats fit the course."""
@@ -1298,7 +1288,7 @@ def should_refresh_stats(stats_path: str) -> bool:
     
     return file_timestamp < current_tuesday
 
-def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False):
+def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, custom_weights: Dict[str, float] = None):
     global TOURNEY
     TOURNEY = tourney
     print(f"\n{'='*50}")
@@ -1355,7 +1345,7 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False):
 
     print(f"Loading course stats for {TOURNEY}...")
     course_stats = load_course_stats(TOURNEY)
-    analyzer = CoursePlayerFit(course_stats, golfers)
+    analyzer = CoursePlayerFit(course_stats, golfers, custom_weights=custom_weights)
     print("Course stats loaded successfully\n")
 
     # Calculate fit scores for all golfers and create DataFrame
@@ -1378,6 +1368,7 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False):
         })
     history_scores_df = pd.DataFrame(history_scores)
     fit_scores_df = pd.DataFrame(fit_scores_data)
+    analyzer.save_fit_details()
     
 
     # Merge fit scores and history scores with dk_data
