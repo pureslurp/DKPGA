@@ -985,10 +985,18 @@ class StrokesGainedMapping(StatMapping):
 class CoursePlayerFit:
     """Analyzes how well a player's stats fit a course's characteristics"""
     
-    # Load default weights from CSV
-    DEFAULT_WEIGHTS = pd.read_csv('optimization_results/final_weights.csv')
-    DEFAULT_WEIGHTS_DICT = {row['Stat']: row['Weight'] * 4 for _, row in DEFAULT_WEIGHTS.iterrows()}
-        
+    # Define default weights matching the CSV values (multiplied by 4 as in original code)
+    DEFAULT_WEIGHTS_DICT = {
+        'Driving Distance': 0.0,
+        'Driving Accuracy': 0.123340,
+        'Fairway Width': 0.0,
+        'Off the Tee SG': 1.015724,
+        'Approach SG': 1.505708,
+        'Around Green SG': 0.468236,
+        'Putting SG': 0.776232,
+        'Sand Save': 0.110756
+    }
+    
     def __init__(self, course: CourseStats, golfers: List['Golfer'], 
                  custom_weights: Dict[str, float] = None, 
                  mappings: List[StatMapping] = None, 
@@ -996,6 +1004,14 @@ class CoursePlayerFit:
         self.course = course
         self.verbose = verbose
         
+        # Try to load weights from CSV
+        try:
+            weights_df = pd.read_csv('optimization_results/final_weights.csv')
+            self.DEFAULT_WEIGHTS_DICT = {row['Stat']: row['Weight'] * 4 for _, row in weights_df.iterrows()}
+        except (FileNotFoundError, pd.errors.EmptyDataError):
+            # Use the hardcoded defaults defined above
+            pass
+            
         # Use custom weights if provided, otherwise use defaults
         weights = custom_weights if custom_weights is not None else self.DEFAULT_WEIGHTS_DICT
         
