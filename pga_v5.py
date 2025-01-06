@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "The_Sentry"
+TOURNEY = "Sony_Open_in_Hawaii"
 
 def fix_names(name):
     if name == "Si Woo":
@@ -1227,6 +1227,15 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
         if year in history_df.columns:
             finish = player_history[year]
             if pd.notna(finish):
+                # Convert 'CUT' to 65
+                if isinstance(finish, str) and finish.upper() == 'CUT':
+                    finish = 65
+                else:
+                    try:
+                        finish = float(finish)
+                    except (ValueError, TypeError):
+                        continue  # Skip invalid values
+                
                 # Track number of appearances and average finish
                 appearances += 1
                 avg_finish += finish
@@ -1478,4 +1487,4 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, 
 
 
 if __name__ == "__main__":
-    main(TOURNEY, num_lineups=10,tournament_history=True)
+    main(TOURNEY, num_lineups=20,tournament_history=True)

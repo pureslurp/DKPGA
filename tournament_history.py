@@ -35,8 +35,10 @@ def parse_finishes(row_data: Dict[str, str]) -> Dict[str, float]:
             # Handle special cases
             if finish == 'P1':
                 finishes[year] = 1
-            elif finish == 'PT2':
+            elif finish in ['PT2', 'P2']:
                 finishes[year] = 2
+            elif finish in ['CUT', 'CU', 'DQ', 'WD', 'MDF']:  # Add more special cases as needed
+                finishes[year] = "CUT"  # or could use a specific value like 999 if you want to track cuts
             else:
                 # Remove T and convert to int
                 finishes[year] = int(finish.replace('T', ''))
@@ -121,16 +123,33 @@ def format_tournament_history(df: pd.DataFrame) -> pd.DataFrame:
     """Format tournament history data for analysis"""
     # Calculate average finish (excluding DNPs)
     finish_cols = ['24', '2022-23', '2021-22', '2020-21', '2019-20']
-    df['avg_finish'] = df[finish_cols].mean(axis=1, skipna=True)
+    df['avg_finish'] = df[finish_cols].replace('CUT', 65).astype(float).mean(axis=1, skipna=True)
     
     # Calculate measured years (number of tournaments played)
     df['measured_years'] = df[finish_cols].notna().sum(axis=1)
     
     # Calculate made cuts percentage based on measured years
-    df['made_cuts_pct'] = df[finish_cols].apply(lambda x: 
-        sum((~pd.isna(x)) & (x <= 65)) / sum(~pd.isna(x)) 
-        if sum(~pd.isna(x)) > 0 else 0
-    )
+    def _calculate_made_cuts_pct(row):
+        # Count total tournaments played (non-NA values)
+        total_tournaments = 0
+        # Count tournaments where player made the cut
+        made_cuts = 0
+        
+        for col in finish_cols:
+            value = row[col]
+            # Check if the player played in this tournament
+            if pd.notna(value):
+                total_tournaments += 1
+                # Check if they made the cut
+                if value != 'CUT':
+                    made_cuts += 1
+        
+        # Calculate percentage
+        if total_tournaments > 0:
+            return made_cuts / total_tournaments
+        return 0.0
+    
+    df['made_cuts_pct'] = df.apply(_calculate_made_cuts_pct, axis=1)
     
     # Sort by strokes gained total and average finish
     df = df.sort_values(['sg_total', 'avg_finish'], ascending=[False, True])
@@ -209,7 +228,7 @@ def get_tournament_history(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    url = "https://www.pgatour.com/tournaments/2025/the-sentry/R2025016/field/tournament-history"
+    url = "https://www.pgatour.com/tournaments/2025/sony-open-in-hawaii/R2025006/field/tournament-history"
     df = get_tournament_history(url)
     
     if df is not None:
