@@ -596,7 +596,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     dk_data['Normalized Fit'] = (dk_data['Fit Score'] - dk_data['Fit Score'].min()) / \
         (dk_data['Fit Score'].max() - dk_data['Fit Score'].min())
     dk_data['Normalized History'] = (dk_data['History Score'] - dk_data['History Score'].min()) / \
-        (dk_data['History Score'].max() - dk_data['History Score'].min()) if tournament_history else 0
+        (dk_data['History Score'].max() - dk_data['History Score'].min())
     dk_data['Normalized Form'] = (dk_data['Form Score'] - dk_data['Form Score'].min()) / \
         (dk_data['Form Score'].max() - dk_data['Form Score'].min())
 
