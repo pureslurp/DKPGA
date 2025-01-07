@@ -29,15 +29,15 @@ class DataManager:
                 }
             }
         
-        # Initialize component weight sliders
-        if 'odds_weight' not in st.session_state:
-            st.session_state.odds_weight = st.session_state.weights['components']['odds']
-        if 'fit_weight' not in st.session_state:
-            st.session_state.fit_weight = st.session_state.weights['components']['fit']
-        if 'history_weight' not in st.session_state:
-            st.session_state.history_weight = st.session_state.weights['components']['history']
-        if 'form_weight' not in st.session_state:
-            st.session_state.form_weight = st.session_state.weights['components']['form']
+        # # Initialize component weight sliders
+        # if 'odds_weight' not in st.session_state:
+        #     st.session_state.odds_weight = st.session_state.weights['components']['odds']
+        # if 'fit_weight' not in st.session_state:
+        #     st.session_state.fit_weight = st.session_state.weights['components']['fit']
+        # if 'history_weight' not in st.session_state:
+        #     st.session_state.history_weight = st.session_state.weights['components']['history']
+        # if 'form_weight' not in st.session_state:
+        #     st.session_state.form_weight = st.session_state.weights['components']['form']
             
         # Initialize form weight sliders if needed
         if 'current_form_weight' not in st.session_state:
@@ -225,28 +225,28 @@ def main():
         
         # Component weights
         odds_weight = st.sidebar.slider("Odds Weight", 0.0, 1.0, 
-                                      value=st.session_state.odds_weight,
+                                      value=data_manager.weights['components']['odds'],
                                       step=0.05,
                                       key='odds_weight',
                                       on_change=data_manager.update_component_weight,
                                       args=('odds',))
         
         fit_weight = st.sidebar.slider("Course Fit Weight", 0.0, 1.0,
-                                     value=st.session_state.fit_weight,
+                                     value=data_manager.weights['components']['fit'],
                                      step=0.05,
                                      key='fit_weight',
                                      on_change=data_manager.update_component_weight,
                                      args=('fit',))
         
         history_weight = st.sidebar.slider("Tournament History Weight", 0.0, 1.0,
-                                        value=st.session_state.history_weight,
+                                        value=data_manager.weights['components']['history'],
                                         step=0.05,
                                         key='history_weight',
                                         on_change=data_manager.update_component_weight,
                                         args=('history',))
         
         form_weight = st.sidebar.slider("Form Weight", 0.0, 1.0,
-                                     value=st.session_state.form_weight,
+                                     value=data_manager.weights['components']['form'],
                                      step=0.05,
                                      key='form_weight',
                                      on_change=data_manager.update_component_weight,
