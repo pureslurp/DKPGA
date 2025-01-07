@@ -445,7 +445,7 @@ def calculate_form_score(tourney: str, weights: dict) -> pd.DataFrame:
     
     return form_df
 
-def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, weights: dict = None):
+def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     """
     Main function for PGA optimization
     
@@ -487,9 +487,9 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, 
         },
         'components': {
             'odds': 0.4,
-            'fit': 0.3,
+            'fit': 0.2,
             'history': 0.2,
-            'form': 0.1
+            'form': 0.2
         }
     }
     
@@ -501,16 +501,15 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, 
     print(f"Running optimization for {TOURNEY}")
     print(f"{'='*50}\n")
 
+    # TODO: make pga_v5 all encompasing for getting csv files
     # Replace stats file creation logic with:
     create_pga_stats(TOURNEY)
 
     # Read odds data and DraftKings salaries
     odds_df = pd.read_csv(f'2025/{TOURNEY}/odds.csv')
     dk_salaries = pd.read_csv(f'2025/{TOURNEY}/DKSalaries.csv')
-    if tournament_history:
-        tourney_history = pd.read_csv(f'2025/{TOURNEY}/tournament_history.csv')
-    else:
-        tourney_history = pd.DataFrame()
+    tourney_history = pd.read_csv(f'2025/{TOURNEY}/tournament_history.csv')
+    
     
     print(f"Loaded {len(odds_df)} players from odds data")
     print(f"Loaded {len(dk_salaries)} players from DraftKings data\n")
@@ -564,10 +563,7 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, 
     fit_scores_data = []
     history_scores = []
     for golfer in golfers:
-        if tournament_history:
-            history_score = calculate_tournament_history_score(golfer.get_clean_name, tourney_history)
-        else:
-            history_score = 0
+        history_score = calculate_tournament_history_score(golfer.get_clean_name, tourney_history)
             
         # Calculate fit score from CSV data
         fit_score = calculate_fit_score_from_csv(golfer.get_clean_name, course_fit_df)
@@ -668,4 +664,4 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, 
 
 
 if __name__ == "__main__":
-    main(TOURNEY, num_lineups=20, tournament_history=True)
+    main(TOURNEY)
