@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import os
 from course_info import load_course_stats
-from pga_v5 import StrokesGained, main as run_pga_model, fix_names, CoursePlayerFit, Golfer
+from pga_v5 import main as run_pga_model
+from models import Golfer, StrokesGained
+from utils import fix_names
 from typing import List
 
 class DataManager:
@@ -10,10 +12,53 @@ class DataManager:
     
     def __init__(self):
         # Initialize session state if needed
-        if 'custom_weights' not in st.session_state:
-            st.session_state.custom_weights = CoursePlayerFit.DEFAULT_WEIGHTS_DICT.copy()
-        if 'player_data_adjustments' not in st.session_state:
-            st.session_state.player_data_adjustments = {}
+        if 'weights' not in st.session_state:
+            st.session_state.weights = {
+                'components': {
+                    'odds': 0.4,
+                    'fit': 0.2,
+                    'history': 0.2,
+                    'form': 0.2
+                },
+                'form': {
+                    'current': 0.7,
+                    'long': 0.3
+                },
+                'odds': {
+                    'winner': 0.6,
+                    'top5': 0.5,
+                    'top10': 0.8,
+                    'top20': 0.4
+                }
+            }
+        
+        # Initialize component weight sliders
+        if 'odds_weight' not in st.session_state:
+            st.session_state.odds_weight = st.session_state.weights['components']['odds']
+        if 'fit_weight' not in st.session_state:
+            st.session_state.fit_weight = st.session_state.weights['components']['fit']
+        if 'history_weight' not in st.session_state:
+            st.session_state.history_weight = st.session_state.weights['components']['history']
+        if 'form_weight' not in st.session_state:
+            st.session_state.form_weight = st.session_state.weights['components']['form']
+            
+        # Initialize form weight sliders if needed
+        if 'current_form_weight' not in st.session_state:
+            st.session_state.current_form_weight = st.session_state.weights['form']['current']
+        if 'long_form_weight' not in st.session_state:
+            st.session_state.long_form_weight = st.session_state.weights['form']['long']
+            
+        # Add reference to session state weights
+        self.weights = st.session_state.weights
+        if 'player_data' not in st.session_state:
+            st.session_state.player_data = {}
+        self.player_data = st.session_state.player_data
+
+        # Add reset callback to initialization
+        if 'reset_component_weights_clicked' not in st.session_state:
+            st.session_state.reset_component_weights_clicked = False
+        if 'reset_form_weights_clicked' not in st.session_state:
+            st.session_state.reset_form_weights_clicked = False
 
     def load_tournament_data(self, tournament: str) -> tuple:
         """Load and process tournament data with any user adjustments"""
@@ -23,8 +68,8 @@ class DataManager:
             lineups = pd.read_csv(f"2025/{tournament}/dk_lineups_optimized.csv")
             
             # Apply any stored adjustments
-            if tournament in st.session_state.player_data_adjustments:
-                adjustments = st.session_state.player_data_adjustments[tournament]
+            if tournament in st.session_state.player_data:
+                adjustments = st.session_state.player_data[tournament]
                 for player_name, values in adjustments.items():
                     if player_name in player_data['Name'].values:
                         for column, value in values.items():
@@ -49,17 +94,57 @@ class DataManager:
         else:
             st.session_state.player_data_adjustments = {}
     
-    def get_custom_weights(self):
-        """Get current custom weights"""
-        return st.session_state.custom_weights
-    
-    def update_custom_weight(self, stat_name: str, value: float):
-        """Update a specific custom weight"""
-        st.session_state.custom_weights[stat_name] = value
-    
-    def reset_custom_weights(self):
-        """Reset custom weights to defaults"""
-        st.session_state.custom_weights = CoursePlayerFit.DEFAULT_WEIGHTS_DICT.copy()
+    def update_component_weight(self, component: str):
+        """Update a component weight without normalization"""
+        # Get the value from session state using the component's key
+        value = st.session_state[f"{component}_weight"]
+        
+        # Update the weight
+        st.session_state.weights['components'][component] = value
+        
+        # Update the session state value
+        st.session_state[f"{component}_weight"] = value
+
+    def update_form_weight(self, form_type: str):
+        """Update form weights ensuring they sum to 1"""
+        # Get the new value from session state
+        value = st.session_state[f"{form_type}_form_weight"]
+        
+        # Update both session state values
+        if form_type == 'current':
+            st.session_state.current_form_weight = value
+            st.session_state.long_form_weight = 1 - value
+        else:  # form_type == 'long'
+            st.session_state.long_form_weight = value
+            st.session_state.current_form_weight = 1 - value
+        
+        # Also update the weights dictionary
+        st.session_state.weights['form']['current'] = st.session_state.current_form_weight
+        st.session_state.weights['form']['long'] = st.session_state.long_form_weight
+
+    def on_reset_component_weights(self):
+        """Callback for resetting component weights"""
+        st.session_state.reset_component_weights_clicked = True
+        st.session_state.odds_weight = 0.4
+        st.session_state.fit_weight = 0.2
+        st.session_state.history_weight = 0.2
+        st.session_state.form_weight = 0.2
+        st.session_state.weights['components'] = {
+            'odds': 0.4,
+            'fit': 0.2,
+            'history': 0.2,
+            'form': 0.2
+        }
+
+    def on_reset_form_weights(self):
+        """Callback for resetting form weights"""
+        st.session_state.reset_form_weights_clicked = True
+        st.session_state.current_form_weight = 0.7
+        st.session_state.long_form_weight = 0.3
+        st.session_state.weights['form'] = {
+            'current': 0.7,
+            'long': 0.3
+        }
 
 def get_available_tournaments():
     """Get list of tournaments that have data in the 2025 folder"""
@@ -69,48 +154,6 @@ def get_available_tournaments():
         return sorted(tournaments) if tournaments else ["No tournaments available"]
     except FileNotFoundError:
         return ["No tournaments available"]
-
-def create_golfers_from_fit_details(filtered_data: pd.DataFrame, fit_details: pd.DataFrame) -> List[Golfer]:
-    """
-    Create list of Golfer objects from filtered data and fit details
-    
-    Args:
-        filtered_data: DataFrame containing player data including names and salaries
-        fit_details: DataFrame containing detailed fit statistics for each player
-        
-    Returns:
-        List[Golfer]: List of initialized Golfer objects with their stats
-    """
-    golfers = []
-    fit_details_player = fit_details.pivot(
-        index='Name',
-        columns='Course Stat',
-        values='Player Value'
-    ).reset_index()
-    
-    for _, row in filtered_data.iterrows():
-        if len(fit_details_player[fit_details_player['Name'] == row['Name']]) > 0:
-            player_stats = fit_details_player[fit_details_player['Name'] == row['Name']].iloc[0]
-            player = Golfer({
-                'Name + ID': row['Name'],
-                'Salary': row['Salary']
-            })
-            player.stats = {
-                'current': {
-                    'driving_distance': player_stats['adj_driving_distance'],
-                    'driving_accuracy': player_stats['adj_driving_accuracy'],
-                    'scrambling_sand': player_stats['arg_bunker_sg'],
-                    'strokes_gained': StrokesGained(
-                        off_tee=player_stats['ott_sg'],
-                        approach=player_stats['app_sg'],
-                        around_green=player_stats['arg_sg'],
-                        putting=player_stats['putt_sg']
-                    )
-                }
-            }
-            golfers.append(player)
-    
-    return golfers
 
 def main():
     st.set_page_config(layout="wide", page_title="PGA DFS Dashboard", page_icon=":golf:")
@@ -160,12 +203,17 @@ def main():
         get_available_tournaments()
     )
     
+    # Add weight validation
+    total_weight = sum(data_manager.weights['components'].values())
+    if not abs(total_weight - 1.0) < 0.01:  # Allow for small floating point differences
+        st.sidebar.error(f"⚠️ Component weights must sum to 1.0 (Current total: {total_weight:.2f})")
+    
     # Run model button (now data_manager is available)
     if st.sidebar.button("Run Model"):
         with st.spinner(f"Running model for {selected_tournament}..."):
-            run_pga_model(selected_tournament, num_lineups=20, tournament_history=True, 
-                         custom_weights=data_manager.get_custom_weights())
-        st.sidebar.success("Model run complete!")
+            run_pga_model(selected_tournament,
+                         weights=data_manager.weights)
+            st.sidebar.success("Model run complete!")
     
     # Main content
     st.title(f"{selected_tournament}")
@@ -174,67 +222,57 @@ def main():
     player_data, lineups = data_manager.load_tournament_data(selected_tournament)
     
     if player_data is not None:
-        # Load fit details at the start
-        try:
-            fit_details = pd.read_csv(f"2025/{selected_tournament}/fit_details.csv")
-        except FileNotFoundError:
-            st.error("No fit details data available for this tournament.")
-            return
         
         # Weight adjustment section
         st.sidebar.subheader("Adjust Weights")
         
-        # Default weights based on whether tournament history exists
-        has_history = 'Normalized History' in player_data.columns and player_data['Normalized History'].sum() > 0
+        # Component weights
+        odds_weight = st.sidebar.slider("Odds Weight", 0.0, 1.0, 
+                                      value=st.session_state.odds_weight,
+                                      step=0.05,
+                                      key='odds_weight',
+                                      on_change=data_manager.update_component_weight,
+                                      args=('odds',))
         
-        default_odds = 0.5 if has_history else 0.5
-        default_fit = 0.3 if has_history else 0.5
-        default_history = 0.2 if has_history else 0.0
+        fit_weight = st.sidebar.slider("Course Fit Weight", 0.0, 1.0,
+                                     value=st.session_state.fit_weight,
+                                     step=0.05,
+                                     key='fit_weight',
+                                     on_change=data_manager.update_component_weight,
+                                     args=('fit',))
         
-        # Weight sliders
-        odds_weight = st.sidebar.slider("Odds Weight", 0.0, 1.0, default_odds, 0.1)
-        fit_weight = st.sidebar.slider("Course Fit Weight", 0.0, 1.0, default_fit, 0.1)
-        history_weight = st.sidebar.slider("Tournament History Weight", 0.0, 1.0, default_history, 0.1)
+        history_weight = st.sidebar.slider("Tournament History Weight", 0.0, 1.0,
+                                        value=st.session_state.history_weight,
+                                        step=0.05,
+                                        key='history_weight',
+                                        on_change=data_manager.update_component_weight,
+                                        args=('history',))
         
-        # Normalize weights to sum to 1
-        total_weight = odds_weight + fit_weight + history_weight
-        if total_weight > 0:
-            odds_weight = odds_weight / total_weight
-            fit_weight = fit_weight / total_weight
-            history_weight = history_weight / total_weight
-            
-        # Display normalized weights
-        st.sidebar.write(f"Normalized Weights:")
-        st.sidebar.write(f"Odds: {odds_weight:.2f}")
-        st.sidebar.write(f"Fit: {fit_weight:.2f}")
-        st.sidebar.write(f"History: {history_weight:.2f}")
+        form_weight = st.sidebar.slider("Form Weight", 0.0, 1.0,
+                                     value=st.session_state.form_weight,
+                                     step=0.05,
+                                     key='form_weight',
+                                     on_change=data_manager.update_component_weight,
+                                     args=('form',))
+        
+        if st.sidebar.button("Reset Component Weights", 
+                            on_click=data_manager.on_reset_component_weights):
+            st.sidebar.success("Component weights reset to default values!")
         
         # Recalculate Total based on weights
         filtered_data = player_data.copy()
         
-        # Use the function in the main code
-        golfers = create_golfers_from_fit_details(filtered_data, fit_details)
-        course_stats = load_course_stats(selected_tournament)
-        analyzer = CoursePlayerFit(course_stats, golfers, custom_weights=data_manager.get_custom_weights())
         
-        # Calculate fit scores for all players
-        new_fit_scores = []
-        for player in golfers:
-            fit_score = analyzer.calculate_fit_score(player)
-            new_fit_scores.append({
-                'Name': player.name,
-                'Normalized Fit': fit_score['overall_fit'] / 100  # Convert to 0-1 scale
-            })
+
         
         # Update filtered_data with new fit scores
-        new_fit_scores_df = pd.DataFrame(new_fit_scores)
-        filtered_data = pd.merge(filtered_data, new_fit_scores_df, on='Name', how='left', suffixes=('_old', ''))
 
         # Recalculate Total based on weights
         filtered_data['Total'] = (
             filtered_data['Normalized Odds'] * odds_weight +
             filtered_data['Normalized Fit'] * fit_weight +
-            filtered_data['Normalized History'] * history_weight
+            filtered_data['Normalized History'] * history_weight +
+            filtered_data['Normalized Form'] * form_weight
         )
         
         # Recalculate Value based on new Total
@@ -251,11 +289,12 @@ def main():
         
         # Display player data with formatting
         st.dataframe(
-            filtered_data[['Name', 'Salary', 'Normalized Odds', 'Normalized Fit', 'Normalized History', 'Total', 'Value']].style.format({
+            filtered_data[['Name', 'Salary', 'Normalized Odds', 'Normalized Fit', 'Normalized History', 'Normalized Form', 'Total', 'Value']].style.format({
                 'Salary': '${:,.0f}',
                 'Normalized Odds': '{:.2f}',
                 'Normalized Fit': '{:.2f}',
                 'Normalized History': '{:.2f}',
+                'Normalized Form': '{:.2f}',
                 'Total': '{:.2f}',
                 'Value': '{:.2f}'
             }),
@@ -283,160 +322,62 @@ def main():
         except FileNotFoundError:
             st.warning("No odds data available for this tournament.")
         
-        # After odds section but before optimized lineups
-        st.subheader("Course Fit Analysis")
-        st.write("This section details the course and player fit, and combines them into a score that is shown in the anlaysis table in the beginning of the dashboard.")
-        
-        # After the Course Fit Analysis header but before displaying the data
-        st.markdown("#### Adjust Course Fit Weights")
-        st.write("These sliders allow you to adjust the weights of the course fit stats. The weights are used to calculate the fit score for each player. The values are by default set to what worked the best last year.")
-
-        # Create columns for the sliders
-        col1, col2 = st.columns(2)
-
-        # Define callback function for each slider
-        def update_weight(stat_name):
-            data_manager.update_custom_weight(stat_name, st.session_state[f"{stat_name.lower().replace(' ', '_')}_weight"])
-
-        # Add sliders for each weight in the first column
-        with col1:
-            st.slider(
-                "Driving Distance Weight", 0.0, 2.0, 
-                data_manager.get_custom_weights()['Driving Distance'], 0.1,
-                key='driving_distance_weight',
-                on_change=update_weight,
-                args=('Driving Distance',)
-            )
-            st.slider(
-                "Driving Accuracy Weight", 0.0, 2.0, 
-                data_manager.get_custom_weights()['Driving Accuracy'], 0.1,
-                key='driving_accuracy_weight',
-                on_change=update_weight,
-                args=('Driving Accuracy',)
-            )
-            st.slider(
-                "Fairway Width Weight", 0.0, 2.0, 
-                data_manager.get_custom_weights()['Fairway Width'], 0.1,
-                key='fairway_width_weight',
-                on_change=update_weight,
-                args=('Fairway Width',)
-            )
-            st.slider(
-                "Off the Tee SG Weight", 0.0, 2.0, 
-                data_manager.get_custom_weights()['Off the Tee SG'], 0.1,
-                key='off_the_tee_sg_weight',
-                on_change=update_weight,
-                args=('Off the Tee SG',)
-            )
-
-        # Add sliders for remaining weights in the second column
-        with col2:
-            st.slider(
-                "Approach SG Weight", 0.0, 2.0, 
-                data_manager.get_custom_weights()['Approach SG'], 0.1,
-                key='approach_sg_weight',
-                on_change=update_weight,
-                args=('Approach SG',)
-            )
-            st.slider(
-                "Around Green SG Weight", 0.0, 2.0, 
-                data_manager.get_custom_weights()['Around Green SG'], 0.1,
-                key='around_green_sg_weight',
-                on_change=update_weight,
-                args=('Around Green SG',)
-            )
-            st.slider(
-                "Putting SG Weight", 0.0, 2.0, 
-                data_manager.get_custom_weights()['Putting SG'], 0.1,
-                key='putting_sg_weight',
-                on_change=update_weight,
-                args=('Putting SG',)
-            )
-            st.slider(
-                "Sand Save Weight", 0.0, 2.0, 
-                data_manager.get_custom_weights()['Sand Save'], 0.1,
-                key='sand_save_weight',
-                on_change=update_weight,
-                args=('Sand Save',)
-            )
-
-        # Add a button to reset weights to defaults
-        if st.button("Reset Weights to Defaults"):
-            data_manager.reset_custom_weights()
-            st.rerun()
-
-        # After the weight adjustment section but before the next section
+                # Course Fit section (simplified)
+        st.subheader("Course Fit")
         try:
-            # Define column mapping once
-            column_mapping = {
-                'adj_driving_distance': 'Driving Distance',
-                'adj_driving_accuracy': 'Driving Accuracy',
-                'fw_width': 'Fairway Width',
-                'ott_sg': 'Off the Tee SG',
-                'app_sg': 'Approach SG',
-                'arg_sg': 'Around Green SG',
-                'putt_sg': 'Putting SG',
-                'arg_bunker_sg': 'Sand Save %'
-            }
-            
-            # Course Stats Table
-            course_stats_df = fit_details[['Course Stat', 'Course Value', 'Base Weight']].drop_duplicates()
-            course_stats_df['Course Stat'] = course_stats_df['Course Stat'].map(column_mapping)
-            course_stats_df = course_stats_df.drop_duplicates(subset=['Course Stat'])
-
-            # Update Base Weight with current slider values
-            reverse_mapping = {v: k for k, v in column_mapping.items()}
-            for stat, weight in data_manager.get_custom_weights().items():
-                original_stat = reverse_mapping.get(stat)
-                if original_stat:
-                    course_stats_df.loc[course_stats_df['Course Stat'] == stat, 'Base Weight'] = weight
-            
-            # Display course stats
-            st.markdown("#### Course Statistics")
-            st.write("This table shows the course stats and their base weights from the sliders above.")
+            course_fit = pd.read_csv(f"2025/{selected_tournament}/course_fit.csv")
             st.dataframe(
-                course_stats_df.style.format({
-                    'Course Value': '{:.3f}',
-                    'Base Weight': '{:.3f}'
-                }),
-                height=200,
-                use_container_width=True
-            )
-            
-            st.markdown("---")  # Add a separator between tables
-            st.markdown("#### Player Statistics")
-            st.write("This table shows golfer's stats which is used to calculate the fit score based on the course stats and weights.")
-            st.write("TODO: Allow user's to adjust short-term stats vs. long-term stats.\nCurrent weight is 0.7 short, 0.3 long.")
-            # Player Fit Details
-            display_df = fit_details.pivot(
-                index='Name',
-                columns='Course Stat',
-                values='Player Value'
-            ).reset_index()
-            
-            # Rename columns to be more readable
-            display_df.columns = [column_mapping.get(col, col) for col in display_df.columns]
-
-            # Display the data
-            st.dataframe(
-                display_df.style.format({
-                    'Driving Distance': '{:.1f}',
-                    'Driving Accuracy': '{:.3f}',
-                    'Fairway Width': '{:.3f}',
-                    'Off the Tee SG': '{:.3f}',
-                    'Approach SG': '{:.3f}',
-                    'Around Green SG': '{:.3f}',
-                    'Putting SG': '{:.3f}',
-                    'Sand Save %': '{:.3f}',
-                }),
+                course_fit.sort_values('projected_course_fit'),
                 height=400,
                 use_container_width=True
             )
-            
         except FileNotFoundError:
             st.warning("No course fit data available for this tournament.")
+
+        # Player Form section
+        st.subheader("Player Form")
+        st.write("Short-term form represents last 5 starts, Long-term form represents the entire season.")
         
-        # Tournament History section
+        col1, col2 = st.columns(2)
+
+        if st.button("Reset Form Weights",
+                     on_click=data_manager.on_reset_form_weights):
+            st.success("Form weights reset to default values!")
+        
+        with col1:
+            st.markdown("#### Short-term Form")
+            st.slider(
+                "Current Form Weight", 
+                0.0, 
+                1.0,
+                key="current_form_weight",
+                on_change=data_manager.update_form_weight,
+                args=('current',)
+            )
+            
+            try:
+                current_form = pd.read_csv(f"2025/{selected_tournament}/current_form.csv")
+                st.dataframe(current_form, height=400, use_container_width=True)
+            except FileNotFoundError:
+                st.warning("No current form data available.")
+                
+        with col2:
+            st.markdown("#### Long-term Form")
+            st.slider(
+                "Long-term Form Weight", 
+                0.0, 
+                1.0,
+                key="long_form_weight",
+                on_change=data_manager.update_form_weight,
+                args=('long',)
+            )
+            try:
+                long_form = pd.read_csv(f"2025/{selected_tournament}/pga_stats.csv")
+                st.dataframe(long_form, height=400, use_container_width=True)
+            except FileNotFoundError:
+                st.warning("No long-term form data available.")
+            
+            # Tournament History section
         st.subheader("Tournament History")
         st.write("This section shows the golfer's history at this specific tournament. The history is used to calculate the normalized history score.")
         st.write("TODO: Clean up 'make cuts' column to be more accurate, currently uses T65 or better.")
@@ -575,6 +516,24 @@ def main():
             *Note: This score is only available for tournaments with historical data.*
             """)
             
+        with st.expander("Normalized Form"):
+            st.markdown("""
+            **Form Score** combines both short-term and long-term performance metrics:
+            
+            **Short-term Form (Current Weight: {:.1f})**
+            - Recent tournament performances
+            - Current strokes gained statistics
+            - Last 5-10 tournaments
+            
+            **Long-term Form (Current Weight: {:.1f})**
+            - Season-long statistics
+            - Historical performance metrics
+            - Overall strokes gained data
+            
+            The final form score is a weighted combination of both components, normalized to a 0-1 scale.
+            """.format(data_manager.weights['form']['current'],
+                      data_manager.weights['form']['long']))
+            
         with st.expander("Total Score & Value"):
             st.markdown("""
             **Total Score** is calculated using the weighted combination of the three normalized scores:
@@ -589,6 +548,13 @@ def main():
     
     else:
         st.warning("No data available for this tournament. Please run the model first.")
+
+    # Handle form weight reset
+    if 'reset_form' in st.session_state and st.session_state.reset_form:
+        st.session_state.current_form_weight = 0.7
+        st.session_state.long_form_weight = 0.3
+        st.session_state.reset_form = False
+        st.success("Form weights reset to default values!")
 
 if __name__ == "__main__":
     main()
