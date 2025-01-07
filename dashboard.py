@@ -1,11 +1,8 @@
 import streamlit as st
 import pandas as pd
 import os
-from course_info import load_course_stats
 from pga_v5 import main as run_pga_model
-from models import Golfer, StrokesGained
 from utils import fix_names
-from typing import List
 
 class DataManager:
     """Manages data and session state for the dashboard"""
