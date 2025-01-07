@@ -154,11 +154,13 @@ TOURNAMENT_LIST_2024 = {
 TOURNAMENT_LIST_2025 = {
     "The_Sentry": {
         "ID": 401703489,
-        "Course": "Kapalua_Resort_(Plantation_Course)"
+        "Course": "Kapalua_Resort_(Plantation_Course)",
+        "pga-url": "the-sentry/R2025016"
     },
-    "Sony_Open_in_Hawaii": {
+    "Sony_Open_In_Hawaii": {
         "ID": 401703490,
-        "Course": None
+        "Course": "Waialae_Country_Club",
+        "pga-url": "sony-open-in-hawaii/R2025006"
     },
     "The_American_Express": {
         "ID": 401703491,
@@ -345,3 +347,39 @@ TOURNAMENT_LIST_2025 = {
         "Course": None
     }
 }
+
+def fix_names(name):
+    if name == "Si Woo":
+        return "si woo kim"
+    elif name == "Byeong Hun":
+        return "byeong hun an"
+    elif name == "Erik Van":
+        return "erik van rooyen"
+    elif name == "Adrien Dumont":
+        return "adrien dumont de chassart"
+    elif name == "Matthias Schmid":
+        return "matti schmid"
+    elif name == "Samuel Stevens":
+        return "sam stevens"
+    elif name == "Benjamin Silverman":
+        return "ben silverman"
+    elif name =="Min Woo":
+        return "min woo lee"
+    elif name == "Santiago De":
+        return "santiago de la fuente"
+    elif name == "Jose Maria":
+        return "jose maria olazabal"
+    elif name == "Niklas Norgaard Moller":
+        return "niklas moller"
+    elif name == "Jordan L. Smith":
+        return "jordan l."
+    elif name == "daniel bradbury":
+        return "dan bradbury"
+    elif name == "Ludvig Åberg":
+        return "ludvig aberg"
+    elif name == "Cam Davis":
+        return "cameron davis"
+    elif name == "Nicolai Højgaard":
+        return "nicolai hojgaard"
+    else:
+        return name.lower()

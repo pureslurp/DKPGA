@@ -13,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from pga_v5 import fix_names
+from utils import TOURNAMENT_LIST_2025
 
 def parse_recent_finishes(row_data):
     """Parse the last 5 tournament finishes"""
@@ -22,33 +23,34 @@ def parse_recent_finishes(row_data):
     for finish in finish_texts:
         text = finish.text.strip()
         if text == 'CUT':
-            finishes.append(None)  # or handle cuts differently if needed
+            finishes.append('CUT')  # Keep CUT as string
+        elif text in ['', '-']:  # Empty string or dash means didn't play
+            finishes.append(None)
         elif text == 'P1':
             finishes.append(1)  # playoff winner counts as a win (1st place)
         else:
             # Remove 'T' from tied positions and convert to integer
-            finishes.append(int(text.replace('T', '')))
+            try:
+                finishes.append(int(text.replace('T', '')))
+            except ValueError:
+                finishes.append(None)  # Handle any unexpected values
             
     return finishes
 
 def parse_strokes_gained(row_data):
     """Parse strokes gained statistics"""
     stats = {}
-    sg_cols = ['Rounds', 'sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting', 'SG: TOT']
+    sg_cols = ['Rounds', 'sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
     
-    # Get all td cells with class css-deko6d (which contain the SG stats)
     cells = row_data.find_all('td', class_='css-deko6d')
-    
-    # Skip the first cell which contains the finish positions
     cells = cells[1:] if len(cells) > 1 else []
     
     for i, col in enumerate(sg_cols):
         if i < len(cells):
-            # Find the chakra-text span within each cell
             value_span = cells[i].find('span', class_='chakra-text')
             if value_span:
                 value = value_span.text.strip()
-                if value == '-':
+                if value in ['-', '']:  # Added empty string check
                     stats[col] = None
                 else:
                     try:
@@ -59,6 +61,10 @@ def parse_strokes_gained(row_data):
                 stats[col] = None
         else:
             stats[col] = None
+    
+    # Calculate sg_total as sum of all SG components
+    sg_components = [stats[col] for col in ['sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']]
+    stats['sg_total'] = sum(x for x in sg_components if x is not None) if any(x is not None for x in sg_components) else None
                     
     return stats
 
@@ -98,18 +104,19 @@ def extract_player_data(table):
 
 def format_current_form(df):
     """Format current form data for analysis"""
-    # Calculate made cuts percentage
+    # Calculate made cuts percentage (exclude None values, which mean didn't play)
     df['made_cuts_pct'] = df['recent_finishes'].apply(
-        lambda x: sum(1 for finish in x if finish is not None) / len(x) if x else 0
+        lambda x: sum(1 for finish in x if finish is not None and finish != 'CUT') / 
+                 sum(1 for finish in x if finish is not None) if x else 0
     )
     
-    # Calculate average finish (excluding cuts)
+    # Calculate average finish (excluding cuts and tournaments not played)
     df['avg_finish'] = df['recent_finishes'].apply(
-        lambda x: np.mean([f for f in x if f is not None]) if x else None
+        lambda x: np.mean([f for f in x if isinstance(f, (int, float))]) if x else None
     )
     
     # Sort by total strokes gained
-    df = df.sort_values('SG: TOT', ascending=False)
+    df = df.sort_values('sg_total', ascending=False)
     
     return df
 
@@ -162,12 +169,14 @@ def get_current_form(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    url = "https://www.pgatour.com/tournaments/2025/the-sentry/R2025016/field/current-form"
+    TOURNEY = "Sony_Open_In_Hawaii"
+    pga_url = TOURNAMENT_LIST_2025[TOURNEY]["pga-url"]
+    url = f"https://www.pgatour.com/tournaments/2025/{pga_url}/field/current-form"
     df = get_current_form(url)
     
     if df is not None:
         print("\nTop 10 players by total strokes gained:")
-        print(df[['Name', 'avg_finish', 'made_cuts_pct', 'SG: TOT']].head(10))
+        print(df[['Name', 'avg_finish', 'made_cuts_pct', 'sg_total']].head(10))
         timestamp = time.strftime("%Y%m%d")
         # Save to CSV
-        df.to_csv(f'golfers/current_form_{timestamp}.csv', index=False)
+        df.to_csv(f'2025/{TOURNEY}/current_form.csv', index=False)
