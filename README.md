@@ -64,5 +64,8 @@ Utilizes DKLineupOptimizer with customizable parameters:
 ## Quick Start
 - Run `parse_odds.py` to get the odds for each golfer for each stat, this will also create the `2025/{tournament_name}` folder and populate it with the odds.csv file. There needs to be odds available for a tournament or it will fail.
 - Run `tournament_history.py` to get the tournament history for each golfer, this will create the `2025/{tournament_name}/tournament_history.csv` file. The url will need to be updated to the correct url for the tournament.
+- Run `current_form.py` to get the current form for each golfer, this will create the `2025/{tournament_name}/current_form.csv` file. The url will need to be updated to the correct url for the tournament.
+- Run `pga_course_fit.py` to get the course fit for each golfer, this will create the `2025/{tournament_name}/course_fit.csv` file. The url will need to be updated to the correct url for the tournament.
+- Run `pga_stats.py` to get the pga stats for each golfer, this will create the `2025/{tournament_name}/pga_stats.csv` file. The url will need to be updated to the correct url for the tournament.
 - Add the DKSalaries.csv file to the `2025/{tournament_name}` folder, this file is from DraftKings.
 - Run `pga_v5.py` with the tournament name to get the optimized lineups for each tournament, it will also create the player_data.csv and fit_details.csv files.

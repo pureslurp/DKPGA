@@ -11,11 +11,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from io import StringIO
-from course_info import CourseStats
+from pga_stats import create_pga_stats
+from models import Golfer
+from utils import fix_names
 import os
-from utils import TOURNAMENT_LIST_2024
-from course_info import load_course_stats
 
 '''
 This is the main script that runs the PGA model for DraftKings
@@ -23,17 +22,11 @@ This is the main script that runs the PGA model for DraftKings
 Looking for this version to be more systematic:
 
 The model will take into considereation the following:
-- Tournament History ({tournament_name}/tournament_history.csv) -- TODO
+- Tournament History (tournament_history.csv) -- DONE
    - PGATour.com has a new site that has past 5 (same) event finishes
-- Course Attributes (dg_course_table.cvs) against Player Attributes -- DONE
-   - Player Attributes
-      - Strokes Gained (golfers/pga_stats_{date}.csv or golfers/current_form_{date}.csv)
-         - Off the tee, Approach, Around the green, Putting
-      - Driving Accuracy (golfers/pga_stats_{date}.csv)
-      - Green in Regulation (golfers/pga_stats_{date}.csv)
-      - Scrambling from Sand (golfers/pga_stats_{date}.csv)
-   - Need to create a mapping table for course attributes to player attributes -- DONE
-- Weighted Optimizion (weight_optimization_results.csv) -- DONE
+- Course Fit (course_fit.csv) -- DONE
+- Form (Current and Long) (current_form.csv and pga_stats.csv) -- DONE
+- Odds (odds.csv) -- DONE
    - Win, Top 5, Top 10, Top 20
    - Starting weights:
         Tournament Winner: 0.6
@@ -44,42 +37,6 @@ The model will take into considereation the following:
 '''
 
 TOURNEY = "Sony_Open_in_Hawaii"
-
-def fix_names(name):
-    if name == "Si Woo":
-        return "si woo kim"
-    elif name == "Byeong Hun":
-        return "byeong hun an"
-    elif name == "Erik Van":
-        return "erik van rooyen"
-    elif name == "Adrien Dumont":
-        return "adrien dumont de chassart"
-    elif name == "Matthias Schmid":
-        return "matti schmid"
-    elif name == "Samuel Stevens":
-        return "sam stevens"
-    elif name == "Benjamin Silverman":
-        return "ben silverman"
-    elif name =="Min Woo":
-        return "min woo lee"
-    elif name == "Santiago De":
-        return "santiago de la fuente"
-    elif name == "Jose Maria":
-        return "jose maria olazabal"
-    elif name == "Niklas Norgaard Moller":
-        return "niklas moller"
-    elif name == "Jordan L. Smith":
-        return "jordan l."
-    elif name == "daniel bradbury":
-        return "dan bradbury"
-    elif name == "Ludvig Åberg":
-        return "ludvig aberg"
-    elif name == "Cam Davis":
-        return "cameron davis"
-    elif name == "Nicolai Højgaard":
-        return "nicolai hojgaard"
-    else:
-        return name.lower()
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -101,232 +58,6 @@ def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
             return round(final_line * 7 * t10, 3)
         case "Top 20 Finish":
             return round(final_line * 5 * t20, 3)
-
-@dataclass
-class StrokesGained:
-    """Class to hold strokes gained statistics"""
-    off_tee: float = 0.0
-    approach: float = 0.0
-    around_green: float = 0.0
-    putting: float = 0.0
-
-    @property
-    def tee_to_green(self) -> float:
-        """Calculate strokes gained tee to green"""
-        return self.off_tee + self.approach + self.around_green
-    
-    @property
-    def total(self) -> float:
-        """Calculate total strokes gained"""
-        return self.off_tee + self.approach + self.around_green + self.putting
-
-class Golfer:
-    def __init__(self, golfer: pd.DataFrame):
-        # Original DraftKings attributes
-        try:
-            self.name = golfer["Name + ID"].iloc[0]
-            self.salary = golfer["Salary"].iloc[0]
-        except:
-            try:
-                self.name = golfer["Name + ID"]
-                self.salary = golfer["Salary"]
-            except:
-                raise Exception("Unable to assign ", golfer)
-        
-        # Try to get total from dk_final.csv, default to 0 if not found
-        try:
-            self._total = float(golfer["Total"].iloc[0] if isinstance(golfer, pd.DataFrame) else golfer["Total"])
-        except (KeyError, AttributeError, ValueError):
-            self._total = 0.0
-
-        # Try to get odds total, default to 0 if not found
-        try:
-            self._odds_total = float(golfer["Odds Total"].iloc[0] if isinstance(golfer, pd.DataFrame) else golfer["Odds Total"])
-        except (KeyError, AttributeError, ValueError):
-            self._odds_total = 0.0
-                
-        # New statistics attributes
-        self.stats = {
-            'current': self._initialize_stats(),
-            'historical': {}  # Will hold stats by date
-        }
-        self.fit_score = None
-        
-
-        
-    @property
-    def total(self) -> float:
-        """Get total projected score"""
-        return self._total
-        
-    @total.setter
-    def total(self, value: float):
-        """Set total projected score"""
-        self._total = value
-        
-    @property
-    def value(self) -> float:
-        """Calculate value (total points per salary)"""
-        if self.salary == 0:
-            return 0.0
-        return self.total / self.salary * 1000
-        
-    @property
-    def get_clean_name(self) -> str:
-        """Returns cleaned name without DK ID and standardized format"""
-        # Remove DK ID if present and clean the name
-        return fix_names(self.name.split('(')[0].strip())
-    
-    def get_stats_summary(self) -> Dict:
-        """Returns a clean summary of golfer's current stats"""
-        stats = self.stats['current']
-        sg = stats['strokes_gained']
-        
-        return {
-            'name': self.get_clean_name,
-            'driving_distance': stats['driving_distance'],
-            'driving_accuracy': stats['driving_accuracy'],
-            'gir': stats['gir'],
-            'scrambling_sand': stats['scrambling_sand'],
-            'strokes_gained': {
-                'off_the_tee': sg.off_tee,
-                'approach': sg.approach,
-                'around_green': sg.around_green,
-                'putting': sg.putting,
-                'total': sg.total
-            },
-            'last_updated': stats['last_updated']
-        }
-
-    def print_stats(self):
-        """Prints a formatted summary of golfer's current stats"""
-        stats = self.get_stats_summary()
-        print(f"\nStats for {stats['name']}:")
-        print(f"Driving Distance: {stats['driving_distance']:.1f}")
-        print(f"Driving Accuracy: {stats['driving_accuracy']:.1%}")
-        print(f"GIR: {stats['gir']:.1%}")
-        print(f"Sand Save: {stats['scrambling_sand']:.1%}")
-        print("\nStrokes Gained:")
-        for key, value in stats['strokes_gained'].items():
-            print(f"  {key.replace('_', ' ').title()}: {value:.3f}")
-        
-    def _initialize_stats(self) -> Dict:
-        """Initialize the stats dictionary with default values"""
-        return {
-            'strokes_gained': StrokesGained(),
-            'driving_distance': 0.0,
-            'driving_accuracy': 0.0,
-            'gir': 0.0,
-            'scrambling_sand': 0.0,
-            'scoring_average': 0.0,
-            'last_updated': None
-        }
-
-    def update_stats(self, 
-                    strokes_gained: Optional[StrokesGained] = None,
-                    driving_distance: Optional[float] = None,
-                    driving_accuracy: Optional[float] = None,
-                    gir: Optional[float] = None,
-                    scrambling_sand: Optional[float] = None,
-                    scoring_average: Optional[float] = None,
-                    date: Optional[datetime] = None) -> None:
-        """
-        Update golfer statistics. If date is provided, stores in historical data.
-        Otherwise updates current stats.
-        """
-        stats_dict = self.stats['historical'].setdefault(date.strftime('%Y-%m-%d'), 
-                                                        self._initialize_stats()) if date else self.stats['current']
-        
-        if strokes_gained:
-            stats_dict['strokes_gained'] = strokes_gained
-        if driving_distance is not None:
-            stats_dict['driving_distance'] = driving_distance
-        if driving_accuracy is not None:
-            stats_dict['driving_accuracy'] = driving_accuracy / 100  # Convert to decimal
-        if gir is not None:
-            stats_dict['gir'] = gir / 100
-        if scrambling_sand is not None:
-            stats_dict['scrambling_sand'] = scrambling_sand / 100
-        if scoring_average is not None:
-            stats_dict['scoring_average'] = scoring_average
-        
-        stats_dict['last_updated'] = datetime.now()
-
-    def get_stats_trend(self, stat_name: str, weeks: int = 12) -> List[float]:
-        """Get trend data for a specific statistic over the last n weeks"""
-        if not self.stats['historical']:
-            return []
-
-        dates = sorted(self.stats['historical'].keys())[-weeks:]
-        
-        if '.' in stat_name:
-            main_stat, sub_stat = stat_name.split('.')
-            return [self.stats['historical'][date][main_stat].__dict__[sub_stat] 
-                   for date in dates]
-        
-        return [self.stats['historical'][date][stat_name] for date in dates]
-
-    def get_stats_average(self, stat_name: str, weeks: int = 12) -> float:
-        """Calculate average for a specific statistic over the last n weeks"""
-        trend_data = self.get_stats_trend(stat_name, weeks)
-        return np.mean(trend_data) if trend_data else 0.0
-
-    def get_current_form(self) -> float:
-        """Calculate golfer's current form based on recent performance"""
-        sg_trend = self.get_stats_trend('strokes_gained.total', weeks=4)
-        if not sg_trend:
-            return 0.0
-        
-        weights = np.array([0.1, 0.2, 0.3, 0.4])
-        weights = weights[-len(sg_trend):]
-        weights = weights / weights.sum()
-        
-        return max(0.0, min(1.0, np.average(sg_trend, weights=weights) / 2.0 + 0.5))
-
-    def adjust_total_for_stats(self) -> float:
-        """
-        Adjust the total projected points based on current statistics.
-        This method can be customized based on how you want to incorporate
-        stats into your projections.
-        """
-        base_total = self.total
-        
-        # Example adjustment based on current form and recent strokes gained
-        form_factor = self.get_current_form()
-        recent_sg = self.get_stats_average('strokes_gained.total', weeks=4)
-        
-        # Simple adjustment formula - can be modified based on your needs
-        adjustment = (form_factor - 0.5) * 5  # +/- 2.5 points based on form
-        adjustment += recent_sg  # Add recent strokes gained directly
-        
-        return base_total + adjustment
-
-    def __str__(self):
-        return self.name
-    
-    def __repr__(self):
-        return f"{self.name}"
-    
-    def __eq__(self, other):
-        return self.name == other.name
-
-    def set_fit_score(self, score: float) -> None:
-        """Set the course fit score for this golfer"""
-        self.fit_score = score
-        
-    def set_odds_total(self, total: float) -> None:
-        """Set the odds total score for this golfer"""
-        self._odds_total = total
-        
-    def calculate_total(self, odds_weight: float, fit_weight: float) -> None:
-        """Calculate total score using provided weights"""
-        if self.odds_total is not None and self.fit_score is not None:
-            self._total = (
-                odds_weight * self._odds_total +
-                fit_weight * self.fit_score
-            )
-        else:
-            self._total = 0.0
 
 class DKLineupOptimizer:
     def __init__(self, salary_cap: int = 50000, lineup_size: int = 6):
@@ -527,648 +258,6 @@ def optimize_dk_lineups(dk_merge: pd.DataFrame, num_lineups: int = 20) -> pd.Dat
         
     return pd.DataFrame(lineup_rows)
 
-@dataclass
-class StatConfig:
-    """Configuration for each statistic"""
-    url: str
-    name_col: str = 'PLAYER NAME'
-    value_col: str = 'AVG.'
-    drop_cols: list = None
-    table_index: int = 1
-
-class PGATourStatsScraper:
-    """Scraper for PGA Tour statistics using Selenium"""
-    
-    STAT_URLS = {
-        'sg_off_tee': 'https://www.pgatour.com/stats/detail/02567',
-        'sg_approach': 'https://www.pgatour.com/stats/detail/02568',
-        'sg_around_green': 'https://www.pgatour.com/stats/detail/02569',
-        'sg_putting': 'https://www.pgatour.com/stats/detail/02564',
-        'driving_distance': 'https://www.pgatour.com/stats/detail/101',
-        'driving_accuracy': 'https://www.pgatour.com/stats/detail/102',
-        'gir': 'https://www.pgatour.com/stats/detail/103',
-        'sand_saves': 'https://www.pgatour.com/stats/detail/362'
-    }
-
-    def __init__(self):
-        self.stats_cache = {}
-        self.last_update = {}
-        self.driver = None
-
-    def _init_driver(self):
-        """Initialize the Selenium webdriver if not already initialized"""
-        if self.driver is None:
-            options = webdriver.FirefoxOptions()
-            options.add_argument('--headless')
-            self.driver = webdriver.Firefox(options=options)
-
-    def _quit_driver(self):
-        """Quit the Selenium webdriver"""
-        if self.driver is not None:
-            self.driver.quit()
-            self.driver = None
-
-    @staticmethod
-    def _clean_name(name: str) -> str:
-        """Clean player names to match Golfer class format"""
-        # Handle NaN and non-string values
-        if pd.isna(name) or not isinstance(name, str):
-            return ""
-            
-        try:
-            # Remove any ID portion if present
-            name = name.split('(')[0].strip()
-            # Convert to lowercase and strip whitespace
-            return fix_names(name)
-        except Exception as e:
-            print(f"Error cleaning name '{name}': {str(e)}")
-            return ""
-
-    def _fetch_stat(self, stat_name: str, force_refresh: bool = False) -> pd.DataFrame:
-        """Fetch a single statistic from PGA Tour website using Selenium"""
-        if not force_refresh and stat_name in self.stats_cache:
-            last_update = self.last_update.get(stat_name)
-            if last_update and (datetime.now() - last_update).total_seconds() < 86400:
-                return self.stats_cache[stat_name]
-
-        url = self.STAT_URLS[stat_name]
-        
-        try:
-            self._init_driver()
-            self.driver.get(url)
-            
-            # Wait for the table to load
-            wait = WebDriverWait(self.driver, 10)
-            table = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "table")))
-            
-            # Get the table HTML and wrap in StringIO
-            table_html = table.get_attribute('outerHTML')
-            
-            # Parse the table
-            df = pd.read_html(StringIO(table_html))[0]
-            
-            # Print column names for debugging
-            print(f"\nColumns found for {stat_name}:")
-            print(df.columns.tolist())
-            
-            # Handle column names based on the stat type
-            if 'Player' in df.columns:
-                df = df.rename(columns={'Player': 'Name'})
-            
-            # Drop unnecessary columns and handle value column
-            cols_to_keep = ['Name']
-            
-            # Map stat names to their column names in the table
-            stat_col_map = {
-                'sg_off_tee': 'Avg',  # Updated based on your output
-                'sg_approach': 'Avg',
-                'sg_around_green': 'Avg',
-                'sg_putting': 'Avg',
-                'driving_distance': 'Avg',
-                'driving_accuracy': '%',
-                'gir': '%',
-                'sand_saves': '%'
-            }
-            
-            # Find the value column
-            value_col = stat_col_map.get(stat_name)
-            if value_col in df.columns:
-                cols_to_keep.append(value_col)
-                df = df[cols_to_keep]
-                df = df.rename(columns={value_col: stat_name})
-            else:
-                print(f"Warning: Could not find value column '{value_col}' for {stat_name}")
-                print("Available columns:", df.columns.tolist())
-                return pd.DataFrame(columns=['Name', stat_name])
-            
-            # Clean names and remove empty rows
-            df['Name'] = df['Name'].apply(self._clean_name)
-            df = df[df['Name'] != ""]  # Remove rows with empty names
-            
-            # Convert stat values to float
-            df[stat_name] = pd.to_numeric(df[stat_name].astype(str).str.strip('%'), errors='coerce').fillna(0)
-            
-            # Update cache
-            self.stats_cache[stat_name] = df
-            self.last_update[stat_name] = datetime.now()
-            
-            time.sleep(1)
-            
-            return df
-            
-        except Exception as e:
-            print(f"Error fetching {stat_name}: {str(e)}")
-            print("Full error details:", e.__class__.__name__)
-            import traceback
-            print(traceback.format_exc())
-            return pd.DataFrame(columns=['Name', stat_name])
-
-    def get_all_stats(self, force_refresh: bool = False, use_current_form: bool = False) -> pd.DataFrame:
-        """
-        Fetch all statistics and combine them into a single DataFrame
-        
-        Args:
-            force_refresh: Whether to force refresh the stats even if they exist
-            use_current_form: Whether to use current form data for strokes gained stats
-        """
-        try:
-            pga_stats_path = get_stats_filename()
-            
-            if not force_refresh and not should_refresh_stats(pga_stats_path):
-                print("Loading existing PGA stats from this week...")
-                base_df = pd.read_csv(pga_stats_path)
-            else:
-                print("Fetching new PGA stats (last update was before this week's Tuesday's...)...")
-                base_df = None
-                for stat_name in self.STAT_URLS.keys():
-                    print(f"Fetching {stat_name}...")
-                    df = self._fetch_stat(stat_name, force_refresh)
-                    
-                    if base_df is None:
-                        base_df = df
-                    else:
-                        base_df = pd.merge(base_df, df, on='Name', how='outer')
-            
-                # Save PGA stats
-                base_df.to_csv(pga_stats_path, index=False)
-                
-            if use_current_form:
-                # Load current form data
-                form_path = f'golfers/current_form_20241228.csv' # TODO: Make this dynamic once season starts
-                if os.path.exists(form_path):
-                    print("Loading and merging current form data with 70/30 weighting...")
-                    form_df = pd.read_csv(form_path)
-                    
-                    # Keep only the strokes gained columns from current form
-                    sg_columns = ['Name', 'sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
-                    form_df = form_df[sg_columns]
-                    
-                    # Merge with base_df
-                    final_df = pd.merge(base_df, form_df, on='Name', how='left', suffixes=('_pga', '_form'))
-                    
-                    # For each SG stat, apply weighted average (70% current form, 30% PGA stats)
-                    for sg_stat in ['sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']:
-                        pga_col = f'{sg_stat}_pga'
-                        form_col = f'{sg_stat}_form'
-                        
-                        # Fill NaN values with the other source if available
-                        final_df[pga_col] = final_df[pga_col].fillna(final_df[form_col])
-                        final_df[form_col] = final_df[form_col].fillna(final_df[pga_col])
-                        
-                        # Calculate weighted average
-                        final_df[sg_stat] = (
-                            final_df[form_col] * 0.7 + 
-                            final_df[pga_col] * 0.3
-                        )
-                        
-                        # Drop the temporary columns
-                        final_df = final_df.drop(columns=[pga_col, form_col])
-                else:
-                    print("Current form data not found, using PGA stats only")
-                    final_df = base_df
-            else:
-                final_df = base_df
-            
-            # Fill any remaining NaN values with 0
-            final_df = final_df.fillna(0)
-            
-            return final_df
-            
-        finally:
-            self._quit_driver()
-
-    def update_golfer(self, golfer: 'Golfer', stats_df: Optional[pd.DataFrame] = None) -> None:
-        """Update a Golfer instance with the latest statistics"""
-        if stats_df is None:
-            stats_df = self.get_all_stats()
-        
-        golfer_name = self._clean_name(golfer.name)
-        player_stats = stats_df[stats_df['Name'] == golfer_name]
-        
-        if len(player_stats) == 0:
-            print(f"Warning: No stats found for {golfer_name}")
-            return
-            
-        player_stats = player_stats.iloc[0]
-        
-        # Create StrokesGained object
-        sg = StrokesGained(
-            off_tee=float(player_stats.get('sg_off_tee', 0)),
-            approach=float(player_stats.get('sg_approach', 0)),
-            around_green=float(player_stats.get('sg_around_green', 0)),
-            putting=float(player_stats.get('sg_putting', 0))
-        )
-        
-        # Update golfer's stats
-        golfer.update_stats(
-            strokes_gained=sg,
-            driving_distance=float(player_stats.get('driving_distance', 0)),
-            driving_accuracy=float(player_stats.get('driving_accuracy', 0)),
-            gir=float(player_stats.get('gir', 0)),
-            scrambling_sand=float(player_stats.get('sand_saves', 0))
-        )
-
-    def update_golfer_list(self, golfers: list['Golfer'], use_current_form: bool = False) -> None:
-        """Update a list of golfers efficiently by fetching stats once"""
-        stats_df = self.get_all_stats(use_current_form=use_current_form)
-        for golfer in golfers:
-            self.update_golfer(golfer, stats_df)
-
-@dataclass
-class StatCorrelation:
-    """Defines how a player stat correlates with a course stat"""
-    course_stat: str  # Name of the course stat
-    player_stat: str  # Name of the player stat
-    weight: float     # How important this correlation is
-    is_inverse: bool = False  # True if higher course stat means lower player stat is better
-
-@dataclass
-class StatMapping:
-    """Defines how a player stat maps to a course stat"""
-    course_stat: str
-    player_stat: str
-    weight: float
-    is_inverse: bool = False
-    
-    def calculate_fit(self, course_val: float, player_val: float) -> float:
-        """Abstract method to be implemented by subclasses"""
-        raise NotImplementedError
-
-class DistanceMapping(StatMapping):
-    def __init__(self, course_stat: str, player_stat: str, weight: float, 
-                 course_range: tuple = (270, 325), player_range: tuple = (270, 325)):
-        super().__init__(course_stat, player_stat, weight)
-        self.course_range = course_range
-        self.player_range = player_range  
-        
-    def calculate_fit(self, course_val: float, player_val: float) -> float:
-        """
-        For distance:
-        - If player >= course requirement:
-          - Get 0.9 base points for meeting requirement
-          - Get up to 0.1 additional points based on how much they exceed it
-        - If player < course requirement:
-          - Get partial points based on how close they are (max 50% penalty)
-        """
-        if self.is_inverse:
-            player_val = 1 - player_val  # Invert for negative correlations
-            
-        if player_val >= course_val:
-            # Base score for meeting requirement
-            base_score = 0.9
-            
-            # Calculate bonus (max 0.1) based on how much they exceed requirement
-            # Cap the bonus calculation at 30 yards over requirement
-            excess_yards = min(player_val - course_val, 30)
-            bonus = 0.1 * (excess_yards / 30)
-            
-            return base_score + bonus
-        else:
-            # Calculate deficit percentage (max penalty of 50%)
-            deficit = (course_val - player_val) / course_val
-            return max(0.3, 1.0 - deficit)
-
-class AccuracyMapping(StatMapping):
-    # Default ranges for different accuracy types
-    DEFAULT_RANGES = {
-        'adj_driving_accuracy': {
-            'course': (0.44, 0.87),
-            'player': (0.49, 0.73)
-        },
-        'fw_width': {
-            'course': (23.5, 71.9),
-            'player': (0.49, 0.73)
-        }
-    }
-    
-    def __init__(self, course_stat: str, player_stat: str, weight: float, 
-                 course_range: tuple = None, player_range: tuple = None,
-                 is_inverse: bool = False):
-        """
-        Initialize with ranges based on the accuracy stat type.
-        Falls back to provided ranges or generic defaults if stat type not found.
-        """
-        super().__init__(course_stat, player_stat, weight, is_inverse)
-        
-        # Get default ranges for this stat type
-        defaults = self.DEFAULT_RANGES.get(course_stat, {
-            'course': (40, 80),  # Generic fallback ranges as percentages
-            'player': (40, 80)
-        })
-        
-        self.course_range = course_range or defaults['course']
-        self.player_range = player_range or defaults['player']
-
-    def calculate_fit(self, course_val: float, player_val: float) -> float:
-        """
-        For accuracy:
-        - All scores start at 1.0 (100%)
-        - Apply penalties based on course difficulty and player accuracy
-        """
-        if self.is_inverse and self.course_stat == 'fw_width':
-            # Normalize fairway width (lower is harder)
-            min_course, max_course = self.course_range
-            norm_width = (course_val - min_course) / (max_course - min_course)
-            
-            # Normalize player accuracy (higher is better)
-            min_player, max_player = self.player_range
-            norm_accuracy = (player_val - min_player) / (max_player - min_player)
-            
-            # For narrow fairways (low norm_width), we want high accuracy
-            # Calculate penalty: higher when fairways are narrow AND accuracy is low
-            difficulty = 1 - norm_width  # Convert width to difficulty (0=wide, 1=narrow)
-            accuracy_deficit = 1 - norm_accuracy  # How inaccurate the player is
-            
-            # Penalty increases with both difficulty and inaccuracy
-            penalty = difficulty * accuracy_deficit
-            
-            return max(0.3, 1.0 - penalty)  # Cap maximum penalty at 60%
-    
-        # Original logic for other accuracy mappings
-        if self.is_inverse:
-            course_val = 1 - course_val
-            
-        if player_val >= course_val:
-            return 1.0  # No penalty for meeting/exceeding requirement
-        else:
-            deficit = (course_val - player_val) / course_val
-            return max(0.4, 1.0 - deficit)  # Up to 60% penalty
-
-class StrokesGainedMapping(StatMapping):
-    # Default ranges for different SG types
-    DEFAULT_RANGES = {
-        'ott_sg': {
-            'course': (-0.120, 0.130),
-            'player': (-1.4, 0.9)
-        },
-        'app_sg': {
-            'course': (-0.06, 0.9),
-            'player': (-1.1, 1.3)
-        },
-        'arg_sg': {
-            'course': (-0.120, 0.08),
-            'player': (-1.0, 0.6)
-        },
-        'putt_sg': {
-            'course': (-0.035, 0.035),
-            'player': (-1.0, 1.0)
-        }
-    }
-    
-    def __init__(self, course_stat: str, player_stat: str, weight: float):
-        super().__init__(course_stat, player_stat, weight)
-        self.original_weight = weight
-        self.course_range = self.DEFAULT_RANGES[course_stat]['course']
-        self.player_range = self.DEFAULT_RANGES[course_stat]['player']
-        # Remove default ranges, will calculate per tournament
-
-    def calculate_tournament_ranges(self, golfers: List['Golfer']) -> tuple:
-        """Calculate min/max ranges based on the tournament field"""
-        values = []
-        for golfer in golfers:
-            try:
-                # Use self.player_stat instead of golfer.player_stat
-                if self.player_stat.startswith('sg_'):
-                    val = getattr(golfer.stats['current']['strokes_gained'], 
-                                self.player_stat.replace('sg_', ''))
-                else:
-                    val = golfer.stats['current'][self.player_stat]
-                values.append(val)
-            except (AttributeError, KeyError) as e:
-                continue  # Skip golfers with missing stats
-        
-        if not values:
-            return (-1, 1)  # Default range if no valid values found
-        
-        # Use percentiles instead of min/max to handle outliers
-        min_val = np.percentile(values, 5)  # 5th percentile
-        max_val = np.percentile(values, 95)  # 95th percentile
-        return (min_val, max_val)
-
-    def calculate_fit(self, course_val: float, player_val: float, tournament_range: tuple = None) -> tuple:
-        """
-        For Strokes Gained:
-        - Score directly correlates to player's percentile in tournament field
-        - Apply weight adjustments based on course importance
-        Returns: (fit_score, adjusted_weight)
-        """
-        if tournament_range:
-            min_player, max_player = tournament_range
-        else:
-            min_player, max_player = self.DEFAULT_RANGES[self.course_stat]['player']
-        
-        # Normalize course_val to -1 to 1 range based on its specific course_range
-        min_course, max_course = self.course_range
-        normalized_course_val = 2 * (course_val - min_course) / (max_course - min_course) - 1
-
-        # Calculate adjusted weight (but don't modify self.weight)
-        adjusted_weight = self.original_weight
-        if course_val < 0:
-            # Stronger penalty for actually negative values
-            penalty = min(0.7, abs(normalized_course_val))  # Up to 70% penalty
-            adjusted_weight = self.original_weight * (1.0 - penalty)
-        elif normalized_course_val < 0:
-            # Milder penalty for positive values that normalize to negative
-            penalty = min(0.2, abs(normalized_course_val))  # Up to 20% penalty
-            adjusted_weight = self.original_weight * (1.0 - penalty)
-
-        # Calculate percentile directly (0 to 1 range)
-        if player_val <= min_player:
-            fit_score = 0.0
-        elif player_val >= max_player:
-            fit_score = 1.0
-        else:
-            fit_score = (player_val - min_player) / (max_player - min_player)
-
-        return fit_score, adjusted_weight
-
-class CoursePlayerFit:
-    """Analyzes how well a player's stats fit a course's characteristics"""
-    
-    # Define default weights matching the CSV values (multiplied by 4 as in original code)
-    DEFAULT_WEIGHTS_DICT = {
-        'Driving Distance': 0.0,
-        'Driving Accuracy': 0.123340,
-        'Fairway Width': 0.0,
-        'Off the Tee SG': 1.015724,
-        'Approach SG': 1.505708,
-        'Around Green SG': 0.468236,
-        'Putting SG': 0.776232,
-        'Sand Save': 0.110756
-    }
-    
-    def __init__(self, course: CourseStats, golfers: List['Golfer'], 
-                 custom_weights: Dict[str, float] = None, 
-                 mappings: List[StatMapping] = None, 
-                 verbose: bool = False):
-        self.course = course
-        self.verbose = verbose
-        
-        # Try to load weights from CSV
-        try:
-            weights_df = pd.read_csv('optimization_results/final_weights.csv')
-            self.DEFAULT_WEIGHTS_DICT = {row['Stat']: row['Weight'] * 4 for _, row in weights_df.iterrows()}
-        except (FileNotFoundError, pd.errors.EmptyDataError):
-            # Use the hardcoded defaults defined above
-            pass
-            
-        # Use custom weights if provided, otherwise use defaults
-        weights = custom_weights if custom_weights is not None else self.DEFAULT_WEIGHTS_DICT
-        
-        # Create stat mappings with the appropriate weights
-        if mappings is None:
-            self.STAT_MAPPINGS = [
-                # Distance correlations
-                DistanceMapping('adj_driving_distance', 'driving_distance', weights.get('Driving Distance', self.DEFAULT_WEIGHTS_DICT['Driving Distance'])),
-                # Accuracy correlations
-                AccuracyMapping('adj_driving_accuracy', 'driving_accuracy', weights.get('Driving Accuracy', self.DEFAULT_WEIGHTS_DICT['Driving Accuracy'])),
-                AccuracyMapping('fw_width', 'driving_accuracy', weights.get('Fairway Width', self.DEFAULT_WEIGHTS_DICT['Fairway Width']), is_inverse=True),
-                
-                # Strokes Gained correlations
-                StrokesGainedMapping('ott_sg', 'sg_off_tee', weights.get('Off the Tee SG', self.DEFAULT_WEIGHTS_DICT['Off the Tee SG'])),
-                StrokesGainedMapping('app_sg', 'sg_approach', weights.get('Approach SG', self.DEFAULT_WEIGHTS_DICT['Approach SG'])),
-                StrokesGainedMapping('arg_sg', 'sg_around_green', weights.get('Around Green SG', self.DEFAULT_WEIGHTS_DICT['Around Green SG'])),
-                StrokesGainedMapping('putt_sg', 'sg_putting', weights.get('Putting SG', self.DEFAULT_WEIGHTS_DICT['Putting SG'])),
-                
-                # Specific situation correlations
-                AccuracyMapping('arg_bunker_sg', 'scrambling_sand', weights.get('Sand Save', self.DEFAULT_WEIGHTS_DICT['Sand Save']))
-            ]
-        else:
-            self.STAT_MAPPINGS = mappings
-            
-        self.fit_details = []  # Store all fit details
-
-    def calculate_fit_score(self, golfer: 'Golfer', verbose: bool = None) -> Dict[str, float]:
-        """Calculate how well a golfer's stats fit the course."""
-        verbose = self.verbose if verbose is None else verbose
-        
-        if verbose:
-            print(f"\nCalculating fit score for {golfer.name}")
-            print("\nComponent Scores:")
-            print("----------------------------------------")
-            print("Stat             Raw Values        Normalized      Base   Adj    Score")
-            print("                Course  Player    Course  Player   Wgt    Wgt")
-            print("----------------------------------------")
-        
-        scores = {}
-        weights_sum = 0
-        total_score = 0
-        
-        for mapping in self.STAT_MAPPINGS:
-            try:
-                # Get course value
-                course_val = getattr(self.course, mapping.course_stat)
-                
-                # Get player value
-                if mapping.player_stat.startswith('sg_'):
-                    player_val = getattr(golfer.stats['current']['strokes_gained'], 
-                                       mapping.player_stat.replace('sg_', ''))
-                else:
-                    player_val = golfer.stats['current'][mapping.player_stat]
-                
-                # Store original weight for SG stats
-                original_weight = mapping.weight if isinstance(mapping, StrokesGainedMapping) else None
-                
-                # Calculate fit score using appropriate mapping
-                if isinstance(mapping, StrokesGainedMapping):
-                    fit_value, adjusted_weight = mapping.calculate_fit(course_val, player_val)
-                    fit_score = fit_value * adjusted_weight
-                else:
-                    fit_score = mapping.calculate_fit(course_val, player_val) * mapping.weight
-                    adjusted_weight = mapping.weight
-                
-                scores[f"{mapping.course_stat}-{mapping.player_stat}"] = fit_score
-                total_score += fit_score
-                weights_sum += mapping.weight
-                
-                # Move print statements inside verbose check
-                if verbose:
-                    if isinstance(mapping, StrokesGainedMapping):
-                        min_course, max_course = mapping.course_range
-                        min_player, max_player = mapping.player_range
-                        norm_course = 2 * (course_val - min_course) / (max_course - min_course) - 1
-                        norm_player = 2 * (player_val - min_player) / (max_player - min_player) - 1
-                        print(f"{mapping.course_stat:<15} {course_val:6.3f}  {player_val:6.3f}    "
-                              f"{norm_course:6.3f}  {norm_player:6.3f}  {original_weight:6.3f}  "
-                              f"{mapping.weight:6.3f}  {fit_score:6.3f}")
-                    else:
-                        print(f"{mapping.course_stat:<15} {course_val:6.3f}  {player_val:6.3f}            "
-                              f"---  ---      {mapping.weight:6.3f}  {mapping.weight:6.3f}  {fit_score:6.3f}")
-                    
-                    if mapping.is_inverse:
-                        print("  (Inverse correlation)")
-                
-                # Add to fit_details list
-                self.fit_details.append({
-                    'Name': golfer.get_clean_name,
-                    'Course Stat': mapping.course_stat,
-                    'Player Stat': mapping.player_stat,
-                    'Course Value': course_val,
-                    'Player Value': player_val,
-                    'Base Weight': mapping.original_weight if isinstance(mapping, StrokesGainedMapping) else mapping.weight,
-                    'Adjusted Weight': adjusted_weight,
-                    'Fit Score': fit_score
-                })
-                
-            except (AttributeError, KeyError, TypeError) as e:
-                if verbose:
-                    print(f"Warning: Couldn't calculate {mapping.course_stat}-{mapping.player_stat} "
-                          f"correlation: {str(e)}")
-        
-        overall_score = (total_score / weights_sum * 100) if weights_sum > 0 else 0
-        if verbose:
-            print("----------------------------------------")
-            # Calculate overall fit score (0-100 scale)
-            print(f"\nOverall Fit: {overall_score:.1f}%")
-        
-        return {
-            'overall_fit': overall_score,
-            'component_scores': scores
-        }
-
-    def save_fit_details(self):
-        """Save all collected fit details to CSV"""
-        if self.fit_details:
-            fit_df = pd.DataFrame(self.fit_details)
-            fit_df.to_csv(f'2025/{TOURNEY}/fit_details.csv', index=False)
-
-    def get_key_stats(self, golfer: 'Golfer', verbose: bool = None) -> List[str]:
-        """Returns list of key stats for this course based on the golfer's profile."""
-        verbose = self.verbose if verbose is None else verbose
-        
-        if verbose:
-            print(f"\nAnalyzing key stats for {golfer.name} at {self.course.name}")
-        
-        key_stats = []
-        fit_scores = self.calculate_fit_score(golfer, verbose=False)['component_scores']
-        
-        course_emphasis_threshold = 0.7
-        player_weakness_threshold = 0.5
-        
-        if verbose:
-            print("\nKey Stats Analysis:")
-            
-        for corr in self.STAT_CORRELATIONS:
-            if corr.course_stat not in self.normalized_stats:
-                continue
-                
-            course_val = self.normalized_stats[corr.course_stat]
-            fit_score = fit_scores.get(corr.course_stat, 0)
-            
-            if course_val > course_emphasis_threshold:
-                if fit_score < player_weakness_threshold:
-                    msg = f"Improve {corr.player_stat} for this course"
-                    key_stats.append(msg)
-                    if verbose:
-                        print(f"- {msg} (course: {course_val:.3f}, fit: {fit_score:.3f})")
-                elif fit_score > 0.8:
-                    msg = f"Leverage strong {corr.player_stat}"
-                    key_stats.append(msg)
-                    if verbose:
-                        print(f"+ {msg} (course: {course_val:.3f}, fit: {fit_score:.3f})")
-        
-        return key_stats
-
 def calculate_tournament_history_score(name: str, history_df: pd.DataFrame) -> float:
     """
     Calculate a tournament history score based on past performance.
@@ -1287,38 +376,133 @@ def get_current_tuesday() -> datetime:
     tuesday = today - pd.Timedelta(days=days_since_tuesday)
     return tuesday
 
-def get_stats_filename() -> str:
-    """Get the standardized filename using the current week's Tuesday date"""
-    tuesday = get_current_tuesday()
-    return f'golfers/pga_stats_{tuesday.strftime("%Y%m%d")}.csv'
-
-def should_refresh_stats(stats_path: str) -> bool:
-    """
-    Check if stats should be refreshed.
-    Returns True only if:
-    - File doesn't exist, OR
-    - It's Tuesday AND the file is from before this week's Tuesday
-    """
-    if not os.path.exists(stats_path):
-        return True
-        
-    # Check if today is Tuesday
-    today = datetime.now()
-    if today.weekday() != 1:  # Tuesday is 1
-        return False
-        
-    # If it's Tuesday, check if file is from before this week's Tuesday
-    file_timestamp = datetime.fromtimestamp(os.path.getmtime(stats_path))
-    current_tuesday = get_current_tuesday()
+def calculate_fit_score_from_csv(name: str, course_fit_df: pd.DataFrame) -> float:
+    """Calculate fit score from course_fit.csv data"""
+    # Find player in dataframe
+    player_data = course_fit_df[course_fit_df['Name'].apply(fix_names) == fix_names(name)]
     
-    return file_timestamp < current_tuesday
+    if len(player_data) == 0:
+        return 0.0  # Return 0 if player not found
+        
+    # Get projected course fit (lower is better)
+    fit_score = player_data['projected_course_fit'].iloc[0]
+    
+    # Convert to 0-100 scale where 100 is best (lowest rank)
+    max_rank = course_fit_df['projected_course_fit'].max()
+    return 100 * (1 - (fit_score / max_rank))
 
-def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, custom_weights: Dict[str, float] = None):
+def calculate_form_score(tourney: str, weights: dict) -> pd.DataFrame:
+    """
+    Calculate form score by merging current and long-term form data with weights
+    
+    Args:
+        tourney: Tournament name
+        weights: Dictionary containing form weights
+    
+    Returns:
+        DataFrame with merged form data and final form score
+    """
+    # Load PGA stats (long-term form)
+    pga_stats = pd.read_csv(f'2025/{tourney}/pga_stats.csv')
+    
+    # Initialize form DataFrame with long-term stats
+    form_df = pga_stats[['Name', 'sg_total']].copy()
+    form_df = form_df.rename(columns={'sg_total': 'long_term_form'})
+    
+    # Try to load current form data
+    current_form_path = f'2025/{tourney}/current_form.csv'
+    if os.path.exists(current_form_path):
+        print("Loading and merging current form data...")
+        current_form = pd.read_csv(current_form_path)
+        
+        # Calculate current form total
+        sg_columns = ['sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
+        current_form['current_form'] = current_form[sg_columns].sum(axis=1)
+        
+        # Merge with form_df
+        form_df = pd.merge(
+            form_df, 
+            current_form[['Name', 'current_form']], 
+            on='Name', 
+            how='left'
+        )
+        
+        # Fill NaN values with the other source if available
+        form_df['current_form'] = form_df['current_form'].fillna(form_df['long_term_form'])
+        form_df['long_term_form'] = form_df['long_term_form'].fillna(form_df['current_form'])
+        
+        # Calculate weighted form score
+        form_df['Form Score'] = (
+            form_df['current_form'] * weights['form']['current'] + 
+            form_df['long_term_form'] * weights['form']['long']
+        )
+    else:
+        print("Current form data not found, using PGA stats only")
+        form_df['Form Score'] = form_df['long_term_form']
+    
+    # Clean up intermediate columns
+    form_df = form_df[['Name', 'Form Score']]
+    
+    return form_df
+
+def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, weights: dict = None):
+    """
+    Main function for PGA optimization
+    
+    Args:
+        tourney: Tournament name
+        num_lineups: Number of lineups to generate
+        tournament_history: Whether to include tournament history
+        weights: Dictionary containing all weights with the following structure:
+            {
+                'odds': {
+                    'winner': 0.6,
+                    'top5': 0.5,
+                    'top10': 0.8,
+                    'top20': 0.4
+                },
+                'form': {
+                    'current': 0.7,  # Short-term form weight
+                    'long': 0.3      # Long-term form weight
+                },
+                'components': {
+                    'odds': 0.4,
+                    'fit': 0.3,
+                    'history': 0.2,
+                    'form': 0.1
+                }
+            }
+    """
+    # Default weights if none provided
+    default_weights = {
+        'odds': {
+            'winner': 0.6,
+            'top5': 0.5,
+            'top10': 0.8,
+            'top20': 0.4
+        },
+        'form': {
+            'current': 0.7,
+            'long': 0.3
+        },
+        'components': {
+            'odds': 0.4,
+            'fit': 0.3,
+            'history': 0.2,
+            'form': 0.1
+        }
+    }
+    
+    weights = weights or default_weights
+    
     global TOURNEY
     TOURNEY = tourney
     print(f"\n{'='*50}")
     print(f"Running optimization for {TOURNEY}")
     print(f"{'='*50}\n")
+
+    # Replace stats file creation logic with:
+    create_pga_stats(TOURNEY)
 
     # Read odds data and DraftKings salaries
     odds_df = pd.read_csv(f'2025/{TOURNEY}/odds.csv')
@@ -1339,11 +523,20 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, 
     dk_data = pd.merge(dk_salaries, odds_df, on='Name', how='left')
     print(f"After merging: {len(dk_data)} players\n")
     
-    # Calculate odds total using odds_to_score function with optimized weights
-    dk_data['Tournament Winner'] = dk_data['Tournament Winner'].apply(lambda x: odds_to_score(x, "Tournament Winner", w=0.6))
-    dk_data['Top 5 Finish'] = dk_data['Top 5 Finish'].apply(lambda x: odds_to_score(x, "Top 5 Finish", t5=0.5))
-    dk_data['Top 10 Finish'] = dk_data['Top 10 Finish'].apply(lambda x: odds_to_score(x, "Top 10 Finish", t10=0.8))
-    dk_data['Top 20 Finish'] = dk_data['Top 20 Finish'].apply(lambda x: odds_to_score(x, "Top 20 Finish", t20=0.4))
+    # Calculate odds total using provided weights
+    dk_data['Tournament Winner'] = dk_data['Tournament Winner'].apply(
+        lambda x: odds_to_score(x, "Tournament Winner", w=weights['odds']['winner']))
+    dk_data['Top 5 Finish'] = dk_data['Top 5 Finish'].apply(
+        lambda x: odds_to_score(x, "Top 5 Finish", t5=weights['odds']['top5']))
+    dk_data['Top 10 Finish'] = dk_data['Top 10 Finish'].apply(
+        lambda x: odds_to_score(x, "Top 10 Finish", t10=weights['odds']['top10']))
+    dk_data['Top 20 Finish'] = dk_data['Top 20 Finish'].apply(
+        lambda x: odds_to_score(x, "Top 20 Finish", t20=weights['odds']['top20']))
+    
+    # Fill NaN values with 0 for each odds column
+    odds_columns = ['Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish']
+    for col in odds_columns:
+        dk_data[col] = dk_data[col].fillna(0)
     
     dk_data['Odds Total'] = (
         dk_data['Tournament Winner'] +
@@ -1362,18 +555,12 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, 
     # Create golfers from DraftKings data
     golfers = [Golfer(row) for _, row in dk_data.iterrows()]
 
-    # Create scraper
-    scraper = PGATourStatsScraper()
+    # Load course fit data
+    print(f"Loading course fit data for {TOURNEY}...")
+    course_fit_df = pd.read_csv(f'2025/{TOURNEY}/course_fit.csv')
+    print("Course fit data loaded successfully\n")
 
-    # Update all golfers at once
-    scraper.update_golfer_list(golfers, use_current_form=True)
-
-    print(f"Loading course stats for {TOURNEY}...")
-    course_stats = load_course_stats(TOURNEY)
-    analyzer = CoursePlayerFit(course_stats, golfers, custom_weights=custom_weights)
-    print("Course stats loaded successfully\n")
-
-    # Calculate fit scores for all golfers and create DataFrame
+    # Calculate fit scores and history scores for all golfers
     fit_scores_data = []
     history_scores = []
     for golfer in golfers:
@@ -1381,57 +568,50 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, 
             history_score = calculate_tournament_history_score(golfer.get_clean_name, tourney_history)
         else:
             history_score = 0
-        fit_score = analyzer.calculate_fit_score(golfer)
-        golfer.set_fit_score(fit_score['overall_fit'])
+            
+        # Calculate fit score from CSV data
+        fit_score = calculate_fit_score_from_csv(golfer.get_clean_name, course_fit_df)
+        golfer.set_fit_score(fit_score)
+        
         fit_scores_data.append({
             'Name': golfer.get_clean_name,
-            'Fit Score': fit_score['overall_fit']
+            'Fit Score': fit_score
         })
         history_scores.append({
             'Name': golfer.get_clean_name,
             'History Score': history_score
         })
+    
     history_scores_df = pd.DataFrame(history_scores)
     fit_scores_df = pd.DataFrame(fit_scores_data)
-    analyzer.save_fit_details()
-    
+    form_df = calculate_form_score(tourney, weights)
+
 
     # Merge fit scores and history scores with dk_data
     dk_data = pd.merge(dk_data, fit_scores_df, on='Name', how='left')
     dk_data = pd.merge(dk_data, history_scores_df, on='Name', how='left')
+    dk_data = pd.merge(dk_data, form_df, on='Name', how='left')
+    dk_data['Form Score'] = dk_data['Form Score'].fillna(0)
+    
 
+    # Normalize all components
+    dk_data['Normalized Odds'] = (dk_data['Odds Total'] - dk_data['Odds Total'].min()) / \
+        (dk_data['Odds Total'].max() - dk_data['Odds Total'].min())
+    dk_data['Normalized Fit'] = (dk_data['Fit Score'] - dk_data['Fit Score'].min()) / \
+        (dk_data['Fit Score'].max() - dk_data['Fit Score'].min())
+    dk_data['Normalized History'] = (dk_data['History Score'] - dk_data['History Score'].min()) / \
+        (dk_data['History Score'].max() - dk_data['History Score'].min()) if tournament_history else 0
+    dk_data['Normalized Form'] = (dk_data['Form Score'] - dk_data['Form Score'].min()) / \
+        (dk_data['Form Score'].max() - dk_data['Form Score'].min())
 
-    # Load weights from optimization results
-    
-    if len(tourney_history) > 0:
-        odds_weight = 0.5
-        fit_weight = 0.3
-        history_weight = 0.2
-    else:
-        weights_df = pd.read_csv('optimization_results/fit_odds_final_weights.csv')
-        odds_weight = weights_df['odds_weight'].iloc[0]
-        fit_weight = weights_df['fit_weight'].iloc[0]
-        history_weight = 0.0
+    # Calculate Total using all components
+    dk_data['Total'] = (
+        dk_data['Normalized Odds'] * weights['components']['odds'] +
+        dk_data['Normalized Fit'] * weights['components']['fit'] +
+        dk_data['Normalized History'] * weights['components']['history'] +
+        dk_data['Normalized Form'] * weights['components']['form']
+    )
 
-    
-    
-    print("Optimization Weights:")
-    print(f"Odds Weight: {odds_weight:.3f}")
-    print(f"Fit Weight:  {fit_weight:.3f}\n")
-    print(f"History Weight: {history_weight:.3f}\n")
-
-    # Normalize Odds Total and Fit Score using min-max scaling
-    dk_data['Normalized Odds'] = (dk_data['Odds Total'] - dk_data['Odds Total'].min()) / (dk_data['Odds Total'].max() - dk_data['Odds Total'].min())
-    dk_data['Normalized Fit'] = (dk_data['Fit Score'] - dk_data['Fit Score'].min()) / (dk_data['Fit Score'].max() - dk_data['Fit Score'].min())
-    if tournament_history:
-        dk_data['Normalized History'] = (dk_data['History Score'] - dk_data['History Score'].min()) / \
-        (dk_data['History Score'].max() - dk_data['History Score'].min())
-    else:
-        dk_data['Normalized History'] = 0
-    
-    # Calculate Total using normalized values
-    dk_data['Total'] = dk_data['Normalized Odds'] * odds_weight + dk_data['Normalized Fit'] * fit_weight + dk_data['Normalized History'] * history_weight
-    
     dk_data['Value'] = dk_data['Total'] / dk_data['Salary'] * 100000
 
     print("Top 5 Players by Value:")
@@ -1480,6 +660,7 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, 
         'Name', 'Salary', 'Odds Total', 'Normalized Odds',
         'Fit Score', 'Normalized Fit',
         'History Score', 'Normalized History',
+        'Form Score', 'Normalized Form',
         'Total', 'Value'
     ]
     dk_data[columns_to_save].sort_values('Total', ascending=False).to_csv(output_data_path, index=False)
@@ -1487,4 +668,4 @@ def main(tourney: str, num_lineups: int = 20, tournament_history: bool = False, 
 
 
 if __name__ == "__main__":
-    main(TOURNEY, num_lineups=20,tournament_history=True)
+    main(TOURNEY, num_lineups=20, tournament_history=True)
