@@ -377,7 +377,6 @@ def main():
             # Tournament History section
         st.subheader("Tournament History")
         st.write("This section shows the golfer's history at this specific tournament. The history is used to calculate the normalized history score.")
-        st.write("TODO: Clean up 'make cuts' column to be more accurate, currently uses T65 or better.")
         try:
             history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
             
