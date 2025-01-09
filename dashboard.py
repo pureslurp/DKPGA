@@ -411,6 +411,14 @@ def main():
         # Optimized Lineups section
         st.subheader("Optimized Lineups")
         
+        # Single-click export button
+        st.download_button(
+            label="Export Lineups to CSV",
+            data=lineups.to_csv(index=False),
+            file_name=f"{selected_tournament}_lineups.csv",
+            mime="text/csv"
+        )
+        
         # Display top lineups
         for i in range(min(5, len(lineups))):
             with st.expander(f"Lineup {i+1}"):
