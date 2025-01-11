@@ -59,11 +59,12 @@ class DataManager:
 
     def load_tournament_data(self, tournament: str) -> tuple:
         """Load and process tournament data with any user adjustments"""
+        player_data = None
+        lineups = None
+        
+        # Try to load player data
         try:
-            # Load base data
             player_data = pd.read_csv(f"2025/{tournament}/player_data.csv")
-            lineups = pd.read_csv(f"2025/{tournament}/dk_lineups_optimized.csv")
-            
             # Apply any stored adjustments
             if tournament in st.session_state.player_data:
                 adjustments = st.session_state.player_data[tournament]
@@ -71,10 +72,16 @@ class DataManager:
                     if player_name in player_data['Name'].values:
                         for column, value in values.items():
                             player_data.loc[player_data['Name'] == player_name, column] = value
-            
-            return player_data, lineups
         except FileNotFoundError:
-            return None, None
+            pass
+        
+        # Try to load lineup data independently
+        try:
+            lineups = pd.read_csv(f"2025/{tournament}/dk_lineups_optimized.csv")
+        except FileNotFoundError:
+            pass
+        
+        return player_data, lineups
     
     def update_player_adjustment(self, tournament: str, player_name: str, column: str, value: float):
         """Store a player data adjustment"""
@@ -500,100 +507,100 @@ Higher values emphasize recent performance metrics, combining both short-term (l
                 st.write(f"Total Salary: ${total_salary:,.0f}")
                 st.write(f"Total Points: {total_points:.2f}")
         
-        # After the lineups section, add Info section
-        st.subheader("Understanding the Scores") 
+    # After the lineups section, add Info section
+    st.subheader("Understanding the Scores") 
+    
+    with st.expander("Normalized Odds"):
+        st.markdown("""
+        **Odds Score** combines multiple betting market predictions:
+        - Tournament Winner (Weight: 0.6)
+        - Top 5 Finish (Weight: 0.5)
+        - Top 10 Finish (Weight: 0.8)
+        - Top 20 Finish (Weight: 0.4)
         
-        with st.expander("Normalized Odds"):
-            st.markdown("""
-            **Odds Score** combines multiple betting market predictions:
-            - Tournament Winner (Weight: 0.6)
-            - Top 5 Finish (Weight: 0.5)
-            - Top 10 Finish (Weight: 0.8)
-            - Top 20 Finish (Weight: 0.4)
-            
-            The score is normalized to a 0-1 scale, where higher values indicate better betting market expectations.
-            Points awarded:
-            - Win: 30 pts
-            - Top 5: 14 pts
-            - Top 10: 7 pts
-            - Top 20: 5 pts
-            """)
-            
-        with st.expander("Normalized Fit"):
-            st.markdown("""
-            **Course Fit Score** analyzes how well a player's attributes match the course characteristics. 
-            Includes multiple factors:
-            
-            1. **Distance Analysis**
-            - Driving Distance vs Course Length
-            - Adjusted for course-specific requirements
-            
-            2. **Accuracy Metrics**
-            - Driving Accuracy
-            - Fairway Width considerations
-            - Green in Regulation
-            
-            3. **Strokes Gained Categories**
-            - Off the Tee
-            - Approach
-            - Around the Green
-            - Putting
-            
-            4. **Specific Situations**
-            - Sand Save percentage
-            - Course-specific challenges
-            
-            All metrics are normalized to a 0-1 scale, with higher values indicating better course fit.
-            """)
-            
-        with st.expander("Normalized History"):
-            st.markdown("""
-            **Tournament History Score** evaluates past performance at this specific event.
-            
-            Factors considered:
-            - Recent performance (last 3 years weighted more heavily)
-            - Finish positions
-            - Strokes Gained data from previous appearances
-            - Cut percentage
-            
-            Scoring system:
-            - More recent results have higher weights
-            - Consistency bonus for multiple good performances
-            - Penalty for missed cuts
-            - Normalized to 0-1 scale
-            
-            *Note: This score is only available for tournaments with historical data.*
-            """)
-            
-        with st.expander("Normalized Form"):
-            st.markdown("""
-            **Form Score** combines both short-term and long-term performance metrics:
-            
-            **Short-term Form (Current Weight: {:.1f})**
-            - Recent tournament performances
-            - Current strokes gained statistics
-            - Last 5-10 tournaments
-            
-            **Long-term Form (Current Weight: {:.1f})**
-            - Season-long statistics
-            - Historical performance metrics
-            - Overall strokes gained data
-            
-            The final form score is a weighted combination of both components, normalized to a 0-1 scale.
-            """.format(data_manager.weights['form']['current'],
-                      data_manager.weights['form']['long']))
-            
-        with st.expander("Total Score & Value"):
-            st.markdown("""
-            **Total Score** is calculated using the weighted combination of the three normalized scores:
-            - Odds Score × Odds Weight
-            - Fit Score × Fit Weight
-            - History Score × History Weight
-            
-            **Value** is calculated as: `(Total Score / Salary) × 100,000`
-            
-            Use the sliders in the sidebar to adjust the weights and optimize for different strategies.
-            """)
+        The score is normalized to a 0-1 scale, where higher values indicate better betting market expectations.
+        Points awarded:
+        - Win: 30 pts
+        - Top 5: 14 pts
+        - Top 10: 7 pts
+        - Top 20: 5 pts
+        """)
+        
+    with st.expander("Normalized Fit"):
+        st.markdown("""
+        **Course Fit Score** analyzes how well a player's attributes match the course characteristics. 
+        Includes multiple factors:
+        
+        1. **Distance Analysis**
+        - Driving Distance vs Course Length
+        - Adjusted for course-specific requirements
+        
+        2. **Accuracy Metrics**
+        - Driving Accuracy
+        - Fairway Width considerations
+        - Green in Regulation
+        
+        3. **Strokes Gained Categories**
+        - Off the Tee
+        - Approach
+        - Around the Green
+        - Putting
+        
+        4. **Specific Situations**
+        - Sand Save percentage
+        - Course-specific challenges
+        
+        All metrics are normalized to a 0-1 scale, with higher values indicating better course fit.
+        """)
+        
+    with st.expander("Normalized History"):
+        st.markdown("""
+        **Tournament History Score** evaluates past performance at this specific event.
+        
+        Factors considered:
+        - Recent performance (last 3 years weighted more heavily)
+        - Finish positions
+        - Strokes Gained data from previous appearances
+        - Cut percentage
+        
+        Scoring system:
+        - More recent results have higher weights
+        - Consistency bonus for multiple good performances
+        - Penalty for missed cuts
+        - Normalized to 0-1 scale
+        
+        *Note: This score is only available for tournaments with historical data.*
+        """)
+        
+    with st.expander("Normalized Form"):
+        st.markdown("""
+        **Form Score** combines both short-term and long-term performance metrics:
+        
+        **Short-term Form (Current Weight: {:.1f})**
+        - Recent tournament performances
+        - Current strokes gained statistics
+        - Last 5-10 tournaments
+        
+        **Long-term Form (Current Weight: {:.1f})**
+        - Season-long statistics
+        - Historical performance metrics
+        - Overall strokes gained data
+        
+        The final form score is a weighted combination of both components, normalized to a 0-1 scale.
+        """.format(data_manager.weights['form']['current'],
+                    data_manager.weights['form']['long']))
+        
+    with st.expander("Total Score & Value"):
+        st.markdown("""
+        **Total Score** is calculated using the weighted combination of the three normalized scores:
+        - Odds Score × Odds Weight
+        - Fit Score × Fit Weight
+        - History Score × History Weight
+        
+        **Value** is calculated as: `(Total Score / Salary) × 100,000`
+        
+        Use the sliders in the sidebar to adjust the weights and optimize for different strategies.
+        """)
 
     # Handle form weight reset
     if 'reset_form' in st.session_state and st.session_state.reset_form:
