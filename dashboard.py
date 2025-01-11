@@ -462,13 +462,6 @@ Higher values emphasize recent performance metrics, combining both short-term (l
     if lineups is None:
         st.warning("No lineup data available. Please run the model first to generate optimized lineups.")
     else:
-        # Single-click export button
-        st.download_button(
-            label="Export Lineups to CSV",
-            data=lineups.to_csv(index=False),
-            file_name=f"{selected_tournament}_lineups.csv",
-            mime="text/csv"
-        )
         
         # Display top lineups
         for i in range(min(5, len(lineups))):
