@@ -205,12 +205,35 @@ def main():
     if not abs(total_weight - 1.0) < 0.01:  # Allow for small floating point differences
         st.sidebar.error(f"⚠️ Component weights must sum to 1.0 (Current total: {total_weight:.2f})")
     
-    # Run model button (now data_manager is available)
+    # Add number input for lineup count (just before Run Model button)
+    num_lineups = st.sidebar.number_input(
+        "Number of Lineups",
+        min_value=1,
+        max_value=150,
+        value=20,
+        step=1,
+        help="""Specify how many lineups to generate.
+
+Note: The more lineups you generate, the longer it will take to run the model."""
+    )
+    
+    # Run model button with num_lineups parameter
     if st.sidebar.button("Run Model"):
         with st.spinner(f"Running model for {selected_tournament}..."):
             run_pga_model(selected_tournament,
-                         weights=data_manager.weights)
+                         weights=data_manager.weights,
+                         num_lineups=num_lineups)
+            # Reload the data after running the model
+            _, lineups = data_manager.load_tournament_data(selected_tournament)
             st.sidebar.success("Model run complete!")
+            
+            # Add export button right after model completion
+            st.sidebar.download_button(
+                label="Export Lineups to CSV",
+                data=lineups.to_csv(index=False),
+                file_name=f"{selected_tournament}_lineups.csv",
+                mime="text/csv"
+            )
     
     # Main content
     st.title(f"{selected_tournament}")
@@ -221,42 +244,59 @@ def main():
     if player_data is None:
         st.warning("No player data available for this tournament.")
         return
-        
+    
     # Weight adjustment section
     st.sidebar.subheader("Adjust Weights")
     
     # Component weights
     odds_weight = st.sidebar.slider("Odds Weight", 0.0, 1.0, 
-                                  value=data_manager.weights['components']['odds'],
-                                  step=0.05,
-                                  key='odds_weight',
-                                  on_change=data_manager.update_component_weight,
-                                  args=('odds',))
+                                    value=data_manager.weights['components']['odds'],
+                                    step=0.05,
+                                    key='odds_weight',
+                                    on_change=data_manager.update_component_weight,
+                                    args=('odds',),
+                                    help="""Weight given to betting market predictions.
+
+Higher values place more emphasis on odds from sportsbooks for tournament winner, top 5, top 10, and top 20 finishes.""")
     
     fit_weight = st.sidebar.slider("Course Fit Weight", 0.0, 1.0,
-                                 value=data_manager.weights['components']['fit'],
-                                 step=0.05,
-                                 key='fit_weight',
-                                 on_change=data_manager.update_component_weight,
-                                 args=('fit',))
+                                    value=data_manager.weights['components']['fit'],
+                                    step=0.05,
+                                    key='fit_weight',
+                                    on_change=data_manager.update_component_weight,
+                                    args=('fit',),
+                                    help="""Weight given to course fit metrics.
+
+Higher values emphasize how well a player's attributes match the course characteristics, including distance, accuracy, and specific course challenges.""")
     
     history_weight = st.sidebar.slider("Tournament History Weight", 0.0, 1.0,
                                     value=data_manager.weights['components']['history'],
                                     step=0.05,
                                     key='history_weight',
                                     on_change=data_manager.update_component_weight,
-                                    args=('history',))
+                                    args=('history',),
+                                    help="""Weight given to tournament history.
+
+Higher values emphasize past performance at this specific event, including finish positions and strokes gained data.""")
     
     form_weight = st.sidebar.slider("Form Weight", 0.0, 1.0,
-                                 value=data_manager.weights['components']['form'],
-                                 step=0.05,
-                                 key='form_weight',
-                                 on_change=data_manager.update_component_weight,
-                                 args=('form',))
+                                    value=data_manager.weights['components']['form'],
+                                    step=0.05,
+                                    key='form_weight',
+                                    on_change=data_manager.update_component_weight,
+                                    args=('form',),
+                                    help="""Weight given to player form.
+
+Higher values emphasize recent performance metrics, combining both short-term (last 5 starts) and long-term (season-long) statistics.""")
     
     if st.sidebar.button("Reset Component Weights", 
                         on_click=data_manager.on_reset_component_weights):
         st.sidebar.success("Component weights reset to default values!")
+    
+    # Recalculate Total based on weights
+    filtered_data = player_data.copy()
+        
+        
     
     # Recalculate Total based on weights
     filtered_data = player_data.copy()
