@@ -218,198 +218,203 @@ def main():
     # Load data using DataManager
     player_data, lineups = data_manager.load_tournament_data(selected_tournament)
     
-    if player_data is not None:
+    if player_data is None:
+        st.warning("No player data available for this tournament.")
+        return
         
-        # Weight adjustment section
-        st.sidebar.subheader("Adjust Weights")
-        
-        # Component weights
-        odds_weight = st.sidebar.slider("Odds Weight", 0.0, 1.0, 
-                                      value=data_manager.weights['components']['odds'],
-                                      step=0.05,
-                                      key='odds_weight',
-                                      on_change=data_manager.update_component_weight,
-                                      args=('odds',))
-        
-        fit_weight = st.sidebar.slider("Course Fit Weight", 0.0, 1.0,
-                                     value=data_manager.weights['components']['fit'],
-                                     step=0.05,
-                                     key='fit_weight',
-                                     on_change=data_manager.update_component_weight,
-                                     args=('fit',))
-        
-        history_weight = st.sidebar.slider("Tournament History Weight", 0.0, 1.0,
-                                        value=data_manager.weights['components']['history'],
-                                        step=0.05,
-                                        key='history_weight',
-                                        on_change=data_manager.update_component_weight,
-                                        args=('history',))
-        
-        form_weight = st.sidebar.slider("Form Weight", 0.0, 1.0,
-                                     value=data_manager.weights['components']['form'],
-                                     step=0.05,
-                                     key='form_weight',
-                                     on_change=data_manager.update_component_weight,
-                                     args=('form',))
-        
-        if st.sidebar.button("Reset Component Weights", 
-                            on_click=data_manager.on_reset_component_weights):
-            st.sidebar.success("Component weights reset to default values!")
-        
-        # Recalculate Total based on weights
-        filtered_data = player_data.copy()
-        
-        
+    # Weight adjustment section
+    st.sidebar.subheader("Adjust Weights")
+    
+    # Component weights
+    odds_weight = st.sidebar.slider("Odds Weight", 0.0, 1.0, 
+                                  value=data_manager.weights['components']['odds'],
+                                  step=0.05,
+                                  key='odds_weight',
+                                  on_change=data_manager.update_component_weight,
+                                  args=('odds',))
+    
+    fit_weight = st.sidebar.slider("Course Fit Weight", 0.0, 1.0,
+                                 value=data_manager.weights['components']['fit'],
+                                 step=0.05,
+                                 key='fit_weight',
+                                 on_change=data_manager.update_component_weight,
+                                 args=('fit',))
+    
+    history_weight = st.sidebar.slider("Tournament History Weight", 0.0, 1.0,
+                                    value=data_manager.weights['components']['history'],
+                                    step=0.05,
+                                    key='history_weight',
+                                    on_change=data_manager.update_component_weight,
+                                    args=('history',))
+    
+    form_weight = st.sidebar.slider("Form Weight", 0.0, 1.0,
+                                 value=data_manager.weights['components']['form'],
+                                 step=0.05,
+                                 key='form_weight',
+                                 on_change=data_manager.update_component_weight,
+                                 args=('form',))
+    
+    if st.sidebar.button("Reset Component Weights", 
+                        on_click=data_manager.on_reset_component_weights):
+        st.sidebar.success("Component weights reset to default values!")
+    
+    # Recalculate Total based on weights
+    filtered_data = player_data.copy()
+    
+    
 
-        
-        # Update filtered_data with new fit scores
+    
+    # Update filtered_data with new fit scores
 
-        # Recalculate Total based on weights
-        filtered_data['Total'] = (
-            filtered_data['Normalized Odds'] * odds_weight +
-            filtered_data['Normalized Fit'] * fit_weight +
-            filtered_data['Normalized History'] * history_weight +
-            filtered_data['Normalized Form'] * form_weight
+    # Recalculate Total based on weights
+    filtered_data['Total'] = (
+        filtered_data['Normalized Odds'] * odds_weight +
+        filtered_data['Normalized Fit'] * fit_weight +
+        filtered_data['Normalized History'] * history_weight +
+        filtered_data['Normalized Form'] * form_weight
+    )
+    
+    # Recalculate Value based on new Total
+    filtered_data['Value'] = filtered_data['Total'] / filtered_data['Salary'] * 100000
+    
+    # Player Analysis section
+    st.subheader("Player Analysis")
+    st.write("This section summarizes each golfer's odds, fit, and history scores. This section updates dynamically as you make adjustements in the dashboard. It is the source-of-truth for running the model.")
+    
+    # Add search/filter box
+    search = st.text_input("Search Players")
+    if search:
+        filtered_data = filtered_data[filtered_data['Name'].str.contains(search, case=False)]
+    
+    # Display player data with formatting
+    st.dataframe(
+        filtered_data[['Name', 'Salary', 'Normalized Odds', 'Normalized Fit', 'Normalized History', 'Normalized Form', 'Total', 'Value']].style.format({
+            'Salary': '${:,.0f}',
+            'Normalized Odds': '{:.2f}',
+            'Normalized Fit': '{:.2f}',
+            'Normalized History': '{:.2f}',
+            'Normalized Form': '{:.2f}',
+            'Total': '{:.2f}',
+            'Value': '{:.2f}'
+        }),
+        height=400,
+        use_container_width=True
+    )
+    
+    # New Player Odds section
+    st.subheader("Player Odds")
+    st.write("This section summarizes each golfer's odds for the tournament. The odds are based on the lines from https://www.scoresandodds.com/golf and are used to calculate the normalized odds score.")
+    st.write("TODO: Add adjustment sliders for weighting each line.")
+    try:
+        odds_data = pd.read_csv(f"2025/{selected_tournament}/odds.csv")
+        # Format the odds columns to show plus sign for positive values
+        odds_columns = ['Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish']
+        for col in odds_columns:
+            odds_data[col] = odds_data[col].apply(lambda x: f"+{x}" if x > 0 else str(x))
+        
+        # Display the odds data
+        st.dataframe(
+            odds_data,
+            height=400,
+            use_container_width=True
+        )
+    except FileNotFoundError:
+        st.warning("No odds data available for this tournament.")
+    
+                # Course Fit section (simplified)
+    st.subheader("Course Fit")
+    try:
+        course_fit = pd.read_csv(f"2025/{selected_tournament}/course_fit.csv")
+        st.dataframe(
+            course_fit.sort_values('projected_course_fit'),
+            height=400,
+            use_container_width=True
+        )
+    except FileNotFoundError:
+        st.warning("No course fit data available for this tournament.")
+
+    # Player Form section
+    st.subheader("Player Form")
+    st.write("Short-term form represents last 5 starts, Long-term form represents the entire season.")
+    
+    col1, col2 = st.columns(2)
+
+    if st.button("Reset Form Weights",
+                 on_click=data_manager.on_reset_form_weights):
+        st.success("Form weights reset to default values!")
+    
+    with col1:
+        st.markdown("#### Short-term Form")
+        st.slider(
+            "Current Form Weight", 
+            0.0, 
+            1.0,
+            key="current_form_weight",
+            on_change=data_manager.update_form_weight,
+            args=('current',)
         )
         
-        # Recalculate Value based on new Total
-        filtered_data['Value'] = filtered_data['Total'] / filtered_data['Salary'] * 100000
+        try:
+            current_form = pd.read_csv(f"2025/{selected_tournament}/current_form.csv")
+            st.dataframe(current_form, height=400, use_container_width=True)
+        except FileNotFoundError:
+            st.warning("No current form data available.")
+            
+    with col2:
+        st.markdown("#### Long-term Form")
+        st.slider(
+            "Long-term Form Weight", 
+            0.0, 
+            1.0,
+            key="long_form_weight",
+            on_change=data_manager.update_form_weight,
+            args=('long',)
+        )
+        try:
+            long_form = pd.read_csv(f"2025/{selected_tournament}/pga_stats.csv")
+            st.dataframe(long_form, height=400, use_container_width=True)
+        except FileNotFoundError:
+            st.warning("No long-term form data available.")
+            
+        # Tournament History section
+    st.subheader("Tournament History")
+    st.write("This section shows the golfer's history at this specific tournament. The history is used to calculate the normalized history score.")
+    try:
+        history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
         
-        # Player Analysis section
-        st.subheader("Player Analysis")
-        st.write("This section summarizes each golfer's odds, fit, and history scores. This section updates dynamically as you make adjustements in the dashboard. It is the source-of-truth for running the model.")
+        # Format the columns for better display
+        display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 
+                         'sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
+                         'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
         
-        # Add search/filter box
-        search = st.text_input("Search Players")
-        if search:
-            filtered_data = filtered_data[filtered_data['Name'].str.contains(search, case=False)]
+        # Format numeric columns to show fewer decimal places
+        numeric_cols = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
+                      'avg_finish', 'made_cuts_pct']
         
-        # Display player data with formatting
+        # Create formatted dataframe
+        display_df = history_data[display_columns].copy()
+        for col in numeric_cols:
+            display_df[col] = display_df[col].apply(lambda x: f"{x:.3f}" if pd.notna(x) else "")
+        
+        # Sort by most recent year's finish
+        display_df = display_df.sort_values('24', na_position='last')
+        
+        # Display the history data
         st.dataframe(
-            filtered_data[['Name', 'Salary', 'Normalized Odds', 'Normalized Fit', 'Normalized History', 'Normalized Form', 'Total', 'Value']].style.format({
-                'Salary': '${:,.0f}',
-                'Normalized Odds': '{:.2f}',
-                'Normalized Fit': '{:.2f}',
-                'Normalized History': '{:.2f}',
-                'Normalized Form': '{:.2f}',
-                'Total': '{:.2f}',
-                'Value': '{:.2f}'
-            }),
+            display_df,
             height=400,
             use_container_width=True
         )
         
-        # New Player Odds section
-        st.subheader("Player Odds")
-        st.write("This section summarizes each golfer's odds for the tournament. The odds are based on the lines from https://www.scoresandodds.com/golf and are used to calculate the normalized odds score.")
-        st.write("TODO: Add adjustment sliders for weighting each line.")
-        try:
-            odds_data = pd.read_csv(f"2025/{selected_tournament}/odds.csv")
-            # Format the odds columns to show plus sign for positive values
-            odds_columns = ['Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish']
-            for col in odds_columns:
-                odds_data[col] = odds_data[col].apply(lambda x: f"+{x}" if x > 0 else str(x))
-            
-            # Display the odds data
-            st.dataframe(
-                odds_data,
-                height=400,
-                use_container_width=True
-            )
-        except FileNotFoundError:
-            st.warning("No odds data available for this tournament.")
+    except FileNotFoundError:
+        st.warning("No tournament history data available for this tournament.")
         
-                # Course Fit section (simplified)
-        st.subheader("Course Fit")
-        try:
-            course_fit = pd.read_csv(f"2025/{selected_tournament}/course_fit.csv")
-            st.dataframe(
-                course_fit.sort_values('projected_course_fit'),
-                height=400,
-                use_container_width=True
-            )
-        except FileNotFoundError:
-            st.warning("No course fit data available for this tournament.")
-
-        # Player Form section
-        st.subheader("Player Form")
-        st.write("Short-term form represents last 5 starts, Long-term form represents the entire season.")
-        
-        col1, col2 = st.columns(2)
-
-        if st.button("Reset Form Weights",
-                     on_click=data_manager.on_reset_form_weights):
-            st.success("Form weights reset to default values!")
-        
-        with col1:
-            st.markdown("#### Short-term Form")
-            st.slider(
-                "Current Form Weight", 
-                0.0, 
-                1.0,
-                key="current_form_weight",
-                on_change=data_manager.update_form_weight,
-                args=('current',)
-            )
-            
-            try:
-                current_form = pd.read_csv(f"2025/{selected_tournament}/current_form.csv")
-                st.dataframe(current_form, height=400, use_container_width=True)
-            except FileNotFoundError:
-                st.warning("No current form data available.")
-                
-        with col2:
-            st.markdown("#### Long-term Form")
-            st.slider(
-                "Long-term Form Weight", 
-                0.0, 
-                1.0,
-                key="long_form_weight",
-                on_change=data_manager.update_form_weight,
-                args=('long',)
-            )
-            try:
-                long_form = pd.read_csv(f"2025/{selected_tournament}/pga_stats.csv")
-                st.dataframe(long_form, height=400, use_container_width=True)
-            except FileNotFoundError:
-                st.warning("No long-term form data available.")
-            
-            # Tournament History section
-        st.subheader("Tournament History")
-        st.write("This section shows the golfer's history at this specific tournament. The history is used to calculate the normalized history score.")
-        try:
-            history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
-            
-            # Format the columns for better display
-            display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 
-                             'sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
-                             'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
-            
-            # Format numeric columns to show fewer decimal places
-            numeric_cols = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
-                          'avg_finish', 'made_cuts_pct']
-            
-            # Create formatted dataframe
-            display_df = history_data[display_columns].copy()
-            for col in numeric_cols:
-                display_df[col] = display_df[col].apply(lambda x: f"{x:.3f}" if pd.notna(x) else "")
-            
-            # Sort by most recent year's finish
-            display_df = display_df.sort_values('24', na_position='last')
-            
-            # Display the history data
-            st.dataframe(
-                display_df,
-                height=400,
-                use_container_width=True
-            )
-            
-        except FileNotFoundError:
-            st.warning("No tournament history data available for this tournament.")
-        
-        # Optimized Lineups section
-        st.subheader("Optimized Lineups")
-        
+    # Optimized Lineups section
+    st.subheader("Optimized Lineups")
+    
+    if lineups is None:
+        st.warning("No lineup data available. Please run the model first to generate optimized lineups.")
+    else:
         # Single-click export button
         st.download_button(
             label="Export Lineups to CSV",
@@ -549,9 +554,6 @@ def main():
             
             Use the sliders in the sidebar to adjust the weights and optimize for different strategies.
             """)
-    
-    else:
-        st.warning("No data available for this tournament. Please run the model first.")
 
     # Handle form weight reset
     if 'reset_form' in st.session_state and st.session_state.reset_form:
