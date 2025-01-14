@@ -164,7 +164,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "The_American_Express": {
         "ID": 401703491,
-        "Course": None
+        "Course": None,
+        "pga-url": "the-american-express/R2025002"
     },
     "Farmers_Insurance_Open": {
         "ID": 401703492,
