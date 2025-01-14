@@ -150,18 +150,21 @@ class DataManager:
             'long': 0.3
         }
 
-def get_available_tournaments():
-    """Get list of tournaments that have data in the 2025 folder, sorted by creation time"""
+def get_available_tournaments(featured_tournament: str = None):
+    """Get list of tournaments that have data in the 2025 folder"""
     try:
-        # Get all subdirectories in the 2025 folder with their creation times
-        tournaments = [(d, os.path.getctime(os.path.join("2025", d))) 
-                      for d in os.listdir("2025") 
-                      if os.path.isdir(os.path.join("2025", d))]
+        # Get all subdirectories in the 2025 folder
+        tournaments = [d for d in os.listdir("2025") if os.path.isdir(os.path.join("2025", d))]
         
-        # Sort by creation time (newest first) and extract just the tournament names
-        sorted_tournaments = [t[0] for t in sorted(tournaments, key=lambda x: x[1], reverse=True)]
+        # Sort alphabetically first
+        tournaments.sort()
         
-        return sorted_tournaments if sorted_tournaments else ["No tournaments available"]
+        # If featured tournament is specified and exists, move it to front
+        if featured_tournament and featured_tournament in tournaments:
+            tournaments.remove(featured_tournament)
+            tournaments.insert(0, featured_tournament)
+            
+        return tournaments if tournaments else ["No tournaments available"]
     except FileNotFoundError:
         return ["No tournaments available"]
 
@@ -210,7 +213,7 @@ def main():
     # Tournament selection using available tournaments
     selected_tournament = st.sidebar.selectbox(
         "Select Tournament",
-        get_available_tournaments()
+        get_available_tournaments(featured_tournament="The_American_Express")
     )
     
     # Add weight validation
