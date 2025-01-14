@@ -151,11 +151,17 @@ class DataManager:
         }
 
 def get_available_tournaments():
-    """Get list of tournaments that have data in the 2025 folder"""
+    """Get list of tournaments that have data in the 2025 folder, sorted by creation time"""
     try:
-        # Get all subdirectories in the 2025 folder
-        tournaments = [d for d in os.listdir("2025") if os.path.isdir(os.path.join("2025", d))]
-        return sorted(tournaments) if tournaments else ["No tournaments available"]
+        # Get all subdirectories in the 2025 folder with their creation times
+        tournaments = [(d, os.path.getctime(os.path.join("2025", d))) 
+                      for d in os.listdir("2025") 
+                      if os.path.isdir(os.path.join("2025", d))]
+        
+        # Sort by creation time (newest first) and extract just the tournament names
+        sorted_tournaments = [t[0] for t in sorted(tournaments, key=lambda x: x[1], reverse=True)]
+        
+        return sorted_tournaments if sorted_tournaments else ["No tournaments available"]
     except FileNotFoundError:
         return ["No tournaments available"]
 
