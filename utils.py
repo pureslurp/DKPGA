@@ -157,7 +157,7 @@ TOURNAMENT_LIST_2025 = {
         "Course": "Kapalua_Resort_(Plantation_Course)",
         "pga-url": "the-sentry/R2025016"
     },
-    "Sony_Open_In_Hawaii": {
+    "Sony_Open_in_Hawaii": {
         "ID": 401703490,
         "Course": "Waialae_Country_Club",
         "pga-url": "sony-open-in-hawaii/R2025006"
