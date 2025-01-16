@@ -13,6 +13,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
 
+from utils import TOURNAMENT_LIST_2025
+
 '''
 Script to scrape tournament history data from the PGA Tour website for a specific tournament.
 This spans back 5 years.
@@ -228,7 +230,8 @@ def get_tournament_history(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    url = "https://www.pgatour.com/tournaments/2025/sony-open-in-hawaii/R2025006/field/tournament-history"
+    TOURNEY = "The_American_Express"
+    url = f"https://www.pgatour.com/tournaments/2025/{TOURNAMENT_LIST_2025[TOURNEY]['pga-url']}/field/tournament-history"
     df = get_tournament_history(url)
     
     if df is not None:
