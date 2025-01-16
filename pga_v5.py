@@ -486,10 +486,10 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
             'long': 0.3
         },
         'components': {
-            'odds': 0.4,
-            'fit': 0.2,
-            'history': 0.2,
-            'form': 0.2
+            'odds': 0.25,
+            'fit': 0.25,
+            'history': 0.25,
+            'form': 0.25
         }
     }
     
@@ -661,6 +661,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     ]
     dk_data[columns_to_save].sort_values('Total', ascending=False).to_csv(output_data_path, index=False)
     print(f"Saved detailed player data to: {output_data_path}")
+    return optimized_lineups
 
 
 if __name__ == "__main__":
