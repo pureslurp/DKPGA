@@ -285,9 +285,5 @@ def create_pga_stats(tourney: str, weights: dict = None):
         print(f"Stats file already exists at: {stats_path}")
 
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) > 1:
-        tourney = sys.argv[1]
-        create_pga_stats(tourney)
-    else:
-        print("Please provide tournament name as argument")
+    tourney = "The_American_Express"
+    create_pga_stats(tourney)
