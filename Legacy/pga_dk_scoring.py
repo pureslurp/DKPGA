@@ -457,7 +457,7 @@ def dk_points_df(url):
         element.click()
 
     df_total_points = check_world_rank(df_total_points)
-    df_total_points.to_csv(f'past_results/2023/dk_points_id_{t_id}.csv', index=False)
+    df_total_points.to_csv(f'past_results/2025/dk_points_id_{t_id}.csv', index=False)
     driver.close()
     driver.quit() 
     return df_total_points
