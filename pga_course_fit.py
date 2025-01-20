@@ -90,25 +90,22 @@ def extract_player_data(table):
         # Get all data cells (already skips the name cell)
         data_cells = row.find_all('td', class_=['css-1v8y6rt', 'css-deko6d', 'css-4lb9jb', 'css-1vziul4'])
         
-        # Skip players with insufficient data
-        rank_cell = data_cells[0]
-        rank_span = rank_cell.find('span', class_='chakra-text css-1dmexvw')
-        if not rank_span or rank_span.text.strip() == '-':
-            continue
-            
-        player_data = {}
-        
-        # Get player name
+        # Get player name first
         name_cell = row.find('span', class_='chakra-text css-hmig5c')
         if not name_cell:
             continue
             
         name = name_cell.text.strip()
         name = fix_names(name)
-        player_data['Name'] = name
+        player_data = {'Name': name}
         
-        # Process the overall rank (projected course fit)
-        player_data['projected_course_fit'] = float(rank_span.text.strip())
+        # Get projected course fit - now assign None instead of skipping
+        rank_cell = data_cells[0]
+        rank_span = rank_cell.find('span', class_='chakra-text css-1dmexvw')
+        if not rank_span or rank_span.text.strip() == '-':
+            player_data['projected_course_fit'] = None
+        else:
+            player_data['projected_course_fit'] = float(rank_span.text.strip())
         
         # Process the remaining stat cells
         for header, cell in zip(headers[2:], data_cells[1:]):
@@ -136,9 +133,14 @@ def format_course_fit(df):
     if df.empty:
         return df
     
+    # Calculate 70th percentile of non-null values
+    percentile_70 = df['projected_course_fit'].dropna().quantile(0.7)
+    
+    # Fill missing values with 70th percentile
+    df['projected_course_fit'] = df['projected_course_fit'].fillna(percentile_70)
+    
     # Sort by projected course fit score
-    if 'projected_course_fit' in df.columns:
-        df = df.sort_values('projected_course_fit', ascending=True)
+    df = df.sort_values('projected_course_fit', ascending=True)
     
     return df
 
