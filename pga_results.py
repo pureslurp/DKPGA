@@ -3,7 +3,7 @@ from Legacy.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "Sony_Open_In_Hawaii"
+tournament = "The_American_Express"
 
 # Get results data
 try:
@@ -39,7 +39,7 @@ lineups_df['ActualPoints'] = lineups_df[[f'G{i}_Score' for i in range(1,7)]].sum
 print(f"\nLineup Score Summary:")
 print(f"Highest Score: {lineups_df['ActualPoints'].max():.2f}")
 print(f"Lowest Score: {lineups_df['ActualPoints'].min():.2f}")
-print(f"Median Score: {lineups_df['ActualPoints'].median():.2f}")
+print(f"Mean Score: {lineups_df['ActualPoints'].mean():.2f}")
 
 # Save updated lineups
 lineups_df.to_csv(f'2025/{tournament}/dk_lineups_optimized_results.csv', index=False)
