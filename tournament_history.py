@@ -153,8 +153,63 @@ def format_tournament_history(df: pd.DataFrame) -> pd.DataFrame:
     
     df['made_cuts_pct'] = df.apply(_calculate_made_cuts_pct, axis=1)
     
-    # Sort by strokes gained total and average finish
-    df = df.sort_values(['sg_total', 'avg_finish'], ascending=[False, True])
+    def _get_finish_points(position: int) -> int:
+        """Convert finish position to points based on the defined scoring system"""
+        if position == 1:
+            return 30
+        elif position == 2:
+            return 20
+        elif position == 3:
+            return 18
+        elif position == 4:
+            return 16
+        elif position == 5:
+            return 14
+        elif position == 6:
+            return 12
+        elif position == 7:
+            return 10
+        elif position == 8:
+            return 9
+        elif position == 9:
+            return 8
+        elif position == 10:
+            return 7
+        elif 11 <= position <= 15:
+            return 6
+        elif 16 <= position <= 20:
+            return 5
+        elif 21 <= position <= 25:
+            return 4
+        elif 26 <= position <= 30:
+            return 3
+        elif 31 <= position <= 40:
+            return 2
+        elif 41 <= position <= 50:
+            return 1
+        else:
+            return 0
+    
+    # Calculate weighted tournament history score
+    def _calculate_history_score(row):
+        finish_cols = ['24', '2022-23', '2021-22', '2020-21', '2019-20']
+        weights = [1.0, 0.7, 0.5, 0.3, 0.2]  # More recent years weighted higher
+        total_score = 0
+        
+        for col, weight in zip(finish_cols, weights):
+            value = row[col]
+            if pd.notna(value) and value != 'CUT':
+                if isinstance(value, str):
+                    value = int(value.replace('T', ''))
+                points = _get_finish_points(value)
+                total_score += points * weight
+        
+        return total_score
+    
+    df['history_score'] = df.apply(_calculate_history_score, axis=1)
+    
+    # Sort by history score first, then strokes gained total
+    df = df.sort_values(['history_score', 'sg_total'], ascending=[False, False])
     
     return df
 
