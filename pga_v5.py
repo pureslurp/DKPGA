@@ -445,6 +445,44 @@ def calculate_form_score(tourney: str, weights: dict) -> pd.DataFrame:
     
     return form_df
 
+def normalize_with_outlier_handling(series: pd.Series) -> pd.Series:
+    """
+    Normalize a series to 0-1 range while handling outliers using IQR method.
+    
+    Args:
+        series: Series of values to normalize
+    
+    Returns:
+        Normalized series with outliers handled
+    """
+    
+    # Calculate Q1, Q3 and IQR
+    Q1 = series.quantile(0.25)
+    Q3 = series.quantile(0.75)
+    IQR = Q3 - Q1
+    
+    # Define bounds for outliers (using 1.5 * IQR rule)
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    
+    # Create a copy to avoid modifying original data
+    clean_series = series.copy()
+    
+    # Replace outliers with bounds
+    clean_series = clean_series.clip(lower=lower_bound, upper=upper_bound)
+    
+    # Now normalize the cleaned data
+    min_val = clean_series.min()
+    max_val = clean_series.max()
+    
+    if max_val == min_val:
+        print("\nAll values are the same, returning neutral score")
+        return pd.Series([0.832621864455015] * len(series))
+    
+    normalized = (clean_series - min_val) / (max_val - min_val)
+    
+    return normalized
+
 def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     """
     Main function for PGA optimization
@@ -597,8 +635,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
         (dk_data['Fit Score'].max() - dk_data['Fit Score'].min())
     dk_data['Normalized History'] = (dk_data['History Score'] - dk_data['History Score'].min()) / \
         (dk_data['History Score'].max() - dk_data['History Score'].min())
-    dk_data['Normalized Form'] = (dk_data['Form Score'] - dk_data['Form Score'].min()) / \
-        (dk_data['Form Score'].max() - dk_data['Form Score'].min())
+    dk_data['Normalized Form'] = normalize_with_outlier_handling(dk_data['Form Score'])
 
     # Calculate Total using all components
     dk_data['Total'] = (
