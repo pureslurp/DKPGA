@@ -82,10 +82,20 @@ def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame) -> fl
 
 def backtest_weights() -> Tuple[Dict, float]:
     """
-    Test different weight combinations and return the best performing one
+    Test different weight combinations and return the best performing one.
+    Saves progress to CSV and can resume from previous runs.
     """
-    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii"]
+    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express"]
     weight_combinations = generate_weight_combinations()
+    results_file = "backtest/pga_v5_backtest_results.csv"
+    
+    # Initialize or load existing results
+    if os.path.exists(results_file):
+        results_df = pd.read_csv(results_file)
+        # Convert stored string representation of weights back to dict
+        results_df['weights'] = results_df['weights'].apply(eval)
+    else:
+        results_df = pd.DataFrame(columns=['tournament', 'weights', 'score'])
     
     best_score = 0
     best_weights = None
@@ -93,20 +103,42 @@ def backtest_weights() -> Tuple[Dict, float]:
     print(f"Testing {len(weight_combinations)} weight combinations...")
     
     for i, weights in enumerate(weight_combinations):
-        total_score = 0
         print(f"\nTesting combination {i+1}/{len(weight_combinations)}")
         print(f"Weights: {weights['components']}")
+        total_score = 0
+        tournaments_tested = 0
         
         for tournament in tournaments:
-            # Run the main function with these weights and get lineups directly
-            lineups_df = pga_main(tournament, num_lineups=20, weights=weights)
+            # Check if we already have results for this combination and tournament
+            existing_result = results_df[
+                (results_df['tournament'] == tournament) & 
+                (results_df['weights'].apply(lambda x: x['components']) == weights['components'])
+            ]
             
-            # Evaluate the lineup performance
-            score = evaluate_lineup_performance(tournament, lineups_df)
+            if not existing_result.empty:
+                score = existing_result['score'].iloc[0]
+                print(f"{tournament} Score: {score:.2f} (loaded from cache)")
+            else:
+                # Run the main function with these weights and get lineups directly
+                lineups_df = pga_main(tournament, num_lineups=20, weights=weights)
+                
+                # Evaluate the lineup performance
+                score = evaluate_lineup_performance(tournament, lineups_df)
+                
+                # Save the result
+                new_row = pd.DataFrame({
+                    'tournament': [tournament],
+                    'weights': [weights],
+                    'score': [score]
+                })
+                results_df = pd.concat([results_df, new_row], ignore_index=True)
+                results_df.to_csv(results_file, index=False)
+                print(f"{tournament} Score: {score:.2f} (new)")
+            
             total_score += score
-            print(f"{tournament} Score: {score:.2f}")
+            tournaments_tested += 1
         
-        avg_score = total_score / len(tournaments)
+        avg_score = total_score / tournaments_tested
         print(f"Average Score: {avg_score:.2f}")
         
         if avg_score > best_score:
