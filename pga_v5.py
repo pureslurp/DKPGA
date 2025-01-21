@@ -15,6 +15,7 @@ from pga_stats import create_pga_stats
 from models import Golfer
 from utils import fix_names
 import os
+import validate_player_data
 
 '''
 This is the main script that runs the PGA model for DraftKings
@@ -419,12 +420,12 @@ def calculate_form_score(tourney: str, weights: dict) -> pd.DataFrame:
         sg_columns = ['sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
         current_form['current_form'] = current_form[sg_columns].sum(axis=1)
         
-        # Merge with form_df
+        # Merge with form_df, using outer join to keep all players from both sources
         form_df = pd.merge(
             form_df, 
             current_form[['Name', 'current_form']], 
             on='Name', 
-            how='left'
+            how='outer'  # Changed from 'left' to 'outer'
         )
         
         # Fill NaN values with the other source if available
@@ -432,7 +433,10 @@ def calculate_form_score(tourney: str, weights: dict) -> pd.DataFrame:
         form_df['long_term_form'] = form_df['long_term_form'].fillna(form_df['current_form'])
         
         # Calculate weighted form score
-        form_df['Form Score'] = (
+        # For players with only current form, use that exclusively
+        form_df['Form Score'] = np.where(
+            form_df['long_term_form'].isna(),
+            form_df['current_form'],  # Use only current form if no long-term data
             form_df['current_form'] * weights['form']['current'] + 
             form_df['long_term_form'] * weights['form']['long']
         )
