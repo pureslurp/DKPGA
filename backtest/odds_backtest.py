@@ -1,8 +1,12 @@
 # Standard library imports
 import os
+import sys
 import warnings
 from concurrent.futures import ProcessPoolExecutor
 from itertools import combinations
+
+# Add parent directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Third-party imports
 import numpy as np
@@ -163,9 +167,9 @@ class WeightOptimizer:
         with tqdm(total=n_starts, desc=f"Optimization rounds for {tournament}") as pbar:
             attempts = 0
             while attempts < n_starts:
-                # Generate initial weights ensuring they're sufficiently different
-                initial_weights = np.random.uniform(0.1, 2, 4)
-                initial_weights = initial_weights / sum(initial_weights) * 2
+                # Generate initial weights that sum to 1
+                initial_weights = np.random.uniform(0.1, 1, 4)
+                initial_weights = initial_weights / sum(initial_weights)  # Normalize to sum to 1
                 
                 # Convert weights to tuple for hashable comparison
                 weights_key = tuple(np.round(initial_weights, 2))
@@ -177,17 +181,19 @@ class WeightOptimizer:
                 tested_weights.add(weights_key)
                 attempts += 1
                 
-                bounds = [(0, 2)] * 4
+                bounds = [(0.05, 1)] * 4  # Allow weights between 5% and 100%
                 constraints = [
-                    {'type': 'ineq', 'fun': lambda x: 8 - sum(x)},
-                    {'type': 'ineq', 'fun': lambda x: sum(x)},
-                    {'type': 'ineq', 'fun': lambda x: min(x) + 0.1}
+                    {'type': 'eq', 'fun': lambda x: sum(x) - 1},  # Weights must sum to 1
+                    {'type': 'ineq', 'fun': lambda x: min(x) - 0.05}  # Each weight must be at least 5%
                 ]
                 
                 # Add random perturbation to avoid local minima
                 def perturbed_objective(x):
                     noise = np.random.normal(0, 0.01, size=len(x))  # Small random noise
-                    return self.calculate_lineup_score(x + noise, tournament_data)
+                    # Renormalize after adding noise to maintain sum of 1
+                    perturbed = x + noise
+                    perturbed = perturbed / sum(perturbed)
+                    return self.calculate_lineup_score(perturbed, tournament_data)
                 
                 result = minimize(
                     perturbed_objective,
