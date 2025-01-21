@@ -34,10 +34,10 @@ def generate_weight_combinations() -> List[Dict]:
     # Add the default odds and form weights to each combination
     for combo in valid_combinations:
         combo['odds'] = {
-            'winner': 0.6,
-            'top5': 0.5,
-            'top10': 0.8,
-            'top20': 0.4
+            'winner': 0.35,
+            'top5': 0.15,
+            'top10': 0.2,
+            'top20': 0.3
         }
         combo['form'] = {
             'current': 0.7,

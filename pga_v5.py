@@ -476,18 +476,18 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     # Default weights if none provided
     default_weights = {
         'odds': {
-            'winner': 0.6,
-            'top5': 0.5,
-            'top10': 0.8,
-            'top20': 0.4
+            'winner': 0.35,
+            'top5': 0.15,
+            'top10': 0.2,
+            'top20': 0.3
         },
         'form': {
             'current': 0.7,
             'long': 0.3
         },
         'components': {
-            'odds': 0.2,
-            'fit': 0.2,
+            'odds': 0.1,
+            'fit': 0.3,
             'history': 0.4,
             'form': 0.2
         }
