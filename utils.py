@@ -169,7 +169,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "Farmers_Insurance_Open": {
         "ID": 401703492,
-        "Course": None
+        "Course": None,
+        "pga-url": "farmers-insurance-open/R2025004"
     },
     "AT&T_Pebble_Beach_Pro-Am": {
         "ID": 401703493,
