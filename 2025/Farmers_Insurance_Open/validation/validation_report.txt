@@ -1,0 +1,61 @@
+
+Outliers found in Salary:
+  - ludvig aberg: value=10800.00, z-score=3.78 (mean=7045.39, std=993.61)
+  - hideki matsuyama: value=10700.00, z-score=3.68 (mean=7045.39, std=993.61)
+  - tony finau: value=10200.00, z-score=3.17 (mean=7045.39, std=993.61)
+
+Outliers found in Odds Total:
+  - ludvig aberg: value=5.13, z-score=5.64 (mean=0.70, std=0.78)
+  - hideki matsuyama: value=4.75, z-score=5.16 (mean=0.70, std=0.78)
+
+Outliers found in Normalized Odds:
+  - ludvig aberg: value=1.00, z-score=5.64 (mean=0.14, std=0.15)
+  - hideki matsuyama: value=0.93, z-score=5.16 (mean=0.14, std=0.15)
+
+Outliers found in History Score:
+  - ludvig aberg: value=82.12, z-score=3.19 (mean=34.00, std=15.07)
+  - nate lashley: value=85.86, z-score=3.44 (mean=34.00, std=15.07)
+  - jake knapp: value=88.28, z-score=3.60 (mean=34.00, std=15.07)
+  - matthieu pavon: value=90.36, z-score=3.74 (mean=34.00, std=15.07)
+
+Outliers found in Normalized History:
+  - ludvig aberg: value=0.90, z-score=3.19 (mean=0.29, std=0.19)
+  - nate lashley: value=0.94, z-score=3.44 (mean=0.29, std=0.19)
+  - jake knapp: value=0.97, z-score=3.60 (mean=0.29, std=0.19)
+  - matthieu pavon: value=1.00, z-score=3.74 (mean=0.29, std=0.19)
+
+Outliers found in Form Score:
+  - chesson hadley: value=-8.19, z-score=7.45 (mean=-0.15, std=1.08)
+
+Outliers found in Total:
+  - ludvig aberg: value=0.85, z-score=3.71 (mean=0.37, std=0.13)
+
+Outliers found in Value:
+  - nate lashley: value=9.86, z-score=3.25 (mean=5.13, std=1.45)
+
+Suspicious zero values found:
+  - vince whaley (history): base=11.32, normalized=0.00
+  - hayden springer (form): base=0.00, normalized=0.58
+  - shane lowry (form): base=0.00, normalized=0.58
+  - kevin tway (form): base=0.00, normalized=0.58
+  - joseph bramlett (form): base=0.00, normalized=0.58
+  - jackson koivun (form): base=0.00, normalized=0.58
+  - thriston lawrence (form): base=0.00, normalized=0.58
+  - justin rose (form): base=0.00, normalized=0.58
+  - cavin mccall (form): base=0.00, normalized=0.58
+  - pierceson coody (form): base=0.00, normalized=0.58
+  - dylan wu (form): base=0.00, normalized=0.58
+  - troy merritt (form): base=0.00, normalized=0.58
+  - matt wallace (form): base=0.00, normalized=0.58
+  - frankie capan (form): base=0.00, normalized=0.58
+  - matthew mccarty (form): base=0.00, normalized=0.58
+  - kyoung-hoon lee (form): base=0.00, normalized=0.58
+  - seonghyeon kim (form): base=0.00, normalized=0.58
+  - antoine rozner (form): base=-2.33, normalized=0.00
+  - willie mack (form): base=0.00, normalized=0.58
+  - niklas moller (form): base=0.00, normalized=0.58
+  - davis riley (form): base=-2.96, normalized=0.00
+  - scott gutschewski (form): base=0.00, normalized=0.58
+  - trevor cone (form): base=-2.32, normalized=0.00
+  - philip knowles (form): base=-2.65, normalized=0.00
+  - chesson hadley (form): base=-8.19, normalized=0.00
