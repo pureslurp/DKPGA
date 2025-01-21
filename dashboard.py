@@ -12,10 +12,10 @@ class DataManager:
         if 'weights' not in st.session_state:
             st.session_state.weights = {
                 'components': {
-                    'odds': 0.4,
-                    'fit': 0.2,
-                    'history': 0.2,
-                    'form': 0.2
+                    'odds': 0.25,
+                    'fit': 0.25,
+                    'history': 0.25,
+                    'form': 0.25
                 },
                 'form': {
                     'current': 0.7,
@@ -213,7 +213,7 @@ def main():
     # Tournament selection using available tournaments
     selected_tournament = st.sidebar.selectbox(
         "Select Tournament",
-        get_available_tournaments(featured_tournament="The_American_Express")
+        get_available_tournaments(featured_tournament="Farmers_Insurance_Open")
     )
     
     # Add weight validation
