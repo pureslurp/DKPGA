@@ -15,7 +15,6 @@ from pga_stats import create_pga_stats
 from models import Golfer
 from utils import fix_names
 import os
-import validate_player_data
 
 '''
 This is the main script that runs the PGA model for DraftKings
