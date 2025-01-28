@@ -308,11 +308,12 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
     years = ['24', '2022-23', '2021-22', '2020-21', '2019-20']
     weights = [1.0, 0.8, 0.6, 0.4, 0.2]  # More recent years weighted higher
     
-    finish_points = 0.0
+    finishes = []
+    weighted_points = 0.0
     max_possible_points = 0.0
     appearances = 0
-    avg_finish = 0.0
     
+    # First pass: collect valid finishes and calculate base points
     for year, weight in zip(years, weights):
         if year in history_df.columns:
             finish = player_history[year]
@@ -324,49 +325,52 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
                     try:
                         finish = float(finish)
                     except (ValueError, TypeError):
-                        continue  # Skip invalid values
+                        continue
                 
-                # Track number of appearances and average finish
+                finishes.append(finish)
                 appearances += 1
-                avg_finish += finish
                 
                 # Convert finish position to points (1st = 100, 60th = 0)
                 points = max(0, 100 - ((finish - 1) * (100/60)))
-                finish_points += points * weight
+                weighted_points += points * weight
                 max_possible_points += 100 * weight
     
-    # Calculate average finish position
-    avg_finish = avg_finish / appearances if appearances > 0 else 0
+    if appearances == 0:
+        return 0.0
     
-    # Apply consistency penalty for multiple poor performances
+    # Calculate base score (40% of total)
+    base_score = (weighted_points / max_possible_points) * 40 if max_possible_points > 0 else 0
+    
+    # Calculate consistency bonus (30% of total)
+    consistency_bonus = 0.0
     if appearances > 1:
-        # Penalty increases with number of appearances and average finish position
-        consistency_penalty = (avg_finish / 60) * (appearances / 5)  # 5 is max years tracked
-        finish_points *= (1 - consistency_penalty)
+        # Calculate percentage of finishes in top positions
+        top_10_finishes = sum(1 for finish in finishes if finish <= 10)
+        top_20_finishes = sum(1 for finish in finishes if finish <= 20)
+        
+        top_10_pct = top_10_finishes / appearances
+        top_20_pct = top_20_finishes / appearances
+        
+        # Bonus points for consistent good finishes
+        consistency_bonus = (top_10_pct * 20) + (top_20_pct * 10)
+        
+        # Additional bonus for multiple appearances
+        appearance_multiplier = min(1.5, 1 + (appearances - 1) * 0.15)  # Max 50% bonus for 4+ appearances
+        consistency_bonus *= appearance_multiplier
     
-    # Normalize finish points (50% of total score)
-    finish_score = (finish_points / max_possible_points) * 50 if max_possible_points > 0 else 0
+    # Cap consistency bonus at 30 points
+    consistency_bonus = min(30, consistency_bonus)
     
-    # Calculate strokes gained score (30% of total)
-    sg_stats = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting']
-    sg_weights = [0.25, 0.35, 0.25, 0.15]  # Must sum to 1
+    # Calculate recency bonus (30% of total)
+    recency_bonus = 0.0
+    if len(finishes) > 0:
+        recent_finishes = finishes[:2]  # Look at most recent 2 appearances
+        if recent_finishes:
+            avg_recent_finish = sum(recent_finishes) / len(recent_finishes)
+            # Convert to points (1st = 30, 60th = 0)
+            recency_bonus = max(0, 30 - ((avg_recent_finish - 1) * (30/60)))
     
-    sg_score = 0.0
-    for stat, weight in zip(sg_stats, sg_weights):
-        if stat in history_df.columns:
-            sg_val = player_history[stat]
-            if pd.notna(sg_val):
-                # Convert SG to 0-100 scale (-2 to +2 range)
-                normalized_sg = min(100, max(0, (sg_val + 2) * 25))
-                sg_score += normalized_sg * weight
-    
-    # Scale SG score to 30% of total
-    sg_score *= 0.3
-    
-    # Calculate consistency score (20% of total)
-    consistency_score = player_history['made_cuts_pct'] * 20 if 'made_cuts_pct' in history_df.columns else 0
-    # Combine all components
-    total_score = finish_score + sg_score + consistency_score
+    total_score = base_score + consistency_bonus + recency_bonus
     
     return total_score
 
@@ -377,20 +381,24 @@ def get_current_tuesday() -> datetime:
     tuesday = today - pd.Timedelta(days=days_since_tuesday)
     return tuesday
 
-def calculate_fit_score_from_csv(name: str, course_fit_df: pd.DataFrame) -> float:
-    """Calculate fit score from course_fit.csv data"""
-    # Find player in dataframe
-    player_data = course_fit_df[course_fit_df['Name'].apply(fix_names) == fix_names(name)]
+def calculate_fit_score_from_csv(names: pd.Series, course_fit_df: pd.DataFrame) -> pd.Series:
+    """Calculate fit score from course_fit.csv data for all players at once"""
+    # Find players in dataframe using vectorized operations
+    max_rank = course_fit_df['projected_course_fit'].max()
     
-    if len(player_data) == 0:
-        return 0.0  # Return 0 if player not found
-        
-    # Get projected course fit (lower is better)
-    fit_score = player_data['projected_course_fit'].iloc[0]
+    # Merge the data to get projected_course_fit for each name
+    result = pd.merge(
+        pd.DataFrame({'Name': names}),
+        course_fit_df[['Name', 'projected_course_fit']],
+        on='Name',
+        how='left'
+    )
     
     # Convert to 0-100 scale where 100 is best (lowest rank)
-    max_rank = course_fit_df['projected_course_fit'].max()
-    return 100 * (1 - (fit_score / max_rank))
+    # Handle NaN values by returning 0
+    return result['projected_course_fit'].apply(
+        lambda x: 100 * (1 - (x / max_rank)) if pd.notna(x) else 0
+    )
 
 def calculate_form_score(tourney: str, weights: dict) -> pd.DataFrame:
     """
@@ -494,26 +502,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     Args:
         tourney: Tournament name
         num_lineups: Number of lineups to generate
-        tournament_history: Whether to include tournament history
-        weights: Dictionary containing all weights with the following structure:
-            {
-                'odds': {
-                    'winner': 0.6,
-                    'top5': 0.5,
-                    'top10': 0.8,
-                    'top20': 0.4
-                },
-                'form': {
-                    'current': 0.7,  # Short-term form weight
-                    'long': 0.3      # Long-term form weight
-                },
-                'components': {
-                    'odds': 0.4,
-                    'fit': 0.3,
-                    'history': 0.2,
-                    'form': 0.1
-                }
-            }
+        weights: Dictionary containing all weights
     """
     # Default weights if none provided
     default_weights = {
@@ -543,25 +532,42 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     print(f"Running optimization for {TOURNEY}")
     print(f"{'='*50}\n")
 
-    # TODO: make pga_v5 all encompasing for getting csv files
-    # Replace stats file creation logic with:
     create_pga_stats(TOURNEY)
 
-    # Read odds data and DraftKings salaries
+    # Read all required data
     odds_df = pd.read_csv(f'2025/{TOURNEY}/odds.csv')
     dk_salaries = pd.read_csv(f'2025/{TOURNEY}/DKSalaries.csv')
     tourney_history = pd.read_csv(f'2025/{TOURNEY}/tournament_history.csv')
-    
+    course_fit_df = pd.read_csv(f'2025/{TOURNEY}/course_fit.csv')
     
     print(f"Loaded {len(odds_df)} players from odds data")
     print(f"Loaded {len(dk_salaries)} players from DraftKings data\n")
     
-    # Clean up names in both dataframes
+    # Clean up names in all dataframes
     odds_df['Name'] = odds_df['Name'].apply(fix_names)
     dk_salaries['Name'] = dk_salaries['Name'].apply(fix_names)
+    tourney_history['Name'] = tourney_history['Name'].apply(fix_names)
+    course_fit_df['Name'] = course_fit_df['Name'].apply(fix_names)
     
-    # Merge odds with DraftKings data
+    # Merge all data together
     dk_data = pd.merge(dk_salaries, odds_df, on='Name', how='left')
+    dk_data = pd.merge(
+        dk_data,
+        tourney_history[['Name', 'history_score']],
+        on='Name',
+        how='left'
+    )
+    dk_data = pd.merge(
+        dk_data,
+        course_fit_df[['Name', 'projected_course_fit']],
+        on='Name',
+        how='left'
+    )
+    
+    # Fill NaN values with 0 for history score and convert course fit to 0-100 scale
+    dk_data['history_score'] = dk_data['history_score'].fillna(0)
+    dk_data['Fit Score'] = calculate_fit_score_from_csv(dk_data['Name'], course_fit_df)
+    
     print(f"After merging: {len(dk_data)} players\n")
     
     # Calculate odds total using provided weights
@@ -596,49 +602,18 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     # Create golfers from DraftKings data
     golfers = [Golfer(row) for _, row in dk_data.iterrows()]
 
-    # Load course fit data
-    print(f"Loading course fit data for {TOURNEY}...")
-    course_fit_df = pd.read_csv(f'2025/{TOURNEY}/course_fit.csv')
-    print("Course fit data loaded successfully\n")
-
-    # Calculate fit scores and history scores for all golfers
-    fit_scores_data = []
-    history_scores = []
-    for golfer in golfers:
-        history_score = calculate_tournament_history_score(golfer.get_clean_name, tourney_history)
-            
-        # Calculate fit score from CSV data
-        fit_score = calculate_fit_score_from_csv(golfer.get_clean_name, course_fit_df)
-        golfer.set_fit_score(fit_score)
-        
-        fit_scores_data.append({
-            'Name': golfer.get_clean_name,
-            'Fit Score': fit_score
-        })
-        history_scores.append({
-            'Name': golfer.get_clean_name,
-            'History Score': history_score
-        })
-    
-    history_scores_df = pd.DataFrame(history_scores)
-    fit_scores_df = pd.DataFrame(fit_scores_data)
+    # Calculate form score
     form_df = calculate_form_score(tourney, weights)
-
-
-    # Merge fit scores and history scores with dk_data
-    dk_data = pd.merge(dk_data, fit_scores_df, on='Name', how='left')
-    dk_data = pd.merge(dk_data, history_scores_df, on='Name', how='left')
     dk_data = pd.merge(dk_data, form_df, on='Name', how='left')
     dk_data['Form Score'] = dk_data['Form Score'].fillna(0)
-    
 
     # Normalize all components
     dk_data['Normalized Odds'] = (dk_data['Odds Total'] - dk_data['Odds Total'].min()) / \
         (dk_data['Odds Total'].max() - dk_data['Odds Total'].min())
     dk_data['Normalized Fit'] = (dk_data['Fit Score'] - dk_data['Fit Score'].min()) / \
         (dk_data['Fit Score'].max() - dk_data['Fit Score'].min())
-    dk_data['Normalized History'] = (dk_data['History Score'] - dk_data['History Score'].min()) / \
-        (dk_data['History Score'].max() - dk_data['History Score'].min())
+    dk_data['Normalized History'] = (dk_data['history_score'] - dk_data['history_score'].min()) / \
+        (dk_data['history_score'].max() - dk_data['history_score'].min())
     dk_data['Normalized Form'] = normalize_with_outlier_handling(dk_data['Form Score'])
 
     # Calculate Total using all components
@@ -653,7 +628,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
 
     print("Top 5 Players by Value:")
     print("-" * 80)
-    print(dk_data[['Name', 'Salary', 'Odds Total', 'Fit Score', 'History Score', 'Total', 'Value']]
+    print(dk_data[['Name', 'Salary', 'Odds Total', 'Fit Score', 'history_score', 'Total', 'Value']]
           .sort_values(by='Value', ascending=False)
           .head(5)
           .to_string())
@@ -661,7 +636,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
 
     print("Top 5 Players by Total Points:")
     print("-" * 80) 
-    print(dk_data[['Name', 'Salary', 'Odds Total', 'Fit Score', 'History Score', 'Total', 'Value']]
+    print(dk_data[['Name', 'Salary', 'Odds Total', 'Fit Score', 'history_score', 'Total', 'Value']]
           .sort_values(by='Total', ascending=False)
           .head(5)
           .to_string())
@@ -696,7 +671,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     columns_to_save = [
         'Name', 'Salary', 'Odds Total', 'Normalized Odds',
         'Fit Score', 'Normalized Fit',
-        'History Score', 'Normalized History',
+        'history_score', 'Normalized History',
         'Form Score', 'Normalized Form',
         'Total', 'Value'
     ]
