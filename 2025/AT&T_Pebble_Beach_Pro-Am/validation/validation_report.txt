@@ -1,0 +1,18 @@
+
+Outliers found in Salary:
+  - scottie scheffler: value=11900.00, z-score=3.66 (mean=7445.00, std=1218.10)
+
+Outliers found in Odds Total:
+  - scottie scheffler: value=9.39, z-score=6.22 (mean=1.38, std=1.29)
+
+Outliers found in Normalized Odds:
+  - scottie scheffler: value=1.00, z-score=6.22 (mean=0.12, std=0.14)
+
+Outliers found in Total:
+  - scottie scheffler: value=0.94, z-score=3.23 (mean=0.46, std=0.15)
+
+Suspicious zero values found:
+  - brendon todd (odds): base=0.26, normalized=0.00
+  - min woo lee (history): base=10.74, normalized=0.00
+  - brendon todd (form): base=-1.39, normalized=0.00
+  - rasmus hojgaard (form): base=0.00, normalized=0.42
