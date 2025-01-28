@@ -213,7 +213,7 @@ def main():
     # Tournament selection using available tournaments
     selected_tournament = st.sidebar.selectbox(
         "Select Tournament",
-        get_available_tournaments(featured_tournament="Farmers_Insurance_Open")
+        get_available_tournaments(featured_tournament="AT&T_Pebble_Beach_Pro-Am")
     )
     
     # Add weight validation
