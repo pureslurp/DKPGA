@@ -174,7 +174,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "AT&T_Pebble_Beach_Pro-Am": {
         "ID": 401703493,
-        "Course": None
+        "Course": None,
+        "pga-url": "att-pebble-beach-pro-am/R2025005"
     },
     "WM_Phoenix_Open": {
         "ID": 401703494,
