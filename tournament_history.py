@@ -285,7 +285,7 @@ def get_tournament_history(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "Farmers_Insurance_Open"
+    TOURNEY = "WM_Phoenix_Open"
     url = f"https://www.pgatour.com/tournaments/2025/{TOURNAMENT_LIST_2025[TOURNEY]['pga-url']}/field/tournament-history"
     df = get_tournament_history(url)
     
