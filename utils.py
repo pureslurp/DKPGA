@@ -179,7 +179,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "WM_Phoenix_Open": {
         "ID": 401703494,
-        "Course": None
+        "Course": None,
+        'pga-url': 'wm-phoenix-open/R2025003'
     },
     "The_Genesis_Invitational": {
         "ID": 401703495,
