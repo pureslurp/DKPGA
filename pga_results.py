@@ -3,7 +3,7 @@ from Legacy.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "Farmers_Insurance_Open"
+tournament = "AT&T_Pebble_Beach_Pro-Am"
 
 # Get results data
 try:
