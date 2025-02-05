@@ -6,3 +6,5 @@ selenium>=4.11.0
 python-dotenv>=1.0.0
 dataclasses>=0.6
 typing>=3.7.4
+openai>=1.0.0
+asyncio>=3.4.3
