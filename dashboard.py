@@ -3,6 +3,11 @@ import pandas as pd
 import os
 from pga_v5 import main as run_pga_model
 from utils import fix_names
+from openai import OpenAI
+from dotenv import load_dotenv
+import asyncio
+
+load_dotenv()
 
 class DataManager:
     """Manages data and session state for the dashboard"""
@@ -167,6 +172,38 @@ def get_available_tournaments(featured_tournament: str = None):
         return tournaments if tournaments else ["No tournaments available"]
     except FileNotFoundError:
         return ["No tournaments available"]
+    
+async def get_chatgpt_response_async(prompt):
+    """Gets a response from ChatGPT asynchronously."""
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    
+    if not openai_api_key:
+        return "Error: Missing OpenAI API key. Make sure it's set in the .env file."
+
+    try:
+        client = OpenAI(api_key=openai_api_key)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response.choices[0].message.content
+    
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+def display_chatgpt_insights(container, prompt, key):
+    """Display ChatGPT insights with loading state"""
+    if key not in st.session_state:
+        st.session_state[key] = None
+        
+    if st.session_state[key] is None:
+        with container:
+            with st.spinner("Getting AI insights..."):
+                # Run the async function using asyncio
+                response = asyncio.run(get_chatgpt_response_async(prompt))
+                st.session_state[key] = response
+    
+    container.write(st.session_state[key])
 
 def main():
     st.set_page_config(layout="wide", page_title="PGA DFS Dashboard", page_icon=":golf:")
@@ -213,7 +250,7 @@ def main():
     # Tournament selection using available tournaments
     selected_tournament = st.sidebar.selectbox(
         "Select Tournament",
-        get_available_tournaments(featured_tournament="AT&T_Pebble_Beach_Pro-Am")
+        get_available_tournaments(featured_tournament="WM_Phoenix_Open")
     )
     
     # Add weight validation
@@ -311,15 +348,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
     
     # Recalculate Total based on weights
     filtered_data = player_data.copy()
-        
-        
-    
-    # Recalculate Total based on weights
-    filtered_data = player_data.copy()
-    
-    
-
-    
+            
     # Update filtered_data with new fit scores
 
     # Recalculate Total based on weights
@@ -336,7 +365,30 @@ Higher values emphasize recent performance metrics, combining both short-term (l
     # Player Analysis section
     st.subheader("Player Analysis")
     st.write("This section summarizes each golfer's odds, fit, and history scores. This section updates dynamically as you make adjustements in the dashboard. It is the source-of-truth for running the model.")
+
+    # Sort filtered_data by Total in descending order and get top 10
+    prompt_data = filtered_data.sort_values('Total', ascending=False).head(10)
     
+    # Create container for insights
+    analysis_container = st.empty()
+    
+    # Get user input
+    user_prompt = f'''Here is some data about the Top 10 golfer's in the {selected_tournament} tournament: {prompt_data.to_string()}. 
+    The Salary represents the cost of the player if selected in a DraftKings contest, 
+    The Normalized Odds are the golfer's odds to win the tournament (higher is better, normalized to 0-1),
+    The Normalized Fit is how well the golfer's attributes match the course characteristics (higher is better, normalized to 0-1),
+    The Normalized History is the golfer's history at this specific tournament (higher is better, normalized to 0-1),
+    The Normalized Form is the golfer's form, where form represents the golfer's strokes gained statistics (higher is better, normalized to 0-1),
+    The Total score is a combination of the four normalized scores.
+    The Value is the Total score divided by the Salary and multiplied by 100,000.
+    Please provide a summary of the data and any insights you can provide about the golfers.
+    Don't mention you are only using data for 10 golfers.
+    Please be concise and to the point, only a few sentences total, you don't need to cover all 10 golfers.
+    '''
+
+    # Get response from ChatGPT
+    display_chatgpt_insights(analysis_container, user_prompt, 'analysis_insights')
+
     # Add search/filter box
     search = st.text_input("Search Players")
     if search:
@@ -360,9 +412,30 @@ Higher values emphasize recent performance metrics, combining both short-term (l
     # New Player Odds section
     st.subheader("Player Odds")
     st.write("This section summarizes each golfer's odds for the tournament. The odds are based on the lines from https://www.scoresandodds.com/golf and are used to calculate the normalized odds score.")
-    st.write("TODO: Add adjustment sliders for weighting each line.")
+        
+    # Load odds data first
     try:
         odds_data = pd.read_csv(f"2025/{selected_tournament}/odds.csv")
+        # Get first 10 rows for the prompt
+        top_10_odds = odds_data.head(10)
+        
+        # Create container for odds insights
+        odds_container = st.empty()
+        
+        # Get user input
+        user_prompt = f'''Here is some data about the Top 10 golfer's in the {selected_tournament} tournament based on Betting Odds: {top_10_odds.to_string()}. 
+        Tournament Winner is the golfer with the highest odds to win the tournament.
+        Top 5 Finish is the golfer with the highest odds to finish in the top 5.
+        Top 10 Finish is the golfer with the highest odds to finish in the top 10.
+        Top 20 Finish is the golfer with the highest odds to finish in the top 20.
+        Please provide a summary of the data and any insights you can provide about the golfers.
+        Don't mention you are only using data for 10 golfers.
+        Please be concise and to the point, only a few sentences total, you don't need to cover all 10 golfers.
+        '''
+
+        # Get response from ChatGPT
+        display_chatgpt_insights(odds_container, user_prompt, 'odds_insights')
+
         # Format the odds columns to show plus sign for positive values
         odds_columns = ['Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish']
         for col in odds_columns:
@@ -381,6 +454,22 @@ Higher values emphasize recent performance metrics, combining both short-term (l
     st.subheader("Course Fit")
     try:
         course_fit = pd.read_csv(f"2025/{selected_tournament}/course_fit.csv")
+        top_10_fit = course_fit.head(10)
+        # Create container for odds insights
+        fit_container = st.empty()
+        
+        # Get user input
+        user_prompt = f'''Here is some data about the Top 10 golfer's in the {selected_tournament} tournament based on their fit to the course: {top_10_fit.to_string()}. 
+        The projected_course_fit column ranks (lowest is best) the best fit golfer's for a specific course based on the attributes in the other columns data.
+        Please provide a summary of the data and any insights you can provide about the golfers.
+        Don't mention you are only using data for 10 golfers.
+        Please be concise and to the point, only a few sentences total, you don't need to cover all 10 golfers.
+        '''
+
+        # Get response from ChatGPT
+        display_chatgpt_insights(fit_container, user_prompt, 'fit_insights')
+
+        
         st.dataframe(
             course_fit.sort_values('projected_course_fit'),
             height=400,
@@ -437,6 +526,24 @@ Higher values emphasize recent performance metrics, combining both short-term (l
     st.write("This section shows the golfer's history at this specific tournament. The history is used to calculate the normalized history score.")
     try:
         history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
+        # Create container for odds insights
+        history_container = st.empty()
+        
+        # Get user input
+        user_prompt = f'''Here is some data about golfer's in the {selected_tournament} tournament based on their history at the tournament: {history_data.to_string()}. 
+        The 24 column shows the golfer's finish in the previous year.
+        The 2022-23 column shows the golfer's results in the 2022-23 season.
+        The 2021-22 column shows the golfer's results in the 2021-22 season.
+        The 2020-21 column shows the golfer's results in the 2020-21 season.
+        The 2019-20 column shows the golfer's results in the 2019-20 season.
+        Please provide a summary of the data and any insights you can provide about the golfers.
+        Please be concise and to the point, only a few sentences total, you don't need to cover all golfers.
+        '''
+
+        # Get response from ChatGPT
+        display_chatgpt_insights(history_container, user_prompt, 'history_insights')
+
+        
         
         # Format the columns for better display
         display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 

@@ -10,3 +10,5 @@ geckodriver.log
 log/
 # ignore the dk_lineups_optimized csvs in any subdirectory
 **/dk_lineups_optimized.csv
+# ignore the .env file
+.env
