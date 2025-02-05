@@ -34,15 +34,15 @@ class DataManager:
                 }
             }
         
-        # # Initialize component weight sliders
-        # if 'odds_weight' not in st.session_state:
-        #     st.session_state.odds_weight = st.session_state.weights['components']['odds']
-        # if 'fit_weight' not in st.session_state:
-        #     st.session_state.fit_weight = st.session_state.weights['components']['fit']
-        # if 'history_weight' not in st.session_state:
-        #     st.session_state.history_weight = st.session_state.weights['components']['history']
-        # if 'form_weight' not in st.session_state:
-        #     st.session_state.form_weight = st.session_state.weights['components']['form']
+        # Initialize component weight sliders
+        if 'odds_weight' not in st.session_state:
+            st.session_state.odds_weight = st.session_state.weights['components']['odds']
+        if 'fit_weight' not in st.session_state:
+            st.session_state.fit_weight = st.session_state.weights['components']['fit']
+        if 'history_weight' not in st.session_state:
+            st.session_state.history_weight = st.session_state.weights['components']['history']
+        if 'form_weight' not in st.session_state:
+            st.session_state.form_weight = st.session_state.weights['components']['form']
             
         # Initialize form weight sliders if needed
         if 'current_form_weight' not in st.session_state:
@@ -256,7 +256,10 @@ def main():
     # Add weight validation
     total_weight = sum(data_manager.weights['components'].values())
     if not abs(total_weight - 1.0) < 0.01:  # Allow for small floating point differences
-        st.sidebar.error(f"⚠️ Component weights must sum to 1.0 (Current total: {total_weight:.2f})")
+        difference = total_weight - 1.0
+        direction = "high" if difference > 0 else "low"
+        adjustment = abs(difference)
+        st.sidebar.error(f"⚠️ Component weights must sum to 1.0 (Current total: {total_weight:.2f} is {adjustment:.2f} too {direction})")
     
     # Add number input for lineup count (just before Run Model button)
     num_lineups = st.sidebar.number_input(
@@ -303,7 +306,7 @@ Note: The more lineups you generate, the longer it will take to run the model.""
     
     # Component weights
     odds_weight = st.sidebar.slider("Odds Weight", 0.0, 1.0, 
-                                    value=data_manager.weights['components']['odds'],
+                                    value=st.session_state.odds_weight,
                                     step=0.05,
                                     key='odds_weight',
                                     on_change=data_manager.update_component_weight,
@@ -313,7 +316,7 @@ Note: The more lineups you generate, the longer it will take to run the model.""
 Higher values place more emphasis on odds from sportsbooks for tournament winner, top 5, top 10, and top 20 finishes.""")
     
     fit_weight = st.sidebar.slider("Course Fit Weight", 0.0, 1.0,
-                                    value=data_manager.weights['components']['fit'],
+                                    value=st.session_state.fit_weight,
                                     step=0.05,
                                     key='fit_weight',
                                     on_change=data_manager.update_component_weight,
@@ -323,7 +326,7 @@ Higher values place more emphasis on odds from sportsbooks for tournament winner
 Higher values emphasize how well a player's attributes match the course characteristics, including distance, accuracy, and specific course challenges.""")
     
     history_weight = st.sidebar.slider("Tournament History Weight", 0.0, 1.0,
-                                    value=data_manager.weights['components']['history'],
+                                    value=st.session_state.history_weight,
                                     step=0.05,
                                     key='history_weight',
                                     on_change=data_manager.update_component_weight,
@@ -333,7 +336,7 @@ Higher values emphasize how well a player's attributes match the course characte
 Higher values emphasize past performance at this specific event, including finish positions and strokes gained data.""")
     
     form_weight = st.sidebar.slider("Form Weight", 0.0, 1.0,
-                                    value=data_manager.weights['components']['form'],
+                                    value=st.session_state.form_weight,
                                     step=0.05,
                                     key='form_weight',
                                     on_change=data_manager.update_component_weight,
