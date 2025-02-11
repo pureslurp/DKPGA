@@ -377,14 +377,21 @@ def get_current_tuesday() -> datetime:
     return tuesday
 
 def calculate_fit_score_from_csv(name: str, course_fit_df: pd.DataFrame) -> float:
-    """Calculate fit score from course_fit.csv data"""
+    """
+    Calculate fit score from course_fit.csv data.
+    Uses 'fit_score' column if available, otherwise calculates from 'projected_course_fit'.
+    """
     # Find player in dataframe
     player_data = course_fit_df[course_fit_df['Name'].apply(fix_names) == fix_names(name)]
     
     if len(player_data) == 0:
         return 0.0  # Return 0 if player not found
+    
+    # If fit_score column exists, use it directly
+    if 'fit_score' in course_fit_df.columns:
+        return player_data['fit_score'].iloc[0]
         
-    # Get projected course fit (lower is better)
+    # Otherwise, calculate from projected course fit (lower is better)
     fit_score = player_data['projected_course_fit'].iloc[0]
     
     # Convert to 0-100 scale where 100 is best (lowest rank)
