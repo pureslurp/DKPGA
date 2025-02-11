@@ -85,7 +85,7 @@ def backtest_weights() -> Tuple[Dict, float]:
     Test different weight combinations and return the best performing one.
     Saves progress to CSV and can resume from previous runs.
     """
-    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am"]
+    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open"]
     weight_combinations = generate_weight_combinations()
     results_file = "backtest/pga_v5_backtest_results.csv"
     
