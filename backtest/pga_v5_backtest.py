@@ -80,9 +80,9 @@ def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame) -> fl
     
     return total_score / len(lineups_df)  # Average DK points per lineup
 
-def backtest_weights() -> Tuple[Dict, float]:
+def backtest_weights() -> Tuple[List[Dict], List[float]]:
     """
-    Test different weight combinations and return the best performing one.
+    Test different weight combinations and return the top 3 best performing ones.
     Saves progress to CSV and can resume from previous runs.
     """
     tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open"]
@@ -92,13 +92,13 @@ def backtest_weights() -> Tuple[Dict, float]:
     # Initialize or load existing results
     if os.path.exists(results_file):
         results_df = pd.read_csv(results_file)
-        # Convert stored string representation of weights back to dict
         results_df['weights'] = results_df['weights'].apply(eval)
     else:
         results_df = pd.DataFrame(columns=['tournament', 'weights', 'score'])
     
-    best_score = 0
-    best_weights = None
+    # Track top 3 instead of just the best
+    top_scores = [0, 0, 0]
+    top_weights = [None, None, None]
     
     print(f"Testing {len(weight_combinations)} weight combinations...")
     
@@ -141,17 +141,24 @@ def backtest_weights() -> Tuple[Dict, float]:
         avg_score = total_score / tournaments_tested
         print(f"Average Score: {avg_score:.2f}")
         
-        if avg_score > best_score:
-            best_score = avg_score
-            best_weights = weights
-            print("New best weights found!")
+        # Update top 3 if necessary
+        for j in range(3):
+            if avg_score > top_scores[j]:
+                # Shift lower scores down
+                top_scores[j+1:] = top_scores[j:-1]
+                top_weights[j+1:] = top_weights[j:-1]
+                # Insert new score
+                top_scores[j] = avg_score
+                top_weights[j] = weights
+                break
     
-    return best_weights, best_score
+    return top_weights, top_scores
 
 if __name__ == "__main__":
-    best_weights, best_score = backtest_weights()
+    best_weights, best_scores = backtest_weights()
     print("\nBacktesting Complete!")
     print("=" * 50)
-    print("Best Performing Weights:")
-    print(f"Components: {best_weights['components']}")
-    print(f"Average Score: {best_score:.2f}")
+    print("Top 3 Performing Weights:")
+    for i in range(3):
+        print(f"\n{i+1}. Average Score: {best_scores[i]:.2f}")
+        print(f"   Components: {best_weights[i]['components']}")
