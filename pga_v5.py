@@ -305,69 +305,84 @@ def calculate_tournament_history_score(name: str, history_df: pd.DataFrame) -> f
 def calculate_tournament_history_score_internal(player_history: pd.Series, history_df: pd.DataFrame) -> float:
     """Internal function to calculate tournament history score for a player with history"""
     years = ['24', '2022-23', '2021-22', '2020-21', '2019-20']
-    weights = [1.0, 0.8, 0.6, 0.4, 0.2]  # More recent years weighted higher
+    weights = [1.0, 0.8, 0.6, 0.4, 0.2]
+    
+    # Calculate perfect score benchmark
+    perfect_score = 95
     
     finish_points = 0.0
-    max_possible_points = 0.0
+    total_weight = 0.0
     appearances = 0
-    avg_finish = 0.0
+    good_finishes = 0
     
     for year, weight in zip(years, weights):
         if year in history_df.columns:
             finish = player_history[year]
             if pd.notna(finish):
-                # Convert 'CUT' to 65
                 if isinstance(finish, str) and finish.upper() == 'CUT':
                     finish = 65
                 else:
                     try:
                         finish = float(finish)
+                        if finish <= 15:
+                            good_finishes += 1
                     except (ValueError, TypeError):
-                        continue  # Skip invalid values
+                        continue
                 
-                # Track number of appearances and average finish
                 appearances += 1
-                avg_finish += finish
                 
-                # Convert finish position to points (1st = 100, 60th = 0)
-                points = max(0, 100 - ((finish - 1) * (100/60)))
+                if finish <= 60:
+                    points = max(0, 100 - ((finish - 1) * (100/60)))
+                else:
+                    points = 0
+                
                 finish_points += points * weight
-                max_possible_points += 100 * weight
+                total_weight += weight
     
-    # Calculate average finish position
-    avg_finish = avg_finish / appearances if appearances > 0 else 0
+    # Calculate base finish score normalized to our perfect score benchmark
+    base_finish_score = ((finish_points / total_weight) / perfect_score * 50) if total_weight > 0 else 0
     
-    # Apply consistency penalty for multiple poor performances
-    if appearances > 1:
-        # Penalty increases with number of appearances and average finish position
-        consistency_penalty = (avg_finish / 60) * (appearances / 5)  # 5 is max years tracked
-        finish_points *= (1 - consistency_penalty)
+    # After calculating base_finish_score
+    if appearances == 1:
+        base_finish_score = base_finish_score * 0.95  # 5% reduction for single appearance
     
-    # Normalize finish points (50% of total score)
-    finish_score = (finish_points / max_possible_points) * 50 if max_possible_points > 0 else 0
+    # Apply bonus for multiple good finishes
+    if good_finishes >= 2:
+        bonus = min(good_finishes - 1, 3) * 0.1
+        finish_score = base_finish_score * (1 + bonus)
+    else:
+        finish_score = base_finish_score
     
-    # Calculate strokes gained score (30% of total)
+    # Calculate SG score (max 30 points)
     sg_stats = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting']
-    sg_weights = [0.25, 0.35, 0.25, 0.15]  # Must sum to 1
+    sg_weights = [0.25, 0.35, 0.25, 0.15]
     
-    sg_score = 0.0
-    for stat, weight in zip(sg_stats, sg_weights):
-        if stat in history_df.columns:
-            sg_val = player_history[stat]
-            if pd.notna(sg_val):
-                # Convert SG to 0-100 scale (-2 to +2 range)
-                normalized_sg = min(100, max(0, (sg_val + 2) * 25))
-                sg_score += normalized_sg * weight
+    try:
+        sg_score = 0.0
+        valid_sg_stats = 0
+        for stat, weight in zip(sg_stats, sg_weights):
+            if stat in history_df.columns:
+                sg_val = player_history[stat]
+                if pd.notna(sg_val):
+                        normalized_sg = min(100, max(0, (sg_val + 2) * 25))
+                        sg_score += normalized_sg * weight
+                        valid_sg_stats += 1
+    except:
+        sg_score = 0.0
+        valid_sg_stats = 0
     
-    # Scale SG score to 30% of total
-    sg_score *= 0.3
+    sg_score = sg_score * 0.3 if valid_sg_stats > 0 else 0
     
-    # Calculate consistency score (20% of total)
-    consistency_score = player_history['made_cuts_pct'] * 20 if 'made_cuts_pct' in history_df.columns else 0
-    # Combine all components
+    # Calculate consistency score (max 20 points)
+    consistency_score = 0
+    if appearances > 0:
+        made_cuts_pct = player_history['made_cuts_pct'] if 'made_cuts_pct' in history_df.columns else 0
+        max_consistency_points = 15 if appearances == 1 else 20
+        consistency_score = made_cuts_pct * max_consistency_points
+    
     total_score = finish_score + sg_score + consistency_score
     
-    return total_score
+    return min(100, total_score)
 
 def get_current_tuesday() -> datetime:
     """Get the date of the current week's Tuesday"""
@@ -535,9 +550,9 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
         },
         'components': {
             'odds': 0.1,
-            'fit': 0.3,
+            'fit': 0.4,
             'history': 0.4,
-            'form': 0.2
+            'form': 0.1
         }
     }
     
