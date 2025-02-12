@@ -14,6 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import os
 
 from utils import TOURNAMENT_LIST_2025
+from pga_v5 import fix_names, calculate_tournament_history_score_internal
 
 '''
 Script to scrape tournament history data from the PGA Tour website for a specific tournament.
@@ -23,7 +24,6 @@ Output:
     - tournament/{tournament_name}/tournament_history.csv: the tournament history data
 '''
 
-from pga_v5 import fix_names
 def parse_finishes(row_data: Dict[str, str]) -> Dict[str, float]:
     """Parse finishing positions for last 5 years"""
     years = ["24", "2022-23", "2021-22", "2020-21", "2019-20"]
@@ -153,60 +153,8 @@ def format_tournament_history(df: pd.DataFrame) -> pd.DataFrame:
     
     df['made_cuts_pct'] = df.apply(_calculate_made_cuts_pct, axis=1)
     
-    def _get_finish_points(position: int) -> int:
-        """Convert finish position to points based on the defined scoring system"""
-        if position == 1:
-            return 30
-        elif position == 2:
-            return 20
-        elif position == 3:
-            return 18
-        elif position == 4:
-            return 16
-        elif position == 5:
-            return 14
-        elif position == 6:
-            return 12
-        elif position == 7:
-            return 10
-        elif position == 8:
-            return 9
-        elif position == 9:
-            return 8
-        elif position == 10:
-            return 7
-        elif 11 <= position <= 15:
-            return 6
-        elif 16 <= position <= 20:
-            return 5
-        elif 21 <= position <= 25:
-            return 4
-        elif 26 <= position <= 30:
-            return 3
-        elif 31 <= position <= 40:
-            return 2
-        elif 41 <= position <= 50:
-            return 1
-        else:
-            return 0
-    
-    # Calculate weighted tournament history score
-    def _calculate_history_score(row):
-        finish_cols = ['24', '2022-23', '2021-22', '2020-21', '2019-20']
-        weights = [1.0, 0.7, 0.5, 0.3, 0.2]  # More recent years weighted higher
-        total_score = 0
-        
-        for col, weight in zip(finish_cols, weights):
-            value = row[col]
-            if pd.notna(value) and value != 'CUT':
-                if isinstance(value, str):
-                    value = int(value.replace('T', ''))
-                points = _get_finish_points(value)
-                total_score += points * weight
-        
-        return total_score
-    
-    df['history_score'] = df.apply(_calculate_history_score, axis=1)
+    # Calculate history score using imported function from pga_v5
+    df['history_score'] = df.apply(lambda row: calculate_tournament_history_score_internal(row, df), axis=1)
     
     # Sort by history score first, then strokes gained total
     df = df.sort_values(['history_score', 'sg_total'], ascending=[False, False])
@@ -285,7 +233,7 @@ def get_tournament_history(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "WM_Phoenix_Open"
+    TOURNEY = "AT&T_Pebble_Beach_Pro-Am"
     url = f"https://www.pgatour.com/tournaments/2025/{TOURNAMENT_LIST_2025[TOURNEY]['pga-url']}/field/tournament-history"
     df = get_tournament_history(url)
     
