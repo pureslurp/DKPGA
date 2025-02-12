@@ -36,7 +36,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "WM_Phoenix_Open"
+TOURNEY = "The_Genesis_Invitational"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -388,8 +388,8 @@ def calculate_fit_score_from_csv(name: str, course_fit_df: pd.DataFrame) -> floa
         return 0.0  # Return 0 if player not found
     
     # If fit_score column exists, use it directly
-    if 'fit_score' in course_fit_df.columns:
-        return player_data['fit_score'].iloc[0]
+    if 'fit score' in course_fit_df.columns:
+        return player_data['fit score'].iloc[0]
         
     # Otherwise, calculate from projected course fit (lower is better)
     fit_score = player_data['projected_course_fit'].iloc[0]
@@ -556,8 +556,21 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     # Read odds data and DraftKings salaries
     odds_df = pd.read_csv(f'2025/{TOURNEY}/odds.csv')
     dk_salaries = pd.read_csv(f'2025/{TOURNEY}/DKSalaries.csv')
-    tourney_history = pd.read_csv(f'2025/{TOURNEY}/tournament_history.csv')
     
+    # Try to read tournament history, fall back to course history if not available
+    history_file = f'2025/{TOURNEY}/tournament_history.csv'
+    if not os.path.exists(history_file):
+        history_file = f'2025/{TOURNEY}/course_history.csv'
+        print(f"Tournament history not found, using course history data instead")
+    
+    try:
+        tourney_history = pd.read_csv(history_file)
+    except FileNotFoundError:
+        print(f"No history data found. Setting history scores to 0.")
+        # Create empty history DataFrame with required columns
+        tourney_history = pd.DataFrame(columns=['Name', 'measured_years', 'made_cuts_pct'])
+        for year in ['24', '2022-23', '2021-22', '2020-21', '2019-20']:
+            tourney_history[year] = None
     
     print(f"Loaded {len(odds_df)} players from odds data")
     print(f"Loaded {len(dk_salaries)} players from DraftKings data\n")
