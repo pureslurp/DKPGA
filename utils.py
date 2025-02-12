@@ -184,7 +184,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "The_Genesis_Invitational": {
         "ID": 401703495,
-        "Course": None
+        "Course": None,
+        "pga-url": "the-genesis-invitational/R2025007"
     },
     "Mexico_Open_at_VidantaWorld": {
         "ID": 401703496,
