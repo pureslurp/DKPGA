@@ -171,6 +171,15 @@ def main(urls, tourney):
         combined_df['measured_years'] = measured_years
         combined_df['made_cuts_pct'] = made_cuts_pct
         
+        # Calculate average finish (treating CUT/WD as 65th place)
+        def convert_position(pos):
+            if pd.isna(pos) or pos in ['CUT', 'WD']:
+                return 65
+            return int(pos)
+            
+        position_df = combined_df[combined_df.columns[:-2]].applymap(convert_position)
+        combined_df['avg_finish'] = position_df.mean(axis=1).round(1)
+        
         # Rename columns to match desired format
         column_mapping = {
             '2025': '24',

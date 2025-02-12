@@ -250,7 +250,7 @@ def main():
     # Tournament selection using available tournaments
     selected_tournament = st.sidebar.selectbox(
         "Select Tournament",
-        get_available_tournaments(featured_tournament="WM_Phoenix_Open")
+        get_available_tournaments(featured_tournament="The_Genesis_Invitational")
     )
     
     # Add weight validation
@@ -472,12 +472,18 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         # Get response from ChatGPT
         display_chatgpt_insights(fit_container, user_prompt, 'fit_insights')
 
-        
-        st.dataframe(
-            course_fit.sort_values('projected_course_fit'),
-            height=400,
-            use_container_width=True
-        )
+        try:
+            st.dataframe(
+                course_fit.sort_values('projected_course_fit'),
+                height=400,
+                use_container_width=True
+            )
+        except:
+            st.dataframe(
+                course_fit.sort_values('fit score', ascending=False),
+                height=400,
+                use_container_width=True
+            )
     except FileNotFoundError:
         st.warning("No course fit data available for this tournament.")
 
@@ -528,7 +534,27 @@ Higher values emphasize recent performance metrics, combining both short-term (l
     st.subheader("Tournament History")
     st.write("This section shows the golfer's history at this specific tournament. The history is used to calculate the normalized history score.")
     try:
-        history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
+        try:
+            history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
+
+             # Format the columns for better display
+            display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 
+                            'sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
+                            'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
+            
+            # Format numeric columns to show fewer decimal places
+            numeric_cols = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
+                        'avg_finish', 'made_cuts_pct']
+        except:
+            history_data = pd.read_csv(f"2025/{selected_tournament}/course_history.csv")
+            st.write("Note: This tournament is not traditionally played on this course, so the history represents the last 5 times this **course** was played. The years in the column headers are not accurate, it is just the last 5 times")
+
+            # Format the columns for better display
+            display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 
+                             'avg_finish', 'measured_years', 'made_cuts_pct']
+            
+            # Format numeric columns to show fewer decimal places
+            numeric_cols = ['avg_finish', 'made_cuts_pct']
         # Create container for odds insights
         history_container = st.empty()
         
@@ -545,17 +571,6 @@ Higher values emphasize recent performance metrics, combining both short-term (l
 
         # Get response from ChatGPT
         display_chatgpt_insights(history_container, user_prompt, 'history_insights')
-
-        
-        
-        # Format the columns for better display
-        display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 
-                         'sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
-                         'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
-        
-        # Format numeric columns to show fewer decimal places
-        numeric_cols = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
-                      'avg_finish', 'made_cuts_pct']
         
         # Create formatted dataframe
         display_df = history_data[display_columns].copy()
@@ -567,7 +582,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         
         # Display the history data
         st.dataframe(
-            display_df,
+            display_df.sort_index(ascending=True),
             height=400,
             use_container_width=True
         )
