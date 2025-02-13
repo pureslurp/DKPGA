@@ -388,5 +388,7 @@ def fix_names(name):
         return "nicolai hojgaard"
     elif name == "Nico Echavarria":
         return "nicolas echavarria"
+    elif name == "Rasmus Højgaard":
+        return "rasmus hojgaard"
     else:
         return name.lower()
