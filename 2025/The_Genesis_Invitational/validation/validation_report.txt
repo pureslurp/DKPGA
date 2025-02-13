@@ -1,0 +1,21 @@
+
+Outliers found in Salary:
+  - scottie scheffler: value=12300.00, z-score=3.71 (mean=7473.97, std=1301.82)
+
+Outliers found in Odds Total:
+  - rory mcilroy: value=8.68, z-score=4.01 (mean=1.63, std=1.76)
+  - scottie scheffler: value=12.67, z-score=6.27 (mean=1.63, std=1.76)
+
+Outliers found in Normalized Odds:
+  - rory mcilroy: value=0.68, z-score=4.01 (mean=0.12, std=0.14)
+  - scottie scheffler: value=1.00, z-score=6.27 (mean=0.12, std=0.14)
+
+Outliers found in Value:
+  - jake knapp: value=12.10, z-score=3.32 (mean=5.71, std=1.92)
+
+Suspicious zero values found:
+  - danny list (odds): base=0.07, normalized=0.00
+  - rasmus hojgaard (form): base=0.00, normalized=0.38
+  - matthieu pavon (form): base=-1.09, normalized=0.00
+  - danny list (form): base=0.00, normalized=0.38
+  - tiger woods (form): base=0.00, normalized=0.38
