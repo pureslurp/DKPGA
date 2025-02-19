@@ -61,6 +61,7 @@ def parse_strokes_gained(row_data: Dict[str, str]) -> Dict[str, float]:
     
     for field, key in sg_fields.items():
         value = row_data.get(field, '')
+        print(value)
         if pd.isna(value) or value == '' or value == '-':
             stats[key] = np.nan
         else:
@@ -79,36 +80,89 @@ def extract_player_data(html_table: BeautifulSoup) -> pd.DataFrame:
     """Extract player tournament history data from HTML table"""
     players = []
     
-    for row in html_table.find_all('tr')[1:]:  # Skip header row
+    # Get header row to determine which years are present
+    header_row = html_table.find('tr', class_='css-1odhsqu')
+    if not header_row:
+        return pd.DataFrame()
+        
+    # Get all header cells and extract years
+    header_cells = header_row.find_all('th')
+    available_years = []
+    
+    # Map column names to their indices
+    column_indices = {'rounds': None, 'sg_start': None}
+    
+    for i, cell in enumerate(header_cells):
+        button = cell.find('button')
+        if button:
+            text = button.text.strip()
+            
+            # Check if it's a year
+            if text in ['24', '2022-23', '2021-22', '2020-21', '2019-20']:
+                available_years.append(text)
+            # Check if it's the rounds column (marks start of SG stats)
+            elif text == 'Rounds':
+                column_indices['rounds'] = i
+                column_indices['sg_start'] = i + 1
+    
+    print(f"\nProcessing with:")
+    print(f"Available years: {available_years}")
+    print(f"Column indices: {column_indices}")
+    
+    for row in html_table.find_all('tr', class_='css-79elbk'):  # Add the player row class
         cells = row.find_all('td')
-        if len(cells) < 12:  # Skip incomplete rows
+        if len(cells) < 7:
             continue
             
-        # Get player name and format it
+        # Get player name
         name_cell = cells[0].find('span', class_='chakra-text')
         if not name_cell:
             continue
         
-        # Convert "Last, First" to "first last" format
         name = name_cell.text.strip()
         if ',' in name:
             last_name, first_name = name.split(',', 1)
             name = f"{first_name.strip()} {last_name.strip()}"
-        name = fix_names(name)  # Use existing fix_names function
+        name = fix_names(name)
+        
+        print(f"\nProcessing player: {name}")
         
         # Get recent finishes
         finish_data = {}
-        for i, year in enumerate(['24', '2022-23', '2021-22', '2020-21', '2019-20']):
+        for i, year in enumerate(available_years):
             finish = cells[i+1].find('span', class_='chakra-text')
             if finish:
                 finish_data[year] = finish.text.strip()
-            
+        
+        print(f"Finish data: {finish_data}")
+        
         # Get strokes gained data
-        sg_data = {}
-        for i, field in enumerate(['Rounds', 'SG: OTT', 'SG: APP', 'SG: ATG', 'SG: P', 'SG: TOT']):
-            sg = cells[i+7].find('span', class_='chakra-text')
-            if sg:
-                sg_data[field] = sg.text.strip()
+        sg_data = {
+            'Rounds': '',
+            'SG: OTT': '',
+            'SG: APP': '',
+            'SG: ATG': '',
+            'SG: P': '',
+            'SG: TOT': ''
+        }
+        
+        # Get rounds and SG stats
+        if column_indices['rounds'] is not None:
+            # Get rounds
+            rounds = cells[column_indices['rounds']].find('span', class_='chakra-text')
+            if rounds:
+                sg_data['Rounds'] = rounds.text.strip()
+            
+            # Get SG stats
+            sg_fields = ['SG: OTT', 'SG: APP', 'SG: ATG', 'SG: P', 'SG: TOT']
+            for i, field in enumerate(sg_fields):
+                cell_index = column_indices['sg_start'] + i
+                if cell_index < len(cells):
+                    sg = cells[cell_index].find('span', class_='chakra-text')
+                    if sg:
+                        sg_data[field] = sg.text.strip()
+        
+        print(f"SG data before parsing: {sg_data}")
         
         # Parse all data
         player_data = {
@@ -117,8 +171,9 @@ def extract_player_data(html_table: BeautifulSoup) -> pd.DataFrame:
             **parse_strokes_gained(sg_data)
         }
         
+        print(f"Final player data: {player_data}")
         players.append(player_data)
-        
+    
     return pd.DataFrame(players)
 
 def format_tournament_history(df: pd.DataFrame) -> pd.DataFrame:
@@ -191,49 +246,49 @@ def get_tournament_history(url: str) -> Optional[pd.DataFrame]:
     firefox_options = Options()
     firefox_options.add_argument("--headless")  # Run in headless mode
     
-    try:
-        # Initialize the driver
-        driver = webdriver.Firefox(options=firefox_options)
-        driver.get(url)
+    # try:
+    # Initialize the driver
+    driver = webdriver.Firefox(options=firefox_options)
+    driver.get(url)
+    
+    # Wait for table to load
+    wait = WebDriverWait(driver, 20)
+    table = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "chakra-table")))
+    
+    # Get the page source after JavaScript has loaded
+    html_content = driver.page_source
+    
+    # Parse HTML
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Get tournament name
+    tournament_name = get_tournament_name(soup)
+    
+    table = soup.find('table', class_='chakra-table')
+    
+    # Extract and format data
+    df = extract_player_data(table)
+    df = format_tournament_history(df)
+    
+    # Add tournament name to DataFrame
+    df['tournament'] = tournament_name
+    
+    return df
         
-        # Wait for table to load
-        wait = WebDriverWait(driver, 20)
-        table = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "chakra-table")))
+    # except Exception as e:
+    #     print(f"Error scraping data: {e}")
+    #     return None
         
-        # Get the page source after JavaScript has loaded
-        html_content = driver.page_source
-        
-        # Parse HTML
-        soup = BeautifulSoup(html_content, 'html.parser')
-        
-        # Get tournament name
-        tournament_name = get_tournament_name(soup)
-        
-        table = soup.find('table', class_='chakra-table')
-        
-        # Extract and format data
-        df = extract_player_data(table)
-        df = format_tournament_history(df)
-        
-        # Add tournament name to DataFrame
-        df['tournament'] = tournament_name
-        
-        return df
-        
-    except Exception as e:
-        print(f"Error scraping data: {e}")
-        return None
-        
-    finally:
-        # Close the browser
-        try:
-            driver.quit()
-        except:
-            pass
+    # finally:
+    #     # Close the browser
+    #     try:
+    #         driver.quit()
+    #     except:
+    #         pass
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "AT&T_Pebble_Beach_Pro-Am"
+    TOURNEY = "Mexico_Open_at_VidantaWorld"
     url = f"https://www.pgatour.com/tournaments/2025/{TOURNAMENT_LIST_2025[TOURNEY]['pga-url']}/field/tournament-history"
     df = get_tournament_history(url)
     

@@ -189,7 +189,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "Mexico_Open_at_VidantaWorld": {
         "ID": 401703496,
-        "Course": None
+        "Course": None,
+        "pga-url": "mexico-open-at-vidantaworld/R2025540"
     },
     "Cognizant_Classic_in_The_Palm_Beaches": {
         "ID": 401703497,
