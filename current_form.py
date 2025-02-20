@@ -134,38 +134,38 @@ def get_current_form(url: str) -> Optional[pd.DataFrame]:
     firefox_options = Options()
     firefox_options.add_argument("--headless")
     
-    # try:
+    try:
         # Initialize the driver
-    driver = webdriver.Firefox(options=firefox_options)
-    driver.get(url)
-    
-    # Wait for table to load
-    wait = WebDriverWait(driver, 20)
-    table = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "chakra-table")))
-    
-    # Get the page source after JavaScript has loaded
-    html_content = driver.page_source
-    
-    # Parse HTML
-    soup = BeautifulSoup(html_content, 'html.parser')
-    table = soup.find('table', class_='chakra-table')
-    
-    # Extract and format data
-    df = extract_player_data(table)
-    df = format_current_form(df)
-    
-    return df
-    
-    # except Exception as e:
-    #     print(f"Error scraping data: {e}")
-    #     return None
+        driver = webdriver.Firefox(options=firefox_options)
+        driver.get(url)
         
-    # finally:
-    #     # Close the browser
-    #     try:
-    #         driver.quit()
-    #     except:
-    #         pass
+        # Wait for table to load
+        wait = WebDriverWait(driver, 20)
+        table = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "chakra-table")))
+        
+        # Get the page source after JavaScript has loaded
+        html_content = driver.page_source
+        
+        # Parse HTML
+        soup = BeautifulSoup(html_content, 'html.parser')
+        table = soup.find('table', class_='chakra-table')
+        
+        # Extract and format data
+        df = extract_player_data(table)
+        df = format_current_form(df)
+        
+        return df
+    
+    except Exception as e:
+        print(f"Error scraping data: {e}")
+        return None
+        
+    finally:
+        # Close the browser
+        try:
+            driver.quit()
+        except:
+            pass
 
 if __name__ == "__main__":
     # Example usage
