@@ -103,7 +103,7 @@ class DKLineupOptimizer:
             prob += pulp.lpSum([decisions[p['Name + ID']] * p['Salary'] for p in players]) >= min_salary
             
             # Constraint 4: Maximum one player over $10000
-            expensive_players = [p for p in players if p['Salary'] >= 10000]
+            expensive_players = [p for p in players if p['Salary'] >= 9800]
             if expensive_players:
                 prob += pulp.lpSum([decisions[p['Name + ID']] for p in expensive_players]) <= 1
             
@@ -111,7 +111,7 @@ class DKLineupOptimizer:
             cheap_threshold = 6400 if min_salary >= 6000 else 6000
             cheap_players = [p for p in players if p['Salary'] <= cheap_threshold]
             if cheap_players:
-                prob += pulp.lpSum([decisions[p['Name + ID']] for p in cheap_players]) == 0
+                prob += pulp.lpSum([decisions[p['Name + ID']] for p in cheap_players]) <= 1
             
             # Constraint 6: Overlap constraint with previous lineups
             if i > 0:
