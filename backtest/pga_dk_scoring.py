@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import os
 import sys
+from io import StringIO
 
 options = Options()
 
@@ -214,8 +215,13 @@ def pos_rewrite(x: str):
 
 def find_par(df):
     winner = df.iloc[0]
-    par = (int(winner['TOT']) - int(winner['SCORE'])) / 4
-    return par
+    try:
+        # Only attempt conversion if not 'CUT'
+        if isinstance(winner['TOT'], str) and winner['TOT'].upper() == 'CUT':
+            return None
+        return (int(winner['TOT']) - int(winner['SCORE'])) / 4
+    except (ValueError, TypeError):
+        return None
 
 def find_net_score(df_score):
     try:
@@ -372,13 +378,9 @@ def round_dk_score(r1_score, r2_score, r3_score, r4_score, pos, par, raw_data):
 def round_scores(driver, select2, round):
     select2.select_by_visible_text(round)
     scores = driver.page_source
-    scores_pd = pd.read_html(scores)
+    scores_pd = pd.read_html(StringIO(scores))
     df_scores = scores_pd[-1]
-    #print(df_scores.columns[0])
     df_scores = df_scores.drop(df_scores.columns[[0, 10, 20, 21]], axis=1)
-    #print(df_scores)
-    #df_scores = df_scores.drop(['Hole', 'Out', 'In', 'Tot'], axis=1)
-
     return df_scores
 
 def world_rank_rewrite(data):
@@ -433,8 +435,8 @@ def check_world_rank(df_merge):
     driver.close()
     driver.quit()
     
-    # Parse the data from the page
-    data = pd.read_html(result)[0]
+    # Parse the data from the page using StringIO
+    data = pd.read_html(StringIO(result))[0]
     
     # Process the data
     data['Name'] = data['Player'].apply(lambda x: series_lower_new(x))
