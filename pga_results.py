@@ -3,7 +3,7 @@ from Legacy.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "The_Genesis_Invitational"
+tournament = "Mexico_Open_at_VidantaWorld"
 
 # Get results data
 try:

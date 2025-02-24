@@ -1,0 +1,49 @@
+
+Outliers found in Salary:
+  - akshay bhatia: value=10700.00, z-score=3.51 (mean=7103.01, std=1024.47)
+  - kurt kitayama: value=10200.00, z-score=3.02 (mean=7103.01, std=1024.47)
+
+Outliers found in Odds Total:
+  - akshay bhatia: value=3.55, z-score=4.09 (mean=0.77, std=0.68)
+  - rasmus hojgaard: value=3.00, z-score=3.28 (mean=0.77, std=0.68)
+
+Outliers found in Normalized Odds:
+  - akshay bhatia: value=1.00, z-score=4.09 (mean=0.22, std=0.19)
+  - rasmus hojgaard: value=0.85, z-score=3.28 (mean=0.22, std=0.19)
+
+Outliers found in Fit Score:
+  - aaron rai: value=87.10, z-score=3.28 (mean=36.65, std=15.38)
+
+Outliers found in Normalized Fit:
+  - aaron rai: value=1.00, z-score=3.28 (mean=0.42, std=0.18)
+
+Outliers found in Form Score:
+  - jesse droemer: value=-5.35, z-score=5.44 (mean=-0.31, std=0.93)
+  - jose antonio safa: value=-3.25, z-score=3.17 (mean=-0.31, std=0.93)
+
+Outliers found in Total:
+  - akshay bhatia: value=0.87, z-score=3.47 (mean=0.40, std=0.14)
+
+Suspicious zero values found:
+  - jose antonio safa (history): base=8.02, normalized=0.00
+  - justin hastings (form): base=0.00, normalized=0.56
+  - riley lewis (form): base=0.00, normalized=0.56
+  - luke gifford (form): base=0.00, normalized=0.56
+  - matthew watkins (form): base=0.00, normalized=0.56
+  - erich fortlage (form): base=0.00, normalized=0.56
+  - leandro mihaich (form): base=0.00, normalized=0.56
+  - gerardo gomez (form): base=0.00, normalized=0.56
+  - karl vilips (form): base=-3.02, normalized=0.00
+  - tyler mccumber (form): base=-2.54, normalized=0.00
+  - jesse droemer (form): base=-5.35, normalized=0.00
+  - davis riley (form): base=-2.66, normalized=0.00
+  - rafael campos (form): base=-2.06, normalized=0.00
+  - trevor cone (form): base=-1.88, normalized=0.00
+  - thorbjorn olesen (form): base=0.00, normalized=0.56
+  - frankie capan (form): base=0.00, normalized=0.56
+  - matthew mccarty (form): base=0.00, normalized=0.56
+  - kyoung-hoon lee (form): base=0.00, normalized=0.56
+  - jose cristobal islas (form): base=0.00, normalized=0.56
+  - niklas moller (form): base=0.00, normalized=0.56
+  - jose luis ballester (form): base=0.00, normalized=0.56
+  - jose antonio safa (form): base=-3.25, normalized=0.00
