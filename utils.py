@@ -194,7 +194,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "Cognizant_Classic_in_The_Palm_Beaches": {
         "ID": 401703497,
-        "Course": None
+        "Course": None,
+        "pga-url": "cognizant-classic-in-the-palm-beaches/R2025010"
     },
     "Arnold_Palmer_Invitational_pres._by_Mastercard": {
         "ID": 401703498,
