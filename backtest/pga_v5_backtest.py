@@ -83,9 +83,9 @@ def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame) -> fl
 def backtest_weights() -> Tuple[List[Dict], List[float]]:
     """
     Test different weight combinations and return the top 3 best performing ones.
-    Saves progress to CSV and can resume from previous runs.
+    Scores are normalized within each tournament before averaging.
     """
-    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open"]
+    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld"]
     weight_combinations = generate_weight_combinations()
     results_file = "backtest/pga_v5_backtest_results.csv"
     
@@ -96,17 +96,14 @@ def backtest_weights() -> Tuple[List[Dict], List[float]]:
     else:
         results_df = pd.DataFrame(columns=['tournament', 'weights', 'score'])
     
-    # Track top 3 instead of just the best
-    top_scores = [0, 0, 0]
-    top_weights = [None, None, None]
+    # Track scores by tournament and weight combination
+    tournament_scores = {t: {} for t in tournaments}
     
     print(f"Testing {len(weight_combinations)} weight combinations...")
     
     for i, weights in enumerate(weight_combinations):
         print(f"\nTesting combination {i+1}/{len(weight_combinations)}")
         print(f"Weights: {weights['components']}")
-        total_score = 0
-        tournaments_tested = 0
         
         for tournament in tournaments:
             # Check if we already have results for this combination and tournament
@@ -135,21 +132,43 @@ def backtest_weights() -> Tuple[List[Dict], List[float]]:
                 results_df.to_csv(results_file, index=False)
                 print(f"{tournament} Score: {score:.2f} (new)")
             
-            total_score += score
-            tournaments_tested += 1
+            # Store score for normalization
+            tournament_scores[tournament][str(weights['components'])] = score
+    
+    # Calculate normalized scores and overall performance
+    weight_performances = {}
+    for weights in weight_combinations:
+        weight_key = str(weights['components'])
+        normalized_scores = []
         
-        avg_score = total_score / tournaments_tested
-        print(f"Average Score: {avg_score:.2f}")
+        for tournament in tournaments:
+            scores = tournament_scores[tournament]
+            if not scores:  # Skip if no scores for tournament
+                continue
+                
+            # Get min and max scores for this tournament
+            min_score = min(scores.values())
+            max_score = max(scores.values())
+            
+            if max_score - min_score > 0:  # Avoid division by zero
+                # Normalize score to 0-100 scale
+                normalized_score = 100 * (scores[weight_key] - min_score) / (max_score - min_score)
+                normalized_scores.append(normalized_score)
         
-        # Update top 3 if necessary
-        for j in range(3):
-            if avg_score > top_scores[j]:
-                # Shift lower scores down
-                top_scores[j+1:] = top_scores[j:-1]
-                top_weights[j+1:] = top_weights[j:-1]
-                # Insert new score
-                top_scores[j] = avg_score
-                top_weights[j] = weights
+        if normalized_scores:  # Calculate average if we have scores
+            weight_performances[weight_key] = sum(normalized_scores) / len(normalized_scores)
+    
+    # Get top 3 performing weight combinations
+    sorted_weights = sorted(weight_performances.items(), key=lambda x: x[1], reverse=True)
+    top_weights = []
+    top_scores = []
+    
+    for weight_str, score in sorted_weights[:3]:
+        # Find the original weight dictionary
+        for w in weight_combinations:
+            if str(w['components']) == weight_str:
+                top_weights.append(w)
+                top_scores.append(score)
                 break
     
     return top_weights, top_scores
@@ -160,5 +179,5 @@ if __name__ == "__main__":
     print("=" * 50)
     print("Top 3 Performing Weights:")
     for i in range(3):
-        print(f"\n{i+1}. Average Score: {best_scores[i]:.2f}")
+        print(f"\n{i+1}. Normalized Score: {best_scores[i]:.2f}")
         print(f"   Components: {best_weights[i]['components']}")
