@@ -1,0 +1,29 @@
+
+Outliers found in Salary:
+  - shane lowry: value=10500.00, z-score=3.52 (mean=7082.86, std=971.76)
+  - russell henley: value=10700.00, z-score=3.72 (mean=7082.86, std=971.76)
+
+Outliers found in Odds Total:
+  - shane lowry: value=2.68, z-score=3.79 (mean=0.69, std=0.53)
+  - russell henley: value=2.46, z-score=3.38 (mean=0.69, std=0.53)
+  - sungjae im: value=2.34, z-score=3.13 (mean=0.69, std=0.53)
+
+Outliers found in Normalized Odds:
+  - shane lowry: value=1.00, z-score=3.79 (mean=0.26, std=0.20)
+  - russell henley: value=0.92, z-score=3.38 (mean=0.26, std=0.20)
+  - sungjae im: value=0.87, z-score=3.13 (mean=0.26, std=0.20)
+
+Outliers found in Form Score:
+  - brendon todd: value=-2.63, z-score=3.31 (mean=-0.09, std=0.77)
+
+Outliers found in Value:
+  - kevin kisner: value=0.83, z-score=3.13 (mean=5.99, std=1.65)
+
+Suspicious zero values found:
+  - kevin kisner (history): base=8.34, normalized=0.00
+  - thorbjorn olesen (form): base=0.00, normalized=0.58
+  - kyoung-hoon lee (form): base=0.00, normalized=0.58
+  - matthew mccarty (form): base=0.00, normalized=0.58
+  - frankie capan (form): base=0.00, normalized=0.58
+  - niklas moller (form): base=0.00, normalized=0.58
+  - brendon todd (form): base=-2.63, normalized=0.00
