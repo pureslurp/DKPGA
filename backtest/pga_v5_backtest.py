@@ -80,7 +80,7 @@ def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame) -> fl
     
     return total_score / len(lineups_df)  # Average DK points per lineup
 
-def backtest_weights() -> Tuple[List[Dict], List[float]]:
+def backtest_weights() -> Tuple[List[Dict], List[float], List[float]]:
     """
     Test different weight combinations and return the top 3 best performing ones.
     Scores are normalized within each tournament before averaging.
@@ -137,14 +137,19 @@ def backtest_weights() -> Tuple[List[Dict], List[float]]:
     
     # Calculate normalized scores and overall performance
     weight_performances = {}
+    weight_raw_averages = {}  # New dictionary to track raw averages
     for weights in weight_combinations:
         weight_key = str(weights['components'])
         normalized_scores = []
+        raw_scores = []  # New list to track raw scores
         
         for tournament in tournaments:
             scores = tournament_scores[tournament]
             if not scores:  # Skip if no scores for tournament
                 continue
+            
+            # Store raw score
+            raw_scores.append(scores[weight_key])
                 
             # Get min and max scores for this tournament
             min_score = min(scores.values())
@@ -155,13 +160,15 @@ def backtest_weights() -> Tuple[List[Dict], List[float]]:
                 normalized_score = 100 * (scores[weight_key] - min_score) / (max_score - min_score)
                 normalized_scores.append(normalized_score)
         
-        if normalized_scores:  # Calculate average if we have scores
+        if normalized_scores:  # Calculate averages if we have scores
             weight_performances[weight_key] = sum(normalized_scores) / len(normalized_scores)
+            weight_raw_averages[weight_key] = sum(raw_scores) / len(raw_scores)  # Calculate raw average
     
     # Get top 3 performing weight combinations
     sorted_weights = sorted(weight_performances.items(), key=lambda x: x[1], reverse=True)
     top_weights = []
     top_scores = []
+    top_raw_averages = []  # New list for raw averages
     
     for weight_str, score in sorted_weights[:3]:
         # Find the original weight dictionary
@@ -169,15 +176,17 @@ def backtest_weights() -> Tuple[List[Dict], List[float]]:
             if str(w['components']) == weight_str:
                 top_weights.append(w)
                 top_scores.append(score)
+                top_raw_averages.append(weight_raw_averages[weight_str])  # Add raw average
                 break
     
-    return top_weights, top_scores
+    return top_weights, top_scores, top_raw_averages  # Return raw averages
 
 if __name__ == "__main__":
-    best_weights, best_scores = backtest_weights()
+    best_weights, best_scores, avg_scores = backtest_weights()
     print("\nBacktesting Complete!")
     print("=" * 50)
     print("Top 3 Performing Weights:")
     for i in range(3):
         print(f"\n{i+1}. Normalized Score: {best_scores[i]:.2f}")
+        print(f"   Average DK Points: {avg_scores[i]:.2f}")
         print(f"   Components: {best_weights[i]['components']}")
