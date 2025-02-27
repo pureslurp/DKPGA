@@ -65,7 +65,7 @@ class DKLineupOptimizer:
         self.lineup_size = lineup_size
         
     def generate_lineups(self, df: pd.DataFrame, num_lineups: int = 20, 
-                        min_salary: int = 45000, exposure_limit: float = 0.66,
+                        min_salary: int = 49000, exposure_limit: float = 0.66,
                         overlap_limit: int = 4) -> List[Dict]:
         """
         Generate optimal lineups using Integer Linear Programming with exposure and overlap limits
@@ -202,22 +202,36 @@ class DKLineupOptimizer:
                 for pos in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6']:
                     player = lineup[pos]['Name + ID']
                     if player in overexposed and player_counts[player] > max_appearances:
-                        # Find best replacement that fits salary constraints and isn't already in lineup
+                        # Calculate salary constraints for replacement
                         current_salary = lineup['Salary'] - lineup[pos]['Salary']
-                        for replacement in replacement_pool:
+                        min_needed = min_salary - current_salary  # Minimum salary needed
+                        max_allowed = self.salary_cap - current_salary  # Maximum salary allowed
+                        
+                        # Filter replacement pool based on salary constraints
+                        valid_replacements = [
+                            r for r in replacement_pool
+                            if (min_needed <= r['Salary'] <= max_allowed and  # Meets salary constraints
+                                player_counts.get(r['Name + ID'], 0) < max_appearances and  # Not overexposed
+                                r['Name + ID'] not in used_players)  # Not already in lineup
+                        ]
+                        
+                        # Sort by Total score (maintaining value while meeting salary constraints)
+                        valid_replacements.sort(key=lambda x: x['Total'], reverse=True)
+                        
+                        if valid_replacements:
+                            replacement = valid_replacements[0]
                             replacement_id = replacement['Name + ID']
-                            if (current_salary + replacement['Salary'] <= self.salary_cap and 
-                                player_counts.get(replacement_id, 0) < max_appearances and
-                                replacement_id not in used_players):
-                                # Make the swap
-                                player_counts[player] -= 1
-                                player_counts[replacement_id] = player_counts.get(replacement_id, 0) + 1
-                                lineup[pos] = replacement
-                                lineup['Salary'] = current_salary + replacement['Salary']
-                                lineup['TotalPoints'] = sum(lineup[f'G{i+1}']['Total'] for i in range(6))
-                                used_players.add(replacement_id)  # Add to used players
-                                changes_made = True
-                                break
+                            
+                            # Make the swap
+                            player_counts[player] -= 1
+                            player_counts[replacement_id] = player_counts.get(replacement_id, 0) + 1
+                            lineup[pos] = replacement
+                            lineup['Salary'] = current_salary + replacement['Salary']
+                            lineup['TotalPoints'] = sum(lineup[f'G{i+1}']['Total'] for i in range(6))
+                            used_players.add(replacement_id)
+                            changes_made = True
+                        else:
+                            print(f"Warning: Could not find valid replacement for {player} in lineup")
                 
                 if changes_made:
                     # Re-sort lineups after modifications
