@@ -16,8 +16,8 @@ def generate_weight_combinations() -> List[Dict]:
     Generate different weight combinations to test.
     Each combination must sum to 1.0
     """
-    # We'll test weights in 0.1 increments
-    weights = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+    # We'll test weights in 0.1 increments, including 0.0
+    weights = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
     
     valid_combinations = []
     for w1, w2, w3, w4 in itertools.product(weights, repeat=4):
@@ -82,10 +82,11 @@ def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame) -> Tu
     
     return total_score / len(lineups_df), best_lineup_score
 
-def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float]]:
+def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float], Dict]:
     """
     Test different weight combinations and return the top 3 best performing ones,
     based on both average performance and best lineup performance.
+    Also returns tournament-specific best performers.
     """
     tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld"]
     weight_combinations = generate_weight_combinations()
@@ -100,6 +101,11 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
     
     # Track both average and best scores
     tournament_scores = {t: {'avg': {}, 'best': {}} for t in tournaments}
+    
+    # Track tournament-specific best performers
+    tournament_highlights = {t: {'avg': {'score': 0, 'weights': None}, 
+                               'best': {'score': 0, 'weights': None}} 
+                           for t in tournaments}
     
     print(f"Testing {len(weight_combinations)} weight combinations...")
     
@@ -135,6 +141,18 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
             # Store both scores for normalization
             tournament_scores[tournament]['avg'][str(weights['components'])] = avg_score
             tournament_scores[tournament]['best'][str(weights['components'])] = best_score
+
+            # Update tournament highlights
+            if avg_score > tournament_highlights[tournament]['avg']['score']:
+                tournament_highlights[tournament]['avg'] = {
+                    'score': avg_score,
+                    'weights': weights['components']
+                }
+            if best_score > tournament_highlights[tournament]['best']['score']:
+                tournament_highlights[tournament]['best'] = {
+                    'score': best_score,
+                    'weights': weights['components']
+                }
     
     # Calculate normalized scores for both metrics
     weight_performances = {'avg': {}, 'best': {}}
@@ -180,10 +198,11 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
                     break
     
     return (top_weights['avg'], top_scores['avg'], top_raw_averages['avg'], 
-            top_weights['best'], top_scores['best'], top_raw_averages['best'])
+            top_weights['best'], top_scores['best'], top_raw_averages['best'],
+            tournament_highlights)
 
 if __name__ == "__main__":
-    avg_weights, avg_scores, avg_raw_scores, best_weights, best_scores, best_raw_scores = backtest_weights()
+    avg_weights, avg_scores, avg_raw_scores, best_weights, best_scores, best_raw_scores, highlights = backtest_weights()
     print("\nBacktesting Complete!")
     print("=" * 50)
     print("Top 3 Performing Weights (By Average):")
@@ -198,3 +217,12 @@ if __name__ == "__main__":
         print(f"\n{i+1}. Normalized Score: {best_scores[i]:.2f}")
         print(f"   Best DK Points: {best_raw_scores[i]:.2f}")
         print(f"   Components: {best_weights[i]['components']}")
+
+    print("\n" + "=" * 50)
+    print("Tournament-Specific Highlights:")
+    for tournament in highlights:
+        print(f"\n{tournament}:")
+        print(f"  Best Average Score: {highlights[tournament]['avg']['score']:.2f}")
+        print(f"  Best Average Weights: {highlights[tournament]['avg']['weights']}")
+        print(f"  Best Single Lineup: {highlights[tournament]['best']['score']:.2f}")
+        print(f"  Best Single Weights: {highlights[tournament]['best']['weights']}")

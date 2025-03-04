@@ -18,7 +18,7 @@ from tqdm import tqdm
 from utils import TOURNAMENT_LIST_2025
 # update imports from pga_v4
 from pga_v5 import fix_names, odds_to_score, DKLineupOptimizer, optimize_dk_lineups
-from Legacy.pga_dk_scoring import dk_points_df
+from backtest.pga_dk_scoring import dk_points_df
 
 '''
 Script that optimizes weights for the DK scoring system based on odds
