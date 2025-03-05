@@ -169,7 +169,7 @@ def get_current_form(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "Cognizant_Classic_in_The_Palm_Beaches"
+    TOURNEY = "Arnold_Palmer_Invitational_presented_by_Mastercard"
     pga_url = TOURNAMENT_LIST_2025[TOURNEY]["pga-url"]
     url = f"https://www.pgatour.com/tournaments/2025/{pga_url}/field/current-form"
     df = get_current_form(url)

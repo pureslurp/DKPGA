@@ -36,7 +36,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "Cognizant_Classic_in_The_Palm_Beaches"
+TOURNEY = "Arnold_Palmer_Invitational_presented_by_Mastercard"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
