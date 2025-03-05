@@ -197,9 +197,10 @@ TOURNAMENT_LIST_2025 = {
         "Course": None,
         "pga-url": "cognizant-classic-in-the-palm-beaches/R2025010"
     },
-    "Arnold_Palmer_Invitational_pres._by_Mastercard": {
+    "Arnold_Palmer_Invitational_presented_by_Mastercard": {
         "ID": 401703498,
-        "Course": None
+        "Course": None,
+        "pga-url": "arnold-palmer-invitational-presented-by-mastercard/R2025009"
     },
     "Puerto_Rico_Open": {
         "ID": 401703499,
