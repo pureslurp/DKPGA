@@ -202,27 +202,77 @@ class DKLineupOptimizer:
                 for pos in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6']:
                     player = lineup[pos]['Name + ID']
                     if player in overexposed and player_counts[player] > max_appearances:
-                        # Calculate salary constraints for replacement
-                        current_salary = lineup['Salary'] - lineup[pos]['Salary']
-                        min_needed = min_salary - current_salary  # Minimum salary needed
-                        max_allowed = self.salary_cap - current_salary  # Maximum salary allowed
+                        original_salary = lineup[pos]['Salary']
                         
-                        # Filter replacement pool based on salary constraints
+                        # Check if this is the highest-salary player and if single swap is impossible
+                        is_highest_salary = all(lineup[p]['Salary'] <= original_salary 
+                                             for p in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6'])
+                        next_highest_salary = max(r['Salary'] for r in replacement_pool 
+                                               if r['Name + ID'] not in used_players)
+                        salary_gap = original_salary - next_highest_salary
+                        
+                        # If this is highest salary player and gap makes single swap impossible
+                        if is_highest_salary and salary_gap > 500:
+                            # Find the lowest-salary player in the lineup
+                            lowest_pos = min(
+                                [p for p in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6'] if p != pos],
+                                key=lambda p: lineup[p]['Salary']
+                            )
+                            lowest_salary = lineup[lowest_pos]['Salary']
+                            
+                            # Try to find two replacements that work
+                            valid_pairs = []
+                            for r1 in replacement_pool:
+                                if (player_counts.get(r1['Name + ID'], 0) >= max_appearances or 
+                                    r1['Name + ID'] in used_players):
+                                    continue
+                                    
+                                for r2 in replacement_pool:
+                                    if (r2['Name + ID'] == r1['Name + ID'] or 
+                                        player_counts.get(r2['Name + ID'], 0) >= max_appearances or 
+                                        r2['Name + ID'] in used_players):
+                                        continue
+                                        
+                                    new_salary = (lineup['Salary'] - original_salary - lowest_salary + 
+                                                r1['Salary'] + r2['Salary'])
+                                    
+                                    if 49500 <= new_salary <= 50000:
+                                        valid_pairs.append((r1, r2))
+                            
+                            if valid_pairs:
+                                # Sort pairs by combined total points
+                                valid_pairs.sort(key=lambda x: x[0]['Total'] + x[1]['Total'], reverse=True)
+                                r1, r2 = valid_pairs[0]
+                                
+                                # Make the swaps
+                                player_counts[player] -= 1
+                                player_counts[lineup[lowest_pos]['Name + ID']] -= 1
+                                player_counts[r1['Name + ID']] = player_counts.get(r1['Name + ID'], 0) + 1
+                                player_counts[r2['Name + ID']] = player_counts.get(r2['Name + ID'], 0) + 1
+                                
+                                lineup[pos] = r1
+                                lineup[lowest_pos] = r2
+                                lineup['Salary'] = (lineup['Salary'] - original_salary - lowest_salary + 
+                                                  r1['Salary'] + r2['Salary'])
+                                lineup['TotalPoints'] = sum(lineup[f'G{i+1}']['Total'] for i in range(6))
+                                used_players.add(r1['Name + ID'])
+                                used_players.add(r2['Name + ID'])
+                                changes_made = True
+                                continue
+                        
+                        # If double-swap not needed or failed, try regular single replacement
+                        current_salary = lineup['Salary'] - original_salary
                         valid_replacements = [
                             r for r in replacement_pool
-                            if (min_needed <= r['Salary'] <= max_allowed and  # Meets salary constraints
-                                player_counts.get(r['Name + ID'], 0) < max_appearances and  # Not overexposed
-                                r['Name + ID'] not in used_players)  # Not already in lineup
+                            if (49500 <= (current_salary + r['Salary']) <= 50000 and
+                                player_counts.get(r['Name + ID'], 0) < max_appearances and
+                                r['Name + ID'] not in used_players)
                         ]
                         
-                        # Sort by Total score (maintaining value while meeting salary constraints)
-                        valid_replacements.sort(key=lambda x: x['Total'], reverse=True)
-                        
                         if valid_replacements:
-                            replacement = valid_replacements[0]
+                            replacement = max(valid_replacements, key=lambda x: x['Total'])
                             replacement_id = replacement['Name + ID']
                             
-                            # Make the swap
                             player_counts[player] -= 1
                             player_counts[replacement_id] = player_counts.get(replacement_id, 0) + 1
                             lineup[pos] = replacement
