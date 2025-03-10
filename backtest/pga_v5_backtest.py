@@ -152,7 +152,7 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
     Test different weight combinations and return the top performers based on
     multiple metrics including success rate.
     """
-    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld", "Cognizant_Classic_in_The_Palm_Beaches"]
+    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld", "Cognizant_Classic_in_The_Palm_Beaches", "Arnold_Palmer_Invitational_presented_by_Mastercard"]
     weight_combinations = generate_weight_combinations()
     results_file = "backtest/pga_v5_backtest_results.csv"
     
@@ -320,13 +320,13 @@ if __name__ == "__main__":
             0.20 - 0.25     | Excellent
             0.25+           | Exceptional'''
 
-    # print("\n" + "=" * 50)
-    # print("Tournament-Specific Highlights:")
-    # for tournament in highlights:
-    #     print(f"\n{tournament}:")
-    #     print(f"  Best Average Score: {highlights[tournament]['avg']['score']:.2f}")
-    #     print(f"  Best Average Weights: {highlights[tournament]['avg']['weights']}")
-    #     print(f"  Best Single Lineup: {highlights[tournament]['best']['score']:.2f}")
-    #     print(f"  Best Single Weights: {highlights[tournament]['best']['weights']}")
-    #     print(f"  Best Success Rate: {highlights[tournament]['success']['rate']:.2%}")
-    #     print(f"  Best Success Weights: {highlights[tournament]['success']['weights']}")
+    print("\n" + "=" * 50)
+    print("Tournament-Specific Highlights:")
+    for tournament in highlights:
+        print(f"\n{tournament}:")
+        print(f"  Best Average Score: {highlights[tournament]['avg']['score']:.2f}")
+        print(f"  Best Average Weights: {highlights[tournament]['avg']['weights']}")
+        print(f"  Best Single Lineup: {highlights[tournament]['best']['score']:.2f}")
+        print(f"  Best Single Weights: {highlights[tournament]['best']['weights']}")
+        print(f"  Best Success Rate: {highlights[tournament]['success']['rate']:.2%}")
+        print(f"  Best Success Weights: {highlights[tournament]['success']['weights']}")
