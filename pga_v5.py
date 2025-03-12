@@ -754,6 +754,16 @@ def main(tourney: str, num_lineups: int = 150, weights: dict = None):
         dk_data['Top 20 Finish']
     )
 
+    # Apply logarithmic transformation before normalization to compress the range
+    dk_data['Normalized Odds'] = np.log1p(dk_data['Odds Total'])
+    dk_data['Normalized Odds'] = (dk_data['Normalized Odds'] - dk_data['Normalized Odds'].min()) / \
+        (dk_data['Normalized Odds'].max() - dk_data['Normalized Odds'].min())
+
+    # Alternative approach using softmax-inspired normalization
+    # temperature = 0.3  # Adjust this value to control the spread (lower = more compressed)
+    # dk_data['Normalized Odds'] = np.exp(dk_data['Odds Total'] / temperature)
+    # dk_data['Normalized Odds'] = dk_data['Normalized Odds'] / dk_data['Normalized Odds'].max()
+
     # Create golfers from DraftKings data
     golfers = [Golfer(row) for _, row in dk_data.iterrows()]
 
@@ -771,8 +781,6 @@ def main(tourney: str, num_lineups: int = 150, weights: dict = None):
     dk_data['Form Score'] = dk_data['Form Score'].fillna(0)
     
     # Normalize all components
-    dk_data['Normalized Odds'] = (dk_data['Odds Total'] - dk_data['Odds Total'].min()) / \
-        (dk_data['Odds Total'].max() - dk_data['Odds Total'].min())
     dk_data['Normalized Fit'] = (dk_data['Fit Score'] - dk_data['Fit Score'].min()) / \
         (dk_data['Fit Score'].max() - dk_data['Fit Score'].min())
     dk_data['Normalized History'] = (dk_data['History Score'] - dk_data['History Score'].min()) / \
