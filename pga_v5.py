@@ -15,6 +15,13 @@ from pga_stats import create_pga_stats
 from models import Golfer
 from utils import fix_names
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from functools import partial
+
+# Optimize pandas settings
+pd.options.mode.chained_assignment = None  # default='warn'
+pd.options.compute.use_bottleneck = True
+pd.options.compute.use_numexpr = True
 
 '''
 This is the main script that runs the PGA model for DraftKings
@@ -36,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "Arnold_Palmer_Invitational_presented_by_Mastercard"
+TOURNEY = "THE_PLAYERS_Championship"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -294,56 +301,44 @@ class DKLineupOptimizer:
 def optimize_dk_lineups(dk_merge: pd.DataFrame, num_lineups: int = 20) -> pd.DataFrame:
     """
     Main function to generate optimized DraftKings lineups
-    
-    Args:
-        dk_merge: DataFrame with merged odds and salary data
-        num_lineups: Number of lineups to generate
     """
-    # First, check for and handle NaN values
-    critical_columns = ['Name + ID', 'Salary', 'Total']
-    
-    # Print initial stats
-    print(f"\nInitial dataset size: {len(dk_merge)}")
-    
-    # Check for NaN values in each column
-    for col in critical_columns:
-        nan_count = dk_merge[col].isna().sum()
-        if nan_count > 0:
-            print(f"Found {nan_count} NaN values in {col}")
-            if col == 'Total':
-                # Fill NaN totals with 0
-                dk_merge[col] = dk_merge[col].fillna(0)
-                print(f"Filled NaN values in {col} with 0")
-            else:
-                # For other critical columns, we need to drop these rows
-                dk_merge = dk_merge.dropna(subset=[col])
-                print(f"Dropped rows with NaN in {col}")
-    
-    print(f"Final dataset size after handling NaN values: {len(dk_merge)}\n")
+    # Convert DataFrame to dictionary once, outside the loop
+    players = dk_merge.to_dict('records')
     
     # Create the optimizer and generate lineups
     optimizer = DKLineupOptimizer()
     lineups = optimizer.generate_lineups(dk_merge, num_lineups)
     
-    # Convert lineups to DataFrame format
-    lineup_rows = []
-    for lineup in lineups:
-        row = {}
-        for pos in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6']:
-            row[pos] = lineup[pos]['Name + ID']
-        row['Salary'] = lineup['Salary']
-        row['TotalPoints'] = lineup['TotalPoints']
-        lineup_rows.append(row)
-        
+    # Use list comprehension instead of appending in a loop
+    lineup_rows = [{
+        'G1': lineup['G1']['Name + ID'],
+        'G2': lineup['G2']['Name + ID'],
+        'G3': lineup['G3']['Name + ID'],
+        'G4': lineup['G4']['Name + ID'],
+        'G5': lineup['G5']['Name + ID'],
+        'G6': lineup['G6']['Name + ID'],
+        'Salary': lineup['Salary'],
+        'TotalPoints': lineup['TotalPoints']
+    } for lineup in lineups]
+    
     return pd.DataFrame(lineup_rows)
 
 def calculate_tournament_history_score(name: str, history_df: pd.DataFrame) -> float:
-    """
-    Calculate a tournament history score based on past performance.
-    Players with only old history (>3 years ago) are treated similar to new players.
-    """
-    # Get player's history
-    player_history = history_df[history_df['Name'].apply(fix_names) == fix_names(name)]
+    """Calculate tournament history score with caching"""
+    # Use class-level cache for fixed names
+    if not hasattr(calculate_tournament_history_score, 'name_cache'):
+        calculate_tournament_history_score.name_cache = {}
+    
+    # Cache the player history lookup
+    if name not in calculate_tournament_history_score.name_cache:
+        fixed_name = fix_names(name)
+        calculate_tournament_history_score.name_cache[name] = fixed_name
+    else:
+        fixed_name = calculate_tournament_history_score.name_cache[name]
+    
+    player_history = history_df[
+        history_df['Name'].map(calculate_tournament_history_score.name_cache) == fixed_name
+    ]
     
     # Get median score from players with recent history
     def has_recent_history(player):
@@ -587,6 +582,52 @@ def normalize_with_outlier_handling(series: pd.Series) -> pd.Series:
     
     return normalized
 
+def calculate_scores_parallel(golfers, tourney_history, course_fit_df, tourney: str, weights: dict):
+    """Calculate fit, history, and form scores in parallel"""
+    # Load data once before parallel processing
+    pga_stats = pd.read_csv(f'2025/{tourney}/pga_stats.csv')
+    current_form_df = None
+    current_form_path = f'2025/{tourney}/current_form.csv'
+    if os.path.exists(current_form_path):
+        current_form_df = pd.read_csv(current_form_path)
+
+    def process_golfer(golfer, pga_stats, current_form_df):  # Add parameters here
+        history_score = calculate_tournament_history_score(golfer.get_clean_name, tourney_history)
+        fit_score = calculate_fit_score_from_csv(golfer.get_clean_name, course_fit_df)
+        
+        # Calculate form score for this golfer
+        player_stats = pga_stats[pga_stats['Name'].apply(fix_names) == golfer.get_clean_name]
+        long_term_form = player_stats['sg_total'].iloc[0] if not player_stats.empty else 0
+        
+        current_form = 0
+        if current_form_df is not None:
+            player_data = current_form_df[current_form_df['Name'].apply(fix_names) == golfer.get_clean_name]
+            if len(player_data) > 0:
+                sg_columns = ['sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
+                current_form = player_data[sg_columns].sum(axis=1).iloc[0]
+        
+        # Calculate weighted form score
+        form_score = (current_form * weights['form']['current'] + 
+                     long_term_form * weights['form']['long'])
+        
+        return {
+            'Name': golfer.get_clean_name,
+            'History Score': history_score,
+            'Fit Score': fit_score,
+            'Form Score': form_score
+        }
+    
+    # Create a partial function with the loaded data
+    process_golfer_with_data = partial(process_golfer, 
+                                     pga_stats=pga_stats, 
+                                     current_form_df=current_form_df)
+    
+    with ThreadPoolExecutor(max_workers=min(32, len(golfers))) as executor:
+        futures = [executor.submit(process_golfer_with_data, golfer) for golfer in golfers]
+        results = [f.result() for f in as_completed(futures)]
+    
+    return pd.DataFrame(results)
+
 def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     """
     Main function for PGA optimization
@@ -647,9 +688,27 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     # Replace stats file creation logic with:
     create_pga_stats(TOURNEY)
 
+    # Load all data at once
+    data_files = {
+        'odds': f'2025/{tourney}/odds.csv',
+        'dk_salaries': f'2025/{tourney}/DKSalaries.csv',
+        'course_fit': f'2025/{tourney}/course_fit.csv'
+    }
+    
+    # Use dictionary comprehension for parallel loading
+    dfs = {
+        name: pd.read_csv(path) 
+        for name, path in data_files.items()
+    }
+    
+    # Pre-process names once
+    for df in dfs.values():
+        if 'Name' in df.columns:
+            df['Name'] = df['Name'].apply(fix_names)
+    
     # Read odds data and DraftKings salaries
-    odds_df = pd.read_csv(f'2025/{TOURNEY}/odds.csv')
-    dk_salaries = pd.read_csv(f'2025/{TOURNEY}/DKSalaries.csv')
+    odds_df = dfs['odds']
+    dk_salaries = dfs['dk_salaries']
     
     try:
         # Try tournament history first
@@ -668,10 +727,6 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     
     print(f"Loaded {len(odds_df)} players from odds data")
     print(f"Loaded {len(dk_salaries)} players from DraftKings data\n")
-    
-    # Clean up names in both dataframes
-    odds_df['Name'] = odds_df['Name'].apply(fix_names)
-    dk_salaries['Name'] = dk_salaries['Name'].apply(fix_names)
     
     # Merge odds with DraftKings data
     dk_data = pd.merge(dk_salaries, odds_df, on='Name', how='left')
@@ -699,55 +754,33 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
         dk_data['Top 20 Finish']
     )
 
-    print("Sample of odds calculations:")
-    print(dk_data[['Name', 'Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish', 'Odds Total']]
-          .sort_values('Odds Total', ascending=False)
-          .head(5)
-          .to_string())
-    print("\n")
+    # Apply logarithmic transformation before normalization to compress the range
+    dk_data['Normalized Odds'] = np.log1p(dk_data['Odds Total'])
+    dk_data['Normalized Odds'] = (dk_data['Normalized Odds'] - dk_data['Normalized Odds'].min()) / \
+        (dk_data['Normalized Odds'].max() - dk_data['Normalized Odds'].min())
+
+    # Alternative approach using softmax-inspired normalization
+    # temperature = 0.3  # Adjust this value to control the spread (lower = more compressed)
+    # dk_data['Normalized Odds'] = np.exp(dk_data['Odds Total'] / temperature)
+    # dk_data['Normalized Odds'] = dk_data['Normalized Odds'] / dk_data['Normalized Odds'].max()
 
     # Create golfers from DraftKings data
     golfers = [Golfer(row) for _, row in dk_data.iterrows()]
 
     # Load course fit data
     print(f"Loading course fit data for {TOURNEY}...")
-    course_fit_df = pd.read_csv(f'2025/{TOURNEY}/course_fit.csv')
+    course_fit_df = dfs['course_fit']
     print("Course fit data loaded successfully\n")
 
-    # Calculate fit scores and history scores for all golfers
-    fit_scores_data = []
-    history_scores = []
-    for golfer in golfers:
-        history_score = calculate_tournament_history_score(golfer.get_clean_name, tourney_history)
-            
-        # Calculate fit score from CSV data
-        fit_score = calculate_fit_score_from_csv(golfer.get_clean_name, course_fit_df)
-        golfer.set_fit_score(fit_score)
-        
-        fit_scores_data.append({
-            'Name': golfer.get_clean_name,
-            'Fit Score': fit_score
-        })
-        history_scores.append({
-            'Name': golfer.get_clean_name,
-            'History Score': history_score
-        })
+    # Calculate scores in parallel
+    print(f"Calculating scores in parallel for {len(golfers)} golfers...")
+    scores_df = calculate_scores_parallel(golfers, tourney_history, course_fit_df, TOURNEY, weights)
     
-    history_scores_df = pd.DataFrame(history_scores)
-    fit_scores_df = pd.DataFrame(fit_scores_data)
-    form_df = calculate_form_score(tourney, weights)
-
-
-    # Merge fit scores and history scores with dk_data
-    dk_data = pd.merge(dk_data, fit_scores_df, on='Name', how='left')
-    dk_data = pd.merge(dk_data, history_scores_df, on='Name', how='left')
-    dk_data = pd.merge(dk_data, form_df, on='Name', how='left')
+    # Merge scores with dk_data
+    dk_data = pd.merge(dk_data, scores_df, on='Name', how='left')
     dk_data['Form Score'] = dk_data['Form Score'].fillna(0)
     
-
     # Normalize all components
-    dk_data['Normalized Odds'] = (dk_data['Odds Total'] - dk_data['Odds Total'].min()) / \
-        (dk_data['Odds Total'].max() - dk_data['Odds Total'].min())
     dk_data['Normalized Fit'] = (dk_data['Fit Score'] - dk_data['Fit Score'].min()) / \
         (dk_data['Fit Score'].max() - dk_data['Fit Score'].min())
     dk_data['Normalized History'] = (dk_data['History Score'] - dk_data['History Score'].min()) / \
