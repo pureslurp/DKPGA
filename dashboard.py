@@ -250,7 +250,7 @@ def main():
     # Tournament selection using available tournaments
     selected_tournament = st.sidebar.selectbox(
         "Select Tournament",
-        get_available_tournaments(featured_tournament="Arnold_Palmer_Invitational_presented_by_Mastercard")
+        get_available_tournaments(featured_tournament="THE_PLAYERS_Championship")
     )
     
     # Add weight validation
@@ -390,7 +390,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
     '''
 
     # Get response from ChatGPT
-    display_chatgpt_insights(analysis_container, user_prompt, 'analysis_insights')
+    # display_chatgpt_insights(analysis_container, user_prompt, 'analysis_insights')
 
     # Add search/filter box
     search = st.text_input("Search Players")
@@ -437,7 +437,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         '''
 
         # Get response from ChatGPT
-        display_chatgpt_insights(odds_container, user_prompt, 'odds_insights')
+        # display_chatgpt_insights(odds_container, user_prompt, 'odds_insights')
 
         # Format the odds columns to show plus sign for positive values
         odds_columns = ['Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish']
@@ -470,7 +470,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         '''
 
         # Get response from ChatGPT
-        display_chatgpt_insights(fit_container, user_prompt, 'fit_insights')
+        # display_chatgpt_insights(fit_container, user_prompt, 'fit_insights')
 
         try:
             st.dataframe(
@@ -570,7 +570,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         '''
 
         # Get response from ChatGPT
-        display_chatgpt_insights(history_container, user_prompt, 'history_insights')
+        # display_chatgpt_insights(history_container, user_prompt, 'history_insights')
         
         # Create formatted dataframe
         display_df = history_data[display_columns].copy()
