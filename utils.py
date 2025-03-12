@@ -208,7 +208,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "THE_PLAYERS_Championship": {
         "ID": 401703500,
-        "Course": None
+        "Course": None,
+        "pga-url": "the-players-championship/R2025011"
     },
     "Valspar_Championship": {
         "ID": 401703501,

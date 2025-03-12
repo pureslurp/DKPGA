@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "Arnold_Palmer_Invitational_presented_by_Mastercard"
+TOURNEY = "THE_PLAYERS_Championship"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -628,7 +628,7 @@ def calculate_scores_parallel(golfers, tourney_history, course_fit_df, tourney: 
     
     return pd.DataFrame(results)
 
-def main(tourney: str, num_lineups: int = 150, weights: dict = None):
+def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     """
     Main function for PGA optimization
     
