@@ -440,7 +440,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         # display_chatgpt_insights(odds_container, user_prompt, 'odds_insights')
 
         # Format the odds columns to show plus sign for positive values
-        odds_columns = ['Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish']
+        odds_columns = [col for col in odds_data.columns if col != 'Name']  # Get all columns except 'Name'
         for col in odds_columns:
             odds_data[col] = odds_data[col].apply(lambda x: f"+{x}" if x > 0 else str(x))
         
@@ -538,23 +538,39 @@ Higher values emphasize recent performance metrics, combining both short-term (l
             history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
 
              # Format the columns for better display
-            display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 
-                            'sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
-                            'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
+            display_columns = ['Name']
+            
+            # Add any year columns that exist in the data
+            year_columns = [col for col in history_data.columns if col in ['24', '2022-23', '2021-22', '2020-21', '2019-20']]
+            display_columns.extend(year_columns)
+            
+            # Add the remaining stat columns
+            stat_columns = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
+                          'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
+            display_columns.extend([col for col in stat_columns if col in history_data.columns])
             
             # Format numeric columns to show fewer decimal places
-            numeric_cols = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
-                        'avg_finish', 'made_cuts_pct']
+            numeric_cols = [col for col in ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
+                                          'avg_finish', 'made_cuts_pct'] if col in history_data.columns]
         except:
             history_data = pd.read_csv(f"2025/{selected_tournament}/course_history.csv")
             st.write("Note: This tournament is not traditionally played on this course, so the history represents the last 5 times this **course** was played. The years in the column headers are not accurate, it is just the last 5 times")
 
             # Format the columns for better display
-            display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 
-                             'avg_finish', 'measured_years', 'made_cuts_pct']
+            display_columns = ['Name']
+            
+            # Add any year columns that exist in the data
+            year_columns = [col for col in history_data.columns if col in ['24', '2022-23', '2021-22', '2020-21', '2019-20']]
+            display_columns.extend(year_columns)
+            
+            # Add the remaining stat columns
+            stat_columns = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
+                          'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
+            display_columns.extend([col for col in stat_columns if col in history_data.columns])
             
             # Format numeric columns to show fewer decimal places
-            numeric_cols = ['avg_finish', 'made_cuts_pct']
+            numeric_cols = [col for col in ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
+                                          'avg_finish', 'made_cuts_pct'] if col in history_data.columns]
         # Create container for odds insights
         history_container = st.empty()
         
