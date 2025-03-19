@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "THE_PLAYERS_Championship"
+TOURNEY = "Valspar_Championship"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -51,11 +51,22 @@ def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     top 5: 14
     top 10: 7
     top 20: 5
+    
+    Returns 0 if column is None, NaN, or otherwise invalid
     '''
-    if col < 0:
-        final_line = (col/-110)
-    else:
-        final_line = (100/col)
+    # Return 0 if column is None, NaN, or invalid
+    if pd.isna(col) or col is None:
+        return 0
+    
+    try:
+        if col < 0:
+            final_line = (col/-110)
+        else:
+            final_line = (100/col)
+    except (TypeError, ValueError):
+        return 0
+        
+    # Only calculate scores for columns that exist in the data
     match header:
         case "Tournament Winner":
             return round(final_line * 30 * w, 3)
@@ -65,6 +76,8 @@ def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
             return round(final_line * 7 * t10, 3)
         case "Top 20 Finish":
             return round(final_line * 5 * t20, 3)
+        case _:
+            return 0
 
 class DKLineupOptimizer:
     def __init__(self, salary_cap: int = 50000, lineup_size: int = 6):
@@ -379,6 +392,8 @@ def calculate_tournament_history_score(name: str, history_df: pd.DataFrame) -> f
 def calculate_tournament_history_score_internal(player_history: pd.Series, history_df: pd.DataFrame) -> float:
     """Internal function to calculate tournament history score for a player with history"""
     years = ['24', '2022-23', '2021-22', '2020-21', '2019-20']
+    recent_years = ['24', '2022-23', '2021-22']
+    old_years = ['2020-21', '2019-20']
     weights = [1.0, 0.8, 0.6, 0.4, 0.2]
     
     # Calculate perfect score benchmark
@@ -388,6 +403,7 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
     total_weight = 0.0
     appearances = 0
     good_finishes = 0
+    penalty_weight = 0.0  # Track penalty for missing years
     
     for year, weight in zip(years, weights):
         if year in history_df.columns:
@@ -401,24 +417,30 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
                         if finish <= 15:
                             good_finishes += 1
                     except (ValueError, TypeError):
+                        # Add penalty for invalid/missing finish
+                        penalty_weight += weight * 0.15
                         continue
                 
                 appearances += 1
                 
-                if finish <= 60:
-                    points = max(0, 100 - ((finish - 1) * (100/60)))
+                if finish <= 50:
+                    points = max(0, 100 - ((finish - 1) * (100/50)))
                 else:
                     points = 0
                 
                 finish_points += points * weight
                 total_weight += weight
+            else:
+                # Add penalty for missing year
+                penalty_weight += weight * 0.15
     
     # Calculate base finish score normalized to our perfect score benchmark
-    base_finish_score = ((finish_points / total_weight) / perfect_score * 50) if total_weight > 0 else 0
+    # Include penalty weight in denominator
+    base_finish_score = ((finish_points / (total_weight + penalty_weight)) / perfect_score * 50) if (total_weight + penalty_weight) > 0 else 0
     
-    # After calculating base_finish_score
-    if appearances == 1:
-        base_finish_score = base_finish_score * 0.95  # 5% reduction for single appearance
+    # # After calculating base_finish_score
+    # if appearances == 1:
+    #     base_finish_score = base_finish_score * 0.95  # 5% reduction for single appearance
     
     # Apply bonus for multiple good finishes
     if good_finishes >= 2:
@@ -428,31 +450,45 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
         finish_score = base_finish_score
     
     # Calculate SG score (max 30 points)
-    sg_stats = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting']
-    sg_weights = [0.25, 0.35, 0.25, 0.15]
-    
     try:
-        sg_score = 0.0
-        valid_sg_stats = 0
-        for stat, weight in zip(sg_stats, sg_weights):
-            if stat in history_df.columns:
-                sg_val = player_history[stat]
-                if pd.notna(sg_val):
-                        normalized_sg = min(100, max(0, (sg_val + 2) * 25))
-                        sg_score += normalized_sg * weight
-                        valid_sg_stats += 1
+        sg_val = player_history['sg_total']
+        if pd.notna(sg_val):
+            # Normalize sg_total to 0-100 scale using max of 3, and apply 0.3 multiplier for max 30 points
+            sg_score = min(100, max(0, (sg_val / 3) * 100)) * 0.3
+        else:
+            sg_score = 0.0
     except:
         sg_score = 0.0
-        valid_sg_stats = 0
-    
-    sg_score = sg_score * 0.3 if valid_sg_stats > 0 else 0
     
     # Calculate consistency score (max 20 points)
     consistency_score = 0
     if appearances > 0:
-        made_cuts_pct = player_history['made_cuts_pct'] if 'made_cuts_pct' in history_df.columns else 0
-        max_consistency_points = 15 if appearances == 1 else 20
-        consistency_score = made_cuts_pct * max_consistency_points
+        # Calculate made cuts percentage with reduced penalty for older missed cuts
+        recent_cuts = 0
+        recent_total = 0
+        old_cuts = 0
+        old_total = 0
+        
+        for year in recent_years:
+            if year in history_df.columns and pd.notna(player_history[year]):
+                recent_total += 1
+                if not (isinstance(player_history[year], str) and player_history[year].upper() == 'CUT'):
+                    recent_cuts += 1
+        
+        for year in old_years:
+            if year in history_df.columns and pd.notna(player_history[year]):
+                old_total += 1
+                if not (isinstance(player_history[year], str) and player_history[year].upper() == 'CUT'):
+                    old_cuts += 1
+        
+        # Calculate made cuts percentage with old cuts counting as 0.5 cuts made
+        total_weighted_cuts = recent_cuts + (old_cuts + (old_total - old_cuts) * 0.5)
+        total_rounds = recent_total + old_total
+        
+        if total_rounds > 0:
+            made_cuts_pct = total_weighted_cuts / total_rounds
+            max_consistency_points = 15 if appearances == 1 else (17.5 if appearances == 2 else 20)
+            consistency_score = made_cuts_pct * max_consistency_points
     
     total_score = finish_score + sg_score + consistency_score
     
@@ -733,20 +769,22 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     print(f"After merging: {len(dk_data)} players\n")
     
     # Calculate odds total using provided weights
-    dk_data['Tournament Winner'] = dk_data['Tournament Winner'].apply(
-        lambda x: odds_to_score(x, "Tournament Winner", w=weights['odds']['winner']))
-    dk_data['Top 5 Finish'] = dk_data['Top 5 Finish'].apply(
-        lambda x: odds_to_score(x, "Top 5 Finish", t5=weights['odds']['top5']))
-    dk_data['Top 10 Finish'] = dk_data['Top 10 Finish'].apply(
-        lambda x: odds_to_score(x, "Top 10 Finish", t10=weights['odds']['top10']))
-    dk_data['Top 20 Finish'] = dk_data['Top 20 Finish'].apply(
-        lambda x: odds_to_score(x, "Top 20 Finish", t20=weights['odds']['top20']))
+    odds_columns = {
+        'Tournament Winner': weights['odds']['winner'],
+        'Top 5 Finish': weights['odds']['top5'],
+        'Top 10 Finish': weights['odds']['top10'],
+        'Top 20 Finish': weights['odds']['top20']
+    }
     
-    # Fill NaN values with 0 for each odds column
-    odds_columns = ['Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish']
+    # Initialize odds columns with 0
     for col in odds_columns:
-        dk_data[col] = dk_data[col].fillna(0)
+        if col not in dk_data.columns:
+            dk_data[col] = 0
+        else:
+            dk_data[col] = dk_data[col].apply(
+                lambda x: odds_to_score(x, col, w=odds_columns[col]))
     
+    # Calculate Odds Total
     dk_data['Odds Total'] = (
         dk_data['Tournament Winner'] +
         dk_data['Top 5 Finish'] + 
