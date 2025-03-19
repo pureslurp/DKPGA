@@ -213,7 +213,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "Valspar_Championship": {
         "ID": 401703501,
-        "Course": None
+        "Course": None,
+        "pga-url": "valspar-championship/R2025475"
     },
     "Texas_Children's_Houston_Open": {
         "ID": 401703502,
