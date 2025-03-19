@@ -26,7 +26,7 @@ Output:
 
 def parse_finishes(row_data: Dict[str, str]) -> Dict[str, float]:
     """Parse finishing positions for last 5 years"""
-    years = ["24", "2022-23", "2021-22", "2020-21", "2019-20"]
+    years = ["24", "2022-23", "2021-22", "2020-21"]
     finishes = {}
     
     for year in years:
@@ -98,7 +98,7 @@ def extract_player_data(html_table: BeautifulSoup) -> pd.DataFrame:
             text = button.text.strip()
             
             # Check if it's a year
-            if text in ['24', '2022-23', '2021-22', '2020-21', '2019-20']:
+            if text in ['24', '2022-23', '2021-22', '2020-21']:
                 available_years.append(text)
             # Check if it's the rounds column (marks start of SG stats)
             elif text == 'Rounds':
@@ -179,7 +179,7 @@ def extract_player_data(html_table: BeautifulSoup) -> pd.DataFrame:
 def format_tournament_history(df: pd.DataFrame) -> pd.DataFrame:
     """Format tournament history data for analysis"""
     # Calculate average finish (excluding DNPs)
-    finish_cols = ['24', '2022-23', '2021-22', '2020-21', '2019-20']
+    finish_cols = ['24', '2022-23', '2021-22', '2020-21']
     df['avg_finish'] = df[finish_cols].replace('CUT', 65).astype(float).mean(axis=1, skipna=True)
     
     # Calculate measured years (number of tournaments played)
