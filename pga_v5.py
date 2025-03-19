@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "THE_PLAYERS_Championship"
+TOURNEY = "Valspar_Championship"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -51,11 +51,22 @@ def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     top 5: 14
     top 10: 7
     top 20: 5
+    
+    Returns 0 if column is None, NaN, or otherwise invalid
     '''
-    if col < 0:
-        final_line = (col/-110)
-    else:
-        final_line = (100/col)
+    # Return 0 if column is None, NaN, or invalid
+    if pd.isna(col) or col is None:
+        return 0
+    
+    try:
+        if col < 0:
+            final_line = (col/-110)
+        else:
+            final_line = (100/col)
+    except (TypeError, ValueError):
+        return 0
+        
+    # Only calculate scores for columns that exist in the data
     match header:
         case "Tournament Winner":
             return round(final_line * 30 * w, 3)
@@ -65,6 +76,8 @@ def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
             return round(final_line * 7 * t10, 3)
         case "Top 20 Finish":
             return round(final_line * 5 * t20, 3)
+        case _:
+            return 0
 
 class DKLineupOptimizer:
     def __init__(self, salary_cap: int = 50000, lineup_size: int = 6):
@@ -733,20 +746,22 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     print(f"After merging: {len(dk_data)} players\n")
     
     # Calculate odds total using provided weights
-    dk_data['Tournament Winner'] = dk_data['Tournament Winner'].apply(
-        lambda x: odds_to_score(x, "Tournament Winner", w=weights['odds']['winner']))
-    dk_data['Top 5 Finish'] = dk_data['Top 5 Finish'].apply(
-        lambda x: odds_to_score(x, "Top 5 Finish", t5=weights['odds']['top5']))
-    dk_data['Top 10 Finish'] = dk_data['Top 10 Finish'].apply(
-        lambda x: odds_to_score(x, "Top 10 Finish", t10=weights['odds']['top10']))
-    dk_data['Top 20 Finish'] = dk_data['Top 20 Finish'].apply(
-        lambda x: odds_to_score(x, "Top 20 Finish", t20=weights['odds']['top20']))
+    odds_columns = {
+        'Tournament Winner': weights['odds']['winner'],
+        'Top 5 Finish': weights['odds']['top5'],
+        'Top 10 Finish': weights['odds']['top10'],
+        'Top 20 Finish': weights['odds']['top20']
+    }
     
-    # Fill NaN values with 0 for each odds column
-    odds_columns = ['Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish']
+    # Initialize odds columns with 0
     for col in odds_columns:
-        dk_data[col] = dk_data[col].fillna(0)
+        if col not in dk_data.columns:
+            dk_data[col] = 0
+        else:
+            dk_data[col] = dk_data[col].apply(
+                lambda x: odds_to_score(x, col, w=odds_columns[col]))
     
+    # Calculate Odds Total
     dk_data['Odds Total'] = (
         dk_data['Tournament Winner'] +
         dk_data['Top 5 Finish'] + 
