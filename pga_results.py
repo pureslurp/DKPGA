@@ -3,7 +3,7 @@ from backtest.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "Arnold_Palmer_Invitational_presented_by_Mastercard"
+tournament = "THE_PLAYERS_Championship"
 
 # Get results data
 try:
