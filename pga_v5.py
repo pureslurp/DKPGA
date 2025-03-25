@@ -396,47 +396,44 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
     old_years = ['2020-21', '2019-20']
     weights = [1.0, 0.8, 0.6, 0.4, 0.2]
     
-    # Calculate perfect score benchmark
-    perfect_score = 95
     
     finish_points = 0.0
-    total_weight = 0.0
     appearances = 0
+    total_possible = 0.0
     good_finishes = 0
-    penalty_weight = 0.0  # Track penalty for missing years
     
     for year, weight in zip(years, weights):
         if year in history_df.columns:
             finish = player_history[year]
             if pd.notna(finish):
+                # Count appearance
+                appearances += 1
+                
+                # Convert finish to points and count good finishes
                 if isinstance(finish, str) and finish.upper() == 'CUT':
-                    finish = 65
+                    points = 0
                 else:
                     try:
                         finish = float(finish)
+                        # Count good finishes (top 15)
                         if finish <= 15:
                             good_finishes += 1
+                            
+                        if finish <= 50:
+                            points = max(0, 100 - ((finish - 1) * (100/50)))
+                        else:
+                            points = 0
                     except (ValueError, TypeError):
-                        # Add penalty for invalid/missing finish
-                        penalty_weight += weight * 0.15
                         continue
                 
-                appearances += 1
-                
-                if finish <= 50:
-                    points = max(0, 100 - ((finish - 1) * (100/50)))
-                else:
-                    points = 0
-                
                 finish_points += points * weight
-                total_weight += weight
+                total_possible += 100 * weight  # Add full weight for played years
             else:
-                # Add penalty for missing year
-                penalty_weight += weight * 0.15
+                # Add penalty weight to denominator for missing years
+                total_possible += 100 * (weight * 0.15)
     
-    # Calculate base finish score normalized to our perfect score benchmark
-    # Include penalty weight in denominator
-    base_finish_score = ((finish_points / (total_weight + penalty_weight)) / perfect_score * 50) if (total_weight + penalty_weight) > 0 else 0
+    # Calculate base finish score
+    base_finish_score = (finish_points / total_possible * 50) if total_possible > 0 else 0
     
     # # After calculating base_finish_score
     # if appearances == 1:
@@ -444,7 +441,7 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
     
     # Apply bonus for multiple good finishes
     if good_finishes >= 2:
-        bonus = min(good_finishes - 1, 3) * 0.1
+        bonus = min(good_finishes, 3) * 0.1
         finish_score = base_finish_score * (1 + bonus)
     else:
         finish_score = base_finish_score
@@ -452,9 +449,22 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
     # Calculate SG score (max 30 points)
     try:
         sg_val = player_history['sg_total']
-        if pd.notna(sg_val):
-            # Normalize sg_total to 0-100 scale using max of 3, and apply 0.3 multiplier for max 30 points
-            sg_score = min(100, max(0, (sg_val / 3) * 100)) * 0.3
+        rounds_played = player_history['rounds']
+        
+        if pd.notna(sg_val) and pd.notna(rounds_played):
+            # Calculate base SG score
+            base_sg_score = min(100, max(0, (sg_val / 3) * 100)) * 0.3
+            
+            # Apply rounds played multiplier
+            if rounds_played <= 4:
+                rounds_multiplier = 0.75  # 75% for 4 rounds or less
+            elif rounds_played <= 6:
+                # Linear interpolation between 75% and 100% for 4-8 rounds
+                rounds_multiplier = 0.75 + (0.25 * ((rounds_played - 4) / 4))
+            else:
+                rounds_multiplier = 1.0  # Full score for 8+ rounds
+            
+            sg_score = base_sg_score * rounds_multiplier
         else:
             sg_score = 0.0
     except:
@@ -491,6 +501,10 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
             consistency_score = made_cuts_pct * max_consistency_points
     
     total_score = finish_score + sg_score + consistency_score
+    
+    # Save debug info
+    with open('tournament_history_debug.csv', 'a') as f:
+        f.write(f"{player_history['Name']},{finish_score},{sg_score},{consistency_score},{total_score}\n")
     
     return min(100, total_score)
 
