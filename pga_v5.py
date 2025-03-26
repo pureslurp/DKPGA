@@ -458,7 +458,7 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
             # Apply rounds played multiplier
             if rounds_played <= 4:
                 rounds_multiplier = 0.75  # 75% for 4 rounds or less
-            elif rounds_played <= 6:
+            elif rounds_played <= 8:
                 # Linear interpolation between 75% and 100% for 4-8 rounds
                 rounds_multiplier = 0.75 + (0.25 * ((rounds_played - 4) / 4))
             else:
