@@ -218,7 +218,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "Texas_Children's_Houston_Open": {
         "ID": 401703502,
-        "Course": None
+        "Course": None,
+        "pga-url": "texas-childrens-houston-open/R2025020"
     },
     "Valero_Texas_Open": {
         "ID": 401703503,
