@@ -714,10 +714,10 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
             'long': 0.3
         },
         'components': {
-            'odds': 0.25,
-            'fit': 0.25,
-            'history': 0.25,
-            'form': 0.25
+            'odds': 0.4,
+            'fit': 0.2,
+            'history': 0.2,
+            'form': 0.2
         }
     }
     
