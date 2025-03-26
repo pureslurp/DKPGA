@@ -501,11 +501,7 @@ def calculate_tournament_history_score_internal(player_history: pd.Series, histo
             consistency_score = made_cuts_pct * max_consistency_points
     
     total_score = finish_score + sg_score + consistency_score
-    
-    # Save debug info
-    with open('tournament_history_debug.csv', 'a') as f:
-        f.write(f"{player_history['Name']},{finish_score},{sg_score},{consistency_score},{total_score}\n")
-    
+
     return min(100, total_score)
 
 def get_current_tuesday() -> datetime:
