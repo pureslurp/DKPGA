@@ -714,9 +714,9 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
             'long': 0.3
         },
         'components': {
-            'odds': 0.5,
-            'fit': 0.2,
-            'history': 0.1,
+            'odds': 0.0,
+            'fit': 0.5,
+            'history': 0.3,
             'form': 0.2
         }
     }
