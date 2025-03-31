@@ -223,7 +223,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "Valero_Texas_Open": {
         "ID": 401703503,
-        "Course": None
+        "Course": None,
+        "pga-url": "valero-texas-open/R2025041"
     },
     "Masters_Tournament": {
         "ID": 401703504,
