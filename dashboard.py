@@ -250,7 +250,7 @@ def main():
     # Tournament selection using available tournaments
     selected_tournament = st.sidebar.selectbox(
         "Select Tournament",
-        get_available_tournaments(featured_tournament="Texas_Children's_Houston_Open")
+        get_available_tournaments(featured_tournament="Valero_Texas_Open")
     )
     
     # Add weight validation

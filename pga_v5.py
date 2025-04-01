@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "Texas_Children's_Houston_Open"
+TOURNEY = "Valero_Texas_Open"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -122,10 +122,10 @@ class DKLineupOptimizer:
             # Constraint 3: Must meet minimum salary
             prob += pulp.lpSum([decisions[p['Name + ID']] * p['Salary'] for p in players]) >= min_salary
             
-            # Constraint 4: Maximum one player over $10000
-            expensive_players = [p for p in players if p['Salary'] >= 9800]
+            # Constraint 4: Must have exactly one player over $9900
+            expensive_players = [p for p in players if p['Salary'] >= 9900]
             if expensive_players:
-                prob += pulp.lpSum([decisions[p['Name + ID']] for p in expensive_players]) <= 1
+                prob += pulp.lpSum([decisions[p['Name + ID']] for p in expensive_players]) == 1
             
             # Constraint 5: No players below lowest salary tier
             cheap_threshold = 6400 if min_salary >= 6000 else 6000
