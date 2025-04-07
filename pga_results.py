@@ -3,7 +3,7 @@ from backtest.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "Texas_Children's_Houston_Open"
+tournament = "Valero_Texas_Open"
 
 # Get results data
 try:
