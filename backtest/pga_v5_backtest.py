@@ -229,7 +229,7 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
     Test different weight combinations and return the top performers based on
     multiple metrics including success score.
     """
-    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld", "Cognizant_Classic_in_The_Palm_Beaches", "Arnold_Palmer_Invitational_presented_by_Mastercard", "THE_PLAYERS_Championship", "Valspar_Championship", "Texas_Children's_Houston_Open"]
+    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld", "Cognizant_Classic_in_The_Palm_Beaches", "Arnold_Palmer_Invitational_presented_by_Mastercard", "THE_PLAYERS_Championship", "Valspar_Championship", "Texas_Children's_Houston_Open", "Valero_Texas_Open"]
     tournaments = tournaments[-5:]
     weight_combinations = generate_weight_combinations()
     results_file = "backtest/pga_v5_backtest_results.csv"
