@@ -116,7 +116,7 @@ class DataGolfScraper:
         finally:
             driver.quit()
     
-    def save_to_csv(self, df, tourney, filename='course_fit.csv'):
+    def save_to_csv(self, df, tourney, filename='course_fit_dg.csv'):
         """Save the DataFrame to a CSV file in the tournament directory"""
         if df is not None:
             # Create directory path
@@ -146,5 +146,5 @@ def main(tourney):
         print("Failed to scrape data")
 
 if __name__ == "__main__":
-    tourney = "Genesis_Invitational"
+    tourney = "Valero_Texas_Open"
     main(tourney)

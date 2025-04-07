@@ -226,6 +226,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "Valero_Texas_Open": {
         "ID": 401703503,
+        "Course": None,
+        "pga-url": "valero-texas-open/R2025041",
         "Course": "TPC_San_Antonio_(Oaks_Course)"
     },
     "Masters_Tournament": {
@@ -393,5 +395,7 @@ def fix_names(name):
         return "rasmus hojgaard"
     elif name == "Thorbjørn Olesen":
         return "thorbjorn olesen"
+    elif name == "k.h. lee":
+        return "kyoung-hoon lee"
     else:
         return name.lower()
