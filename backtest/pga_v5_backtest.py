@@ -93,34 +93,36 @@ def get_prize_for_placement(placement: int) -> float:
 
 def estimate_placement(achievement_ratio: float, tournament: str = None) -> int:
     """
-    Estimate placement based on achievement ratio using tournament-specific thresholds if available.
-    Falls back to default thresholds (95% = 1st, 65% = min cash) if tournament data not available.
+    Estimate placement using a power law distribution to create natural clustering
+    at different achievement levels
     """
-    # Default thresholds
-    first_place_ratio = 0.95
-    min_cash_ratio = 0.65
-
-    # Try to load tournament-specific thresholds
-    if tournament:
-        thresholds_file = "backtest/tournament_thresholds.csv"
-        if os.path.exists(thresholds_file):
-            thresholds_df = pd.read_csv(thresholds_file)
-            tournament_data = thresholds_df[thresholds_df['tournament'] == tournament]
-            
-            if not tournament_data.empty:
-                optimal_score = tournament_data['optimal_score'].iloc[0]
-                first_place_ratio = tournament_data['first_place_threshold'].iloc[0] / optimal_score
-                min_cash_ratio = tournament_data['min_cash_threshold'].iloc[0] / optimal_score
-
-    if achievement_ratio >= first_place_ratio: return 1
-    if achievement_ratio < min_cash_ratio: return 5029  # Out of money
+    PAID_ENTRIES = 5028  # Number of places that get paid
     
-    # Linear interpolation between min cash and first place thresholds
-    ratio_range = first_place_ratio - min_cash_ratio
-    placement_range = 5028 - 1
-    normalized_ratio = (achievement_ratio - min_cash_ratio) / ratio_range
-    estimated_placement = int(5028 - (normalized_ratio * placement_range))
-    return estimated_placement
+    if achievement_ratio >= 0.95:  # Exceptional performance
+        return 1
+    elif achievement_ratio < 0.65:  # Below min cash
+        return PAID_ENTRIES + 1  # Out of money
+        
+    # Normalize ratio between min cash (0.65) and top score (0.95)
+    normalized_ratio = (achievement_ratio - 0.65) / (0.95 - 0.65)
+    
+    # Apply power law transformation
+    power = 4.4
+    
+    # Calculate placement using power law
+    # Now using normalized_ratio^power directly instead of (1 - normalized_ratio^power)
+    place = int((1 - normalized_ratio)**power * PAID_ENTRIES)
+    place = max(1, min(PAID_ENTRIES, place))
+    
+    # Debug print for high scores
+    if achievement_ratio * 524 > 425:
+        print(f"\nHigh score detected:")
+        print(f"  Raw score: {achievement_ratio * 524:.2f}")
+        print(f"  Achievement ratio: {achievement_ratio:.3f}")
+        print(f"  Estimated place: {place}")
+        print(f"  Prize: ${get_prize_for_placement(place):.2f}")
+    
+    return place
 
 def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame, tournament_highlights: Dict, weights: Dict) -> Tuple[float, float, float, Dict]:
     """
