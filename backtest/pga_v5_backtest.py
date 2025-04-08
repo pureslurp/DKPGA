@@ -107,15 +107,22 @@ def estimate_placement(achievement_ratio: float, tournament: str = None) -> int:
     normalized_ratio = (achievement_ratio - 0.65) / (0.95 - 0.65)
     
     # Apply power law transformation
-    # Lower power = more spread at top end
-    # Higher power = more compression at bottom end
-    power = 2.5
+    power = 4.4
     
     # Calculate placement using power law
-    # This will create natural clusters at different achievement levels
-    place = int((1 - normalized_ratio**power) * PAID_ENTRIES)
+    # Now using normalized_ratio^power directly instead of (1 - normalized_ratio^power)
+    place = int((1 - normalized_ratio)**power * PAID_ENTRIES)
+    place = max(1, min(PAID_ENTRIES, place))
     
-    return max(1, min(PAID_ENTRIES, place))
+    # Debug print for high scores
+    if achievement_ratio * 524 > 425:
+        print(f"\nHigh score detected:")
+        print(f"  Raw score: {achievement_ratio * 524:.2f}")
+        print(f"  Achievement ratio: {achievement_ratio:.3f}")
+        print(f"  Estimated place: {place}")
+        print(f"  Prize: ${get_prize_for_placement(place):.2f}")
+    
+    return place
 
 def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame, tournament_highlights: Dict, weights: Dict) -> Tuple[float, float, float, Dict]:
     """
