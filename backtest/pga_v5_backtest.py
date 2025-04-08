@@ -62,31 +62,120 @@ def get_tournament_optimal_score(tournament: str) -> float:
         print(f"Warning: Couldn't calculate optimal score for {tournament}: {str(e)}")
         return 0.0
 
+def get_prize_for_placement(placement: int) -> float:
+    """Calculate prize money for a given placement."""
+    if placement <= 1: return 5000.00
+    elif placement <= 2: return 2500.00
+    elif placement <= 3: return 1500.00
+    elif placement <= 4: return 1000.00
+    elif placement <= 5: return 750.00
+    elif placement <= 7: return 600.00
+    elif placement <= 10: return 500.00
+    elif placement <= 13: return 400.00
+    elif placement <= 16: return 300.00
+    elif placement <= 19: return 250.00
+    elif placement <= 22: return 200.00
+    elif placement <= 25: return 150.00
+    elif placement <= 30: return 100.00
+    elif placement <= 35: return 75.00
+    elif placement <= 45: return 60.00
+    elif placement <= 55: return 50.00
+    elif placement <= 70: return 40.00
+    elif placement <= 85: return 30.00
+    elif placement <= 105: return 25.00
+    elif placement <= 135: return 20.00
+    elif placement <= 200: return 15.00
+    elif placement <= 400: return 10.00
+    elif placement <= 870: return 8.00
+    elif placement <= 1870: return 6.00
+    elif placement <= 5028: return 5.00
+    return 0.00
+
+def estimate_placement(achievement_ratio: float, tournament: str = None) -> int:
+    """
+    Estimate placement using a power law distribution to create natural clustering
+    at different achievement levels
+    """
+    PAID_ENTRIES = 5028  # Number of places that get paid
+    
+    if achievement_ratio >= 0.95:  # Exceptional performance
+        return 1
+    elif achievement_ratio < 0.65:  # Below min cash
+        return PAID_ENTRIES + 1  # Out of money
+        
+    # Normalize ratio between min cash (0.65) and top score (0.95)
+    normalized_ratio = (achievement_ratio - 0.65) / (0.95 - 0.65)
+    
+    # Apply power law transformation
+    power = 4.4
+    
+    # Calculate placement using power law
+    # Now using normalized_ratio^power directly instead of (1 - normalized_ratio^power)
+    place = int((1 - normalized_ratio)**power * PAID_ENTRIES)
+    place = max(1, min(PAID_ENTRIES, place))
+    
+    # Debug print for high scores
+    if achievement_ratio * 524 > 425:
+        print(f"\nHigh score detected:")
+        print(f"  Raw score: {achievement_ratio * 524:.2f}")
+        print(f"  Achievement ratio: {achievement_ratio:.3f}")
+        print(f"  Estimated place: {place}")
+        print(f"  Prize: ${get_prize_for_placement(place):.2f}")
+    
+    return place
+
 def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame, tournament_highlights: Dict, weights: Dict) -> Tuple[float, float, float, Dict]:
     """
-    Calculate lineup performance metrics including success rate based on optimal score.
-    Returns (average_dk_points, best_lineup_points, success_rate, updated_highlights)
+    Calculate lineup performance metrics including expected value based on optimal score.
+    Returns (average_dk_points, best_lineup_points, expected_value, updated_highlights)
     """
     # Get tournament ID from TOURNAMENT_LIST_2025
     tournament_id = TOURNAMENT_LIST_2025[tournament]['ID']
     results_file = f"past_results/2025/dk_points_id_{tournament_id}.csv"
+    thresholds_file = "backtest/tournament_thresholds.csv"
     
     if not os.path.exists(results_file):
         print(f"Warning: No results file found for {tournament} (ID: {tournament_id})")
         return 0.0, 0.0, 0.0, tournament_highlights
     
-    # Calculate optimal score and success threshold (70% of optimal)
+    # Calculate optimal score
     optimal_score = get_tournament_optimal_score(tournament)
+    
+    # Only calculate and save tournament thresholds if not already in file
+    if optimal_score > 0:
+        if os.path.exists(thresholds_file):
+            existing_df = pd.read_csv(thresholds_file)
+            if tournament not in existing_df['tournament'].values:
+                thresholds_data = {
+                    'tournament': [tournament],
+                    'optimal_score': [optimal_score],
+                    'min_cash_threshold': [optimal_score * 0.65],  # 65% threshold
+                    'first_place_threshold': [optimal_score * 0.95],  # 95% threshold
+                }
+                thresholds_df = pd.DataFrame(thresholds_data)
+                thresholds_df = pd.concat([existing_df, thresholds_df], ignore_index=True)
+                thresholds_df.to_csv(thresholds_file, index=False)
+        else:
+            # Create new file if it doesn't exist
+            thresholds_data = {
+                'tournament': [tournament],
+                'optimal_score': [optimal_score],
+                'min_cash_threshold': [optimal_score * 0.65],
+                'first_place_threshold': [optimal_score * 0.95],
+            }
+            pd.DataFrame(thresholds_data).to_csv(thresholds_file, index=False)
+    
+    # Calculate optimal score and success threshold (70% of optimal)
     success_threshold = optimal_score * 0.70 if optimal_score > 0 else 0.0
     
     # Load actual tournament results
     results_df = pd.read_csv(results_file)
     results_df['Name'] = results_df['Name'].apply(fix_names)
     
-    # Calculate scores and success rate
+    # Calculate scores
     total_score = 0
     best_lineup_score = 0
-    success_score = 0
+    expected_value = 0.0
     
     for _, lineup in lineups_df.iterrows():
         lineup_score = 0
@@ -101,32 +190,23 @@ def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame, tourn
         total_score += lineup_score
         best_lineup_score = max(best_lineup_score, lineup_score)
         
-        # Calculate exponential success score if above threshold
-        if optimal_score > 0 and lineup_score >= success_threshold:
+        # Calculate expected value if above min cash threshold
+        if optimal_score > 0:
             achievement_ratio = lineup_score / optimal_score
-            # Normalize between 0.7 (70%) and 0.95 (95%) instead of 0.7 and 1.0
-            normalized_ratio = min(1.0, (achievement_ratio - 0.7) / 0.25)  # 0.25 is (0.95 - 0.7)
-            exponential_reward = (math.exp(normalized_ratio) - 1) / (math.e - 1)
-            success_score += exponential_reward
+            if achievement_ratio >= 0.65:
+                estimated_place = estimate_placement(achievement_ratio, tournament)
+                prize = get_prize_for_placement(estimated_place)
+                expected_value += prize
     
     avg_score = total_score / len(lineups_df)
     
     if optimal_score > 0:
         print(f"Tournament metrics for {tournament}:")
         print(f"  Optimal score: {optimal_score:.2f}")
-        print(f"  Success threshold (70%): {success_threshold:.2f}")
-        print(f"  95% ceiling: {optimal_score * 0.95:.2f}")
-        print(f"  Cumulative success score: {success_score:.4f}")
+        print(f"  Min cash threshold (70%): {optimal_score * 0.70:.2f}")
+        print(f"  First place threshold (95%): {optimal_score * 0.95:.2f}")
+        print(f"  Expected value: ${expected_value:.2f}")
 
-        '''Success Score   | Interpretation
-            ----------------|------------------
-            0.0 - 1.0      | Poor (few lineups above 70%)
-            1.0 - 2.0      | Below Average
-            2.0 - 3.0      | Average
-            3.0 - 4.0      | Good
-            4.0 - 5.0      | Excellent
-            5.0+           | Exceptional'''
-    
     # Update tournament highlights for all metrics
     if avg_score > tournament_highlights[tournament]['avg']['score']:
         tournament_highlights[tournament]['avg'] = {
@@ -138,20 +218,20 @@ def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame, tourn
             'score': best_lineup_score,
             'weights': weights['components'].copy()
         }
-    if success_score > tournament_highlights[tournament]['success']['score']:
-        tournament_highlights[tournament]['success'] = {
-            'score': success_score,
+    if expected_value > tournament_highlights[tournament]['ev']['score']:
+        tournament_highlights[tournament]['ev'] = {
+            'score': expected_value,
             'weights': weights['components'].copy()
         }
     
-    return avg_score, best_lineup_score, success_score, tournament_highlights
+    return avg_score, best_lineup_score, expected_value, tournament_highlights
 
-def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float], Dict]:
+def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float], List[float], List[float], Dict]:
     """
     Test different weight combinations and return the top performers based on
-    multiple metrics including success rate.
+    multiple metrics including success score.
     """
-    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld", "Cognizant_Classic_in_The_Palm_Beaches", "Arnold_Palmer_Invitational_presented_by_Mastercard", "THE_PLAYERS_Championship", "Valspar_Championship", "Texas_Children's_Houston_Open"]
+    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld", "Cognizant_Classic_in_The_Palm_Beaches", "Arnold_Palmer_Invitational_presented_by_Mastercard", "THE_PLAYERS_Championship", "Valspar_Championship", "Texas_Children's_Houston_Open", "Valero_Texas_Open"]
     tournaments = tournaments[-5:]
     weight_combinations = generate_weight_combinations()
     results_file = "backtest/pga_v5_backtest_results.csv"
@@ -161,7 +241,7 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
         t: {
             'avg': {'score': float('-inf'), 'weights': None},
             'best': {'score': float('-inf'), 'weights': None},
-            'success': {'score': float('-inf'), 'weights': None}
+            'ev': {'score': float('-inf'), 'weights': None}
         } for t in tournaments
     }
     
@@ -170,10 +250,10 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
         results_df = pd.read_csv(results_file)
         results_df['weights'] = results_df['weights'].apply(eval)
     else:
-        results_df = pd.DataFrame(columns=['tournament', 'weights', 'avg_score', 'best_score', 'success_score'])
+        results_df = pd.DataFrame(columns=['tournament', 'weights', 'avg_score', 'best_score', 'ev_score'])
     
-    # Track scores and success rate
-    tournament_scores = {t: {'avg': {}, 'best': {}, 'success': {}} for t in tournaments}
+    # Track scores
+    tournament_scores = {t: {'avg': {}, 'best': {}, 'ev': {}} for t in tournaments}
     
     print(f"Testing {len(weight_combinations)} weight combinations...")
     
@@ -190,8 +270,8 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
             if not existing_result.empty:
                 avg_score = existing_result['avg_score'].iloc[0]
                 best_score = existing_result['best_score'].iloc[0]
-                success_score = existing_result['success_score'].iloc[0]
-                print(f"{tournament} - Avg: {avg_score:.2f}, Best: {best_score:.2f}, Success: {success_score:.2%} (cached)")
+                ev_score = existing_result['ev_score'].iloc[0]
+                print(f"{tournament} - Avg: {avg_score:.2f}, Best: {best_score:.2f}, EV: ${ev_score:.2f} (cached)")
                 
                 # Update tournament highlights for cached results too
                 if avg_score > tournament_highlights[tournament]['avg']['score']:
@@ -204,14 +284,14 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
                         'score': best_score,
                         'weights': weights['components'].copy()
                     }
-                if success_score > tournament_highlights[tournament]['success']['score']:
-                    tournament_highlights[tournament]['success'] = {
-                        'score': success_score,
+                if ev_score > tournament_highlights[tournament]['ev']['score']:
+                    tournament_highlights[tournament]['ev'] = {
+                        'score': ev_score,
                         'weights': weights['components'].copy()
                     }
             else:
                 lineups_df = pga_main(tournament, num_lineups=20, weights=weights)
-                avg_score, best_score, success_score, tournament_highlights = evaluate_lineup_performance(
+                avg_score, best_score, ev_score, tournament_highlights = evaluate_lineup_performance(
                     tournament, lineups_df, tournament_highlights, weights
                 )
                 
@@ -220,24 +300,24 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
                     'weights': [weights],
                     'avg_score': [avg_score],
                     'best_score': [best_score],
-                    'success_score': [success_score]
+                    'ev_score': [ev_score]
                 })
                 results_df = pd.concat([results_df, new_row], ignore_index=True)
                 results_df.to_csv(results_file, index=False)
-                print(f"{tournament} - Avg: {avg_score:.2f}, Best: {best_score:.2f}, Success: {success_score:.2%} (new)")
+                print(f"{tournament} - Avg: {avg_score:.2f}, Best: {best_score:.2f}, EV: ${ev_score:.2f} (new)")
             
-            # Store scores and update highlights
+            # Store scores
             tournament_scores[tournament]['avg'][str(weights['components'])] = avg_score
             tournament_scores[tournament]['best'][str(weights['components'])] = best_score
-            tournament_scores[tournament]['success'][str(weights['components'])] = success_score
+            tournament_scores[tournament]['ev'][str(weights['components'])] = ev_score
 
     # Calculate normalized scores for both metrics
-    weight_performances = {'avg': {}, 'best': {}, 'success': {}}
-    weight_raw_averages = {'avg': {}, 'best': {}, 'success': {}}
+    weight_performances = {'avg': {}, 'best': {}, 'ev': {}}
+    weight_raw_averages = {'avg': {}, 'best': {}, 'ev': {}}
     
     for weights in weight_combinations:
         weight_key = str(weights['components'])
-        for metric in ['avg', 'best', 'success']:
+        for metric in ['avg', 'best', 'ev']:
             normalized_scores = []
             raw_scores = []
             
@@ -256,21 +336,22 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
                     normalized_scores.append(normalized_score)
             
             if normalized_scores:
-                # Calculate average instead of sum for normalized scores
+                if metric == 'ev':
+                    # Sum EV scores across tournaments
+                    weight_raw_averages[metric][weight_key] = sum(raw_scores)
+                else:
+                    # Calculate average for other metrics
+                    weight_raw_averages[metric][weight_key] = sum(raw_scores) / len(raw_scores)
                 weight_performances[metric][weight_key] = sum(normalized_scores) / len(normalized_scores)
-                weight_raw_averages[metric][weight_key] = sum(raw_scores) / len(raw_scores)
     
     # Get top 3 for both metrics
-    top_weights = {'avg': [], 'best': [], 'success': []}
-    top_scores = {'avg': [], 'best': [], 'success': []}
-    top_raw_averages = {'avg': [], 'best': [], 'success': []}
+    top_weights = {'avg': [], 'best': [], 'ev': []}
+    top_scores = {'avg': [], 'best': [], 'ev': []}
+    top_raw_averages = {'avg': [], 'best': [], 'ev': []}
     
-    for metric in ['avg', 'best', 'success']:
-        # Sort by raw averages for success rate, normalized scores for others
-        if metric == 'success':
-            sorted_weights = sorted(weight_raw_averages[metric].items(), key=lambda x: x[1], reverse=True)
-        else:
-            sorted_weights = sorted(weight_performances[metric].items(), key=lambda x: x[1], reverse=True)
+    for metric in ['avg', 'best', 'ev']:
+        # Sort by raw averages for all metrics
+        sorted_weights = sorted(weight_raw_averages[metric].items(), key=lambda x: x[1], reverse=True)
             
         for weight_str, score in sorted_weights[:3]:
             for w in weight_combinations:
@@ -280,13 +361,43 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
                     top_raw_averages[metric].append(weight_raw_averages[metric][weight_str])
                     break
     
+    # Create DataFrame with weight components and EV scores
+    component_analysis = pd.DataFrame([{
+        'odds_weight': eval(weight_key)['odds'],
+        'fit_weight': eval(weight_key)['fit'],
+        'history_weight': eval(weight_key)['history'],
+        'form_weight': eval(weight_key)['form'],
+        'ev_score': score
+    } for weight_key, score in weight_raw_averages['ev'].items()])
+    
+    # Calculate correlations with EV
+    weight_correlations = component_analysis.corr()['ev_score'].drop('ev_score')
+    print("\nWeight Component Correlations with EV:")
+    print(weight_correlations.sort_values(ascending=False))
+    
+    # Optional: Add scatter plots for visualization
+    try:
+        import matplotlib.pyplot as plt
+        fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+        for idx, component in enumerate(['odds_weight', 'fit_weight', 'history_weight', 'form_weight']):
+            ax = axes[idx // 2, idx % 2]
+            ax.scatter(component_analysis[component], component_analysis['ev_score'])
+            ax.set_xlabel(component.replace('_', ' ').title())
+            ax.set_ylabel('Expected Value')
+            ax.set_title(f'EV vs {component.replace("_", " ").title()}')
+        plt.tight_layout()
+        plt.savefig('backtest/weight_correlations.png')
+        plt.close()
+    except ImportError:
+        print("Matplotlib not installed - skipping plots")
+    
     return (top_weights['avg'], top_scores['avg'], top_raw_averages['avg'], 
             top_weights['best'], top_scores['best'], top_raw_averages['best'],
-            top_weights['success'], top_scores['success'], top_raw_averages['success'],
+            top_weights['ev'], top_scores['ev'], top_raw_averages['ev'],
             tournament_highlights)
 
 if __name__ == "__main__":
-    avg_weights, avg_scores, avg_raw_scores, best_weights, best_scores, best_raw_scores, success_weights, success_scores, success_raw_scores, highlights = backtest_weights()
+    avg_weights, avg_scores, avg_raw_scores, best_weights, best_scores, best_raw_scores, ev_weights, ev_scores, ev_raw_scores, highlights = backtest_weights()
     print("\nBacktesting Complete!")
     print("=" * 50)
     print("Top 3 Performing Weights (By Average):")
@@ -303,22 +414,11 @@ if __name__ == "__main__":
         print(f"   Components: {best_weights[i]['components']}")
 
     print("\n" + "=" * 50)
-    print("Top 3 Performing Weights (By Success Rate):")
+    print("Top 3 Performing Weights (By Expected Value):")
     for i in range(3):
-        # Convert cumulative score to average score per lineup (assuming 20 lineups)
-        avg_success_score = success_raw_scores[i] / 20  # Divide by number of lineups
-        print(f"\n{i+1}. Average Success Score: {avg_success_score:.3f}")
-        print(f"   (Total Success Score: {success_raw_scores[i]:.3f})")
-        print(f"   Components: {success_weights[i]['components']}")
-
-        '''Avg Success Score | Interpretation
-            -----------------|------------------
-            0.00 - 0.05     | Poor
-            0.05 - 0.10     | Below Average
-            0.10 - 0.15     | Average
-            0.15 - 0.20     | Good
-            0.20 - 0.25     | Excellent
-            0.25+           | Exceptional'''
+        print(f"\n{i+1}. Total Expected Value: ${ev_raw_scores[i]:.2f}")
+        print(f"   Per Lineup EV: ${ev_raw_scores[i]/20:.2f}")
+        print(f"   Components: {ev_weights[i]['components']}")
 
     print("\n" + "=" * 50)
     print("Tournament-Specific Highlights:")
@@ -328,5 +428,5 @@ if __name__ == "__main__":
         print(f"  Best Average Weights: {highlights[tournament]['avg']['weights']}")
         print(f"  Best Single Lineup: {highlights[tournament]['best']['score']:.2f}")
         print(f"  Best Single Weights: {highlights[tournament]['best']['weights']}")
-        print(f"  Best Success Score: {highlights[tournament]['success']['score']:.3f}")
-        print(f"  Best Success Weights: {highlights[tournament]['success']['weights']}")
+        print(f"  Best Expected Value: ${highlights[tournament]['ev']['score']:.2f}")
+        print(f"  Best EV Weights: {highlights[tournament]['ev']['weights']}")

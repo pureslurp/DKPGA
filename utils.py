@@ -232,7 +232,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "Masters_Tournament": {
         "ID": 401703504,
-        "Course": "Augusta_National_Golf_Club"
+        "Course": "Augusta_National_Golf_Club",
+        "pga-url": "masters-tournament/R2025014"
     },
     "RBC_Heritage": {
         "ID": 401703505,
@@ -395,5 +396,7 @@ def fix_names(name):
         return "rasmus hojgaard"
     elif name == "Thorbjørn Olesen":
         return "thorbjorn olesen"
+    elif name == "k.h. lee":
+        return "kyoung-hoon lee"
     else:
         return name.lower()

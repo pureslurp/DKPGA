@@ -1,0 +1,31 @@
+
+Outliers found in Salary:
+  - tommy fleetwood: value=10700.00, z-score=3.61 (mean=7058.90, std=1007.60)
+  - corey conners: value=10100.00, z-score=3.02 (mean=7058.90, std=1007.60)
+  - ludvig aberg: value=10800.00, z-score=3.71 (mean=7058.90, std=1007.60)
+  - patrick cantlay: value=10200.00, z-score=3.12 (mean=7058.90, std=1007.60)
+
+Outliers found in Odds Total:
+  - tommy fleetwood: value=8.07, z-score=3.75 (mean=1.69, std=1.70)
+  - corey conners: value=7.49, z-score=3.41 (mean=1.69, std=1.70)
+  - ludvig aberg: value=9.25, z-score=4.44 (mean=1.69, std=1.70)
+  - patrick cantlay: value=7.00, z-score=3.12 (mean=1.69, std=1.70)
+
+Outliers found in History Score:
+  - sam stevens: value=89.62, z-score=3.18 (mean=27.24, std=19.59)
+
+Outliers found in Normalized History:
+  - sam stevens: value=1.00, z-score=3.18 (mean=0.30, std=0.22)
+
+Outliers found in Form Score:
+  - jared jones: value=-3.36, z-score=3.62 (mean=-0.21, std=0.87)
+  - ryan palmer: value=-3.32, z-score=3.58 (mean=-0.21, std=0.87)
+
+Suspicious zero values found:
+  - jared jones (form): base=-3.36, normalized=0.00
+  - rafael campos (form): base=-2.32, normalized=0.00
+  - ryan palmer (form): base=-3.32, normalized=0.00
+  - niklas moller (form): base=0.00, normalized=0.58
+  - benjamin james (form): base=0.00, normalized=0.58
+  - frankie capan (form): base=0.00, normalized=0.58
+  - kyoung-hoon lee (form): base=0.00, normalized=0.58

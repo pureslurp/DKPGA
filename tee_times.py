@@ -35,14 +35,14 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
         
         # Wait for tee time rows to load
         wait = WebDriverWait(driver, 20)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-paaamq")))
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-79elbk")))
         
         # Get the page source after JavaScript has loaded
         html_content = driver.page_source
         soup = BeautifulSoup(html_content, 'html.parser')
         
         # Extract tee time data
-        rows = soup.find_all('tr', class_='css-paaamq')
+        rows = soup.find_all('tr', class_='css-79elbk')
         tee_times = []
         
         for row in rows:
@@ -123,7 +123,7 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "Texas_Children's_Houston_Open"
+    TOURNEY = "Valero_Texas_Open"
     tee_times_path = f'2025/{TOURNEY}/tee_times.csv'
     
     # Check if tee times file already exists
@@ -173,13 +173,13 @@ if __name__ == "__main__":
         # Only proceed with calculations if we have the required columns
         if all(col in df.columns for col in ['Wave', 'R1', 'R2']):
             # Calculate R1 wave scoring averages
-            r1_am_avg = df[df['Wave'] == 'PM']['R1'].mean()
-            r1_pm_avg = df[df['Wave'] == 'AM']['R1'].mean()
+            r1_am_avg = df[df['Wave'] == 'AM']['R1'].mean()
+            r1_pm_avg = df[df['Wave'] == 'PM']['R1'].mean()
             r1_wave_diff = r1_am_avg - r1_pm_avg
             
             # Calculate R2 wave scoring averages (waves are switched)
-            r2_am_avg = df[df['Wave'] == 'AM']['R2'].mean()  # PM wave in R1 played AM in R2
-            r2_pm_avg = df[df['Wave'] == 'PM']['R2'].mean()  # AM wave in R1 played PM in R2
+            r2_am_avg = df[df['Wave'] == 'PM']['R2'].mean()  # PM wave in R1 played AM in R2
+            r2_pm_avg = df[df['Wave'] == 'AM']['R2'].mean()  # AM wave in R1 played PM in R2
             r2_wave_diff = r2_am_avg - r2_pm_avg
             
             # Calculate overall wave differentials
