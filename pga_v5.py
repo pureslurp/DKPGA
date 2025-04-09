@@ -558,7 +558,9 @@ def calculate_form_score(tourney: str, weights: dict) -> pd.DataFrame:
         
         # Calculate current form total
         sg_columns = ['sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
+        finishes = current_form['recent_finishes'].apply(_parse_recent_finishes)
         current_form['current_form'] = current_form[sg_columns].sum(axis=1)
+
         
         # Merge with form_df, using outer join to keep all players from both sources
         form_df = pd.merge(
@@ -643,17 +645,72 @@ def calculate_scores_parallel(golfers, tourney_history, course_fit_df, tourney: 
         # Calculate form score for this golfer
         player_stats = pga_stats[pga_stats['Name'].apply(fix_names) == golfer.get_clean_name]
         long_term_form = player_stats['sg_total'].iloc[0] if not player_stats.empty else 0
+
+        def _parse_recent_finishes(recent_finishes: str) -> float:
+            '''Convert recent finishes (example: [20, 15, 25, 12, 2]) to points'''
+            # Remove brackets and split by comma
+            finishes_str = recent_finishes.strip('[]').split(',')
+            
+            # Convert each finish to points
+            total_points = 0
+            valid_finishes = 0
+            cuts = 0
+            
+            for finish in finishes_str:
+                finish = finish.strip().strip("'").strip('"')  # Remove quotes and whitespace
+                if finish == 'CUT':
+                    total_points += 0
+                    valid_finishes += 1
+                elif finish != 'None':
+                    try:
+                        position = int(finish)
+                        # Points system: 100 for 1st, scaling down to 0 for 50th or worse
+                        points = max(0, 100 - ((position - 1) * (100/65)))
+                        total_points += points
+                        valid_finishes += 1
+                    except ValueError:
+                        continue
+            try:
+                consistency_score = 1 - (cuts / valid_finishes)
+            except:
+                consistency_score = 0
+            # Return average points if there are valid finishes, otherwise 0
+            return total_points / valid_finishes if valid_finishes > 0 else 0, consistency_score
         
         current_form = 0
         if current_form_df is not None:
             player_data = current_form_df[current_form_df['Name'].apply(fix_names) == golfer.get_clean_name]
             if len(player_data) > 0:
                 sg_columns = ['sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
-                current_form = player_data[sg_columns].sum(axis=1).iloc[0]
-        
-        # Calculate weighted form score
+                # Get all three raw scores
+                sg_total = player_data[sg_columns].sum(axis=1).iloc[0]
+                recent_finishes_score, consistency_score = player_data['recent_finishes'].apply(_parse_recent_finishes).iloc[0]
+                
+                # Get min/max values from current dataset for sg_total
+                min_sg = current_form_df[sg_columns].sum(axis=1).min()
+                max_sg = current_form_df[sg_columns].sum(axis=1).max()
+                normalized_sg = (sg_total - min_sg) / (max_sg - min_sg) if max_sg != min_sg else 0.5
+                
+                # Get min/max for recent finishes scores
+                all_finishes = current_form_df['recent_finishes'].apply(_parse_recent_finishes)
+                min_recent = min(score for score, _ in all_finishes)
+                max_recent = max(score for score, _ in all_finishes)
+                normalized_recent = (recent_finishes_score - min_recent) / (max_recent - min_recent) if max_recent != min_recent else 0.5
+                
+                # Combine all three scores with weights
+                current_form = (normalized_sg * 0.4 + 
+                              normalized_recent * 0.4 + 
+                              consistency_score * 0.2)
+
+        # Normalize long-term form
+        min_long_term = pga_stats['sg_total'].min()
+        max_long_term = pga_stats['sg_total'].max()
+        normalized_long_term = ((long_term_form - min_long_term) / 
+                              (max_long_term - min_long_term)) if max_long_term != min_long_term else 0.5
+
+        # Calculate weighted form score using normalized values
         form_score = (current_form * weights['form']['current'] + 
-                     long_term_form * weights['form']['long'])
+                     normalized_long_term * weights['form']['long'])
         
         return {
             'Name': golfer.get_clean_name,
@@ -714,10 +771,10 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
             'long': 0.3
         },
         'components': {
-            'odds': 0.25,
-            'fit': 0.25,
-            'history': 0.5,
-            'form': 0.0
+            'odds': 0.05,
+            'fit': 0.05,
+            'history': 0.05,
+            'form': 0.85
         }
     }
     
