@@ -1,0 +1,24 @@
+
+Outliers found in Salary:
+  - scottie scheffler: value=12400.00, z-score=3.76 (mean=7310.42, std=1353.24)
+
+Outliers found in Odds Total:
+  - rory mcilroy: value=35.08, z-score=4.53 (mean=4.63, std=6.72)
+  - scottie scheffler: value=49.62, z-score=6.69 (mean=4.63, std=6.72)
+
+Outliers found in Normalized Odds:
+  - scottie scheffler: value=1.00, z-score=3.26 (mean=0.35, std=0.20)
+
+Suspicious zero values found:
+  - rasmus hojgaard (form): base=-1.42, normalized=0.00
+  - evan beck (form): base=0.00, normalized=0.40
+  - noah kent (form): base=-1.99, normalized=0.00
+  - rafael campos (form): base=-1.79, normalized=0.00
+  - max homa (form): base=-2.16, normalized=0.00
+  - jose maria olazabal (form): base=0.00, normalized=0.40
+  - angel cabrera (form): base=0.00, normalized=0.40
+  - thriston lawrence (form): base=-1.52, normalized=0.00
+  - fred couples (form): base=0.00, normalized=0.40
+  - matthew mccarty (form): base=0.00, normalized=0.40
+  - vijay singh (form): base=0.00, normalized=0.40
+  - jose luis ballester (form): base=0.00, normalized=0.40
