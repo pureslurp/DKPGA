@@ -35,18 +35,18 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
         
         # Wait for tee time rows to load
         wait = WebDriverWait(driver, 20)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-79elbk")))
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-paaamq")))
         
         # Get the page source after JavaScript has loaded
         html_content = driver.page_source
         soup = BeautifulSoup(html_content, 'html.parser')
         
         # Extract tee time data
-        rows = soup.find_all('tr', class_='css-79elbk')
+        rows = soup.find_all('tr', class_='css-paaamq')
         tee_times = []
         
         for row in rows:
-            time_cell = row.find('span', class_='chakra-text css-1r55614')
+            time_cell = row.find('span', class_='css-1r55614')
             # Find all player name cells in the row
             player_divs = row.find_all('div', class_='css-1bntj9o')
             
@@ -95,8 +95,14 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
             time_diffs.append(curr_time - prev_time)
         
         # Find the largest gap (should be between AM and PM waves)
-        wave_split_idx = time_diffs.index(max([td for td in time_diffs if td.total_seconds() > 3600]))
-        
+        time_diff_seconds = [td.total_seconds() for td in time_diffs]
+        if any(td > 3600 for td in time_diff_seconds):
+            # If there's a gap > 1 hour, use that as the split
+            wave_split_idx = time_diffs.index(max([td for td in time_diffs if td.total_seconds() > 3600]))
+        else:
+            # If no clear AM/PM split, just split the field in half
+            wave_split_idx = len(df) // 2
+            
         # Assign waves based on the split
         df['Wave'] = 'AM'
         df.loc[wave_split_idx:, 'Wave'] = 'PM'
@@ -123,7 +129,7 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "Valero_Texas_Open"
+    TOURNEY = "Masters_Tournament"
     tee_times_path = f'2025/{TOURNEY}/tee_times.csv'
     
     # Check if tee times file already exists
@@ -173,13 +179,13 @@ if __name__ == "__main__":
         # Only proceed with calculations if we have the required columns
         if all(col in df.columns for col in ['Wave', 'R1', 'R2']):
             # Calculate R1 wave scoring averages
-            r1_am_avg = df[df['Wave'] == 'AM']['R1'].mean()
-            r1_pm_avg = df[df['Wave'] == 'PM']['R1'].mean()
+            r1_am_avg = df[df['Wave'] == 'PM']['R1'].mean()
+            r1_pm_avg = df[df['Wave'] == 'AM']['R1'].mean()
             r1_wave_diff = r1_am_avg - r1_pm_avg
             
             # Calculate R2 wave scoring averages (waves are switched)
-            r2_am_avg = df[df['Wave'] == 'PM']['R2'].mean()  # PM wave in R1 played AM in R2
-            r2_pm_avg = df[df['Wave'] == 'AM']['R2'].mean()  # AM wave in R1 played PM in R2
+            r2_am_avg = df[df['Wave'] == 'AM']['R2'].mean()  # PM wave in R1 played AM in R2
+            r2_pm_avg = df[df['Wave'] == 'PM']['R2'].mean()  # AM wave in R1 played PM in R2
             r2_wave_diff = r2_am_avg - r2_pm_avg
             
             # Calculate overall wave differentials
