@@ -184,7 +184,7 @@ def get_course_fit(url: str) -> Optional[pd.DataFrame]:
     #         pass
 
 if __name__ == "__main__":
-    TOURNEY = "Valero_Texas_Open"
+    TOURNEY = "RBC_Heritage"
     # Get the URL from tournament list
     pga_url = TOURNAMENT_LIST_2025[TOURNEY]['pga-url']
     url = f"https://www.pgatour.com/tournaments/2025/{pga_url}/field/course-fit"
