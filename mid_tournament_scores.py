@@ -30,7 +30,7 @@ def get_completed_rounds_scores(url):
         pd.DataFrame: DataFrame with player names and their scores for completed rounds
     """
     # Handle URL formatting
-    url = str(url)  # Convert to string in case an integer ID is passed
+    url = str(url)
     if not url.startswith('http'):
         url = f'https://www.espn.com/golf/leaderboard?tournamentId={url}'
     
@@ -39,59 +39,52 @@ def get_completed_rounds_scores(url):
                              service_log_path=os.path.devnull, 
                              options=options)
     
-    # Get raw leaderboard data
-    raw_data = pd.read_html(url)[0]
     driver.get(url)
+    time.sleep(2)  # Give page time to load
     
-    # Initialize results dataframe
+    # Find all player rows
+    player_rows = driver.find_elements(By.CLASS_NAME, 'PlayerRow__Overview')
     df_scores = pd.DataFrame(columns=["Name", "R1", "R2", "R3", "R4", "Total"])
     
-    # Process each player
-    for index, row in raw_data.iterrows():
-        player = fix_names(row['PLAYER'])
+    for row in player_rows:
         try:
-            # Click on player name
-            element = driver.find_element(By.XPATH, f'// a[contains(text(), "{player}")]')
-            element.click()
-            time.sleep(1)
+            # Extract player name from the anchor tag
+            player_element = row.find_element(By.CLASS_NAME, 'leaderboard_player_name')
+            player = fix_names(player_element.text)
             
-            # Get player's detailed scores
-            select = driver.find_element(By.CLASS_NAME, 'Leaderboard__Player__Detail')
-            select2 = Select(select.find_element(By.CLASS_NAME, 'dropdown__select'))
+            # Get all table cells in the row
+            cells = row.find_elements(By.CLASS_NAME, 'Table__TD')
             
-            # Initialize round scores
-            round_totals = {'R1': None, 'R2': None, 'R3': None, 'R4': None}
+            # ESPN table structure: cells[7] = R1, cells[8] = R2, cells[9] = R3, cells[10] = R4
+            round_scores = {
+                'R1': cells[7].text,
+                'R2': cells[8].text,
+                'R3': cells[9].text,
+                'R4': cells[10].text
+            }
             
-            # Try to get scores for each round
-            for round_num in range(1, 5):
-                try:
-                    round_data = round_scores(driver, select2, f"Round {round_num}")
-                    # Sum the scores for the round, excluding any "-" or incomplete holes
-                    round_total = sum(pd.to_numeric(round_data.iloc[1], errors='coerce').fillna(0))
-                    if round_total > 0:  # Only include if round has actual scores
-                        round_totals[f'R{round_num}'] = round_total
-                except:
-                    break
+            # Convert '--' or '-' to None and calculate total
+            for key in round_scores:
+                if round_scores[key] in ['--', '-'] or not round_scores[key]:
+                    round_scores[key] = None
+                else:
+                    round_scores[key] = int(round_scores[key])
             
-            # Calculate total of completed rounds
-            total_score = sum(score for score in round_totals.values() if score is not None)
+            total_score = sum(score for score in round_scores.values() if score is not None)
             
             # Add player data to dataframe
             player_data = {
                 "Name": player.lower(),
-                "R1": round_totals['R1'],
-                "R2": round_totals['R2'],
-                "R3": round_totals['R3'],
-                "R4": round_totals['R4'],
+                "R1": round_scores['R1'],
+                "R2": round_scores['R2'],
+                "R3": round_scores['R3'],
+                "R4": round_scores['R4'],
                 "Total": total_score
             }
             df_scores = pd.concat([df_scores, pd.DataFrame([player_data])], ignore_index=True)
             
-            # Close player detail view
-            element.click()
-            
         except Exception as e:
-            print(f"Error processing {player}: {str(e)}")
+            print(f"Error processing row: {str(e)}")
             continue
     
     # Clean up
@@ -101,7 +94,7 @@ def get_completed_rounds_scores(url):
     return df_scores
 
 if __name__ == "__main__":
-    tournament_name = "Texas_Children's_Houston_Open"
+    tournament_name = "Masters_Tournament"
     tournament_id = TOURNAMENT_LIST_2025[tournament_name]["ID"]
     scores = get_completed_rounds_scores(tournament_id)
     scores.to_csv(f'2025/{tournament_name}/current_tournament_scores.csv', index=False)
