@@ -733,7 +733,7 @@ def calculate_scores_parallel(golfers, tourney_history, course_fit_df, tourney: 
     
     return pd.DataFrame(results)
 
-def main(tourney: str, num_lineups: int = 20, weights: dict = None):
+def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golfers: List[str] = None):
     """
     Main function for PGA optimization
     
@@ -782,6 +782,10 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     }
     
     weights = weights or default_weights
+    exclude_golfers = [fix_names(name) for name in (exclude_golfers or [])]
+    
+    if exclude_golfers:
+        print(f"\nExcluding golfers: {', '.join(exclude_golfers)}")
     
     global TOURNEY
     TOURNEY = tourney
@@ -835,8 +839,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     
     # Merge odds with DraftKings data
     dk_data = pd.merge(dk_salaries, odds_df, on='Name', how='left')
-    print(f"After merging: {len(dk_data)} players\n")
-    
+
     # Calculate odds total using provided weights
     odds_columns = {
         'Tournament Winner': weights['odds']['winner'],
@@ -904,6 +907,24 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
 
     dk_data['Value'] = dk_data['Total'] / dk_data['Salary'] * 100000
 
+    # Save the full player data before exclusions
+    columns_to_save = [
+        'Name', 'Salary', 'Odds Total', 'Normalized Odds',
+        'Fit Score', 'Normalized Fit',
+        'History Score', 'Normalized History',
+        'Form Score', 'Normalized Form',
+        'Total', 'Value'
+    ]
+    dk_data[columns_to_save].sort_values('Total', ascending=False).to_csv(f"2025/{tourney}/player_data.csv", index=False)
+    print(f"Saved detailed player data to: 2025/{tourney}/player_data.csv")
+
+    # Apply exclusions only for lineup optimization
+    if exclude_golfers:
+        print(f"\nExcluding golfers from lineups: {', '.join(exclude_golfers)}")
+        dk_data = dk_data[~dk_data['Name'].isin(exclude_golfers)]
+
+    print(f"Players available for lineups: {len(dk_data)}\n")
+
     print("Top 5 Players by Value:")
     print("-" * 80)
     print(dk_data[['Name', 'Salary', 'Odds Total', 'Fit Score', 'History Score', 'Total', 'Value']]
@@ -944,17 +965,17 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None):
     print(f"\nTotal Salary: ${total_salary:,}")
     print(f"Total Points: {total_points:.2f}")
     
-    # Save detailed player data
-    output_data_path = f"2025/{TOURNEY}/player_data.csv"
-    columns_to_save = [
-        'Name', 'Salary', 'Odds Total', 'Normalized Odds',
-        'Fit Score', 'Normalized Fit',
-        'History Score', 'Normalized History',
-        'Form Score', 'Normalized Form',
-        'Total', 'Value'
-    ]
-    dk_data[columns_to_save].sort_values('Total', ascending=False).to_csv(output_data_path, index=False)
-    print(f"Saved detailed player data to: {output_data_path}")
+    # # Save detailed player data
+    # output_data_path = f"2025/{TOURNEY}/player_data.csv"
+    # columns_to_save = [
+    #     'Name', 'Salary', 'Odds Total', 'Normalized Odds',
+    #     'Fit Score', 'Normalized Fit',
+    #     'History Score', 'Normalized History',
+    #     'Form Score', 'Normalized Form',
+    #     'Total', 'Value'
+    # ]
+    # dk_data[columns_to_save].sort_values('Total', ascending=False).to_csv(output_data_path, index=False)
+    # print(f"Saved detailed player data to: {output_data_path}")
     return optimized_lineups
 
 
