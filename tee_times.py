@@ -35,31 +35,46 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
         
         # Wait for tee time rows to load
         wait = WebDriverWait(driver, 20)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-paaamq")))
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-79elbk")))
         
         # Get the page source after JavaScript has loaded
         html_content = driver.page_source
         soup = BeautifulSoup(html_content, 'html.parser')
         
         # Extract tee time data
-        rows = soup.find_all('tr', class_='css-paaamq')
+        rows = soup.find_all('tr', class_='css-79elbk')
         tee_times = []
+        
+        print(f"Found {len(rows)} tee time rows")  # Debug print
         
         for row in rows:
             time_cell = row.find('span', class_='css-1r55614')
-            # Find all player name cells in the row
+            # Find all player divs in the row
             player_divs = row.find_all('div', class_='css-1bntj9o')
             
             if time_cell and player_divs:
                 time = time_cell.text.strip()
+                print(f"Processing tee time: {time}")  # Debug print
                 
                 # Process each player in the group
                 for player_div in player_divs:
-                    player_name_cell = player_div.find('span', class_='chakra-text css-hmig5c')
-                    if player_name_cell:
-                        player_name = player_name_cell.text.strip()
+                    # Find the player image which contains the name in alt attribute
+                    player_img = player_div.find('img', class_='chakra-avatar__img')
+                    if player_img and player_img.get('alt'):
+                        player_name = player_img.get('alt')
                         player_name = fix_names(player_name)
+                        print(f"  Found player: {player_name}")  # Debug print
                         tee_times.append([time, player_name])
+                    else:
+                        print(f"  No player image found")  # Debug print
+            else:
+                print(f"Missing time cell or player divs")  # Debug print
+        
+        print(f"Total tee times collected: {len(tee_times)}")  # Debug print
+        
+        if not tee_times:
+            print("No tee times were collected, raising exception")
+            raise Exception("No tee times were found in the parsed HTML")
         
         # Create DataFrame
         df = pd.DataFrame(tee_times, columns=["Tee Time", "Player Name"])
@@ -129,7 +144,7 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "Masters_Tournament"
+    TOURNEY = "RBC_Heritage"
     tee_times_path = f'2025/{TOURNEY}/tee_times.csv'
     
     # Check if tee times file already exists
