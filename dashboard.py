@@ -62,6 +62,10 @@ class DataManager:
         if 'reset_form_weights_clicked' not in st.session_state:
             st.session_state.reset_form_weights_clicked = False
 
+        # Initialize excluded players if not in session state
+        if 'excluded_players' not in st.session_state:
+            st.session_state.excluded_players = set()
+
     def load_tournament_data(self, tournament: str) -> tuple:
         """Load and process tournament data with any user adjustments"""
         player_data = None
@@ -250,7 +254,7 @@ def main():
     # Tournament selection using available tournaments
     selected_tournament = st.sidebar.selectbox(
         "Select Tournament",
-        get_available_tournaments(featured_tournament="Cognizant_Classic_in_The_Palm_Beaches")
+        get_available_tournaments(featured_tournament="RBC_Heritage")
     )
     
     # Add weight validation
@@ -276,12 +280,18 @@ Note: The more lineups you generate, the longer it will take to run the model.""
     # Run model button with num_lineups parameter
     if st.sidebar.button("Run Model"):
         with st.spinner(f"Running model for {selected_tournament}..."):
-            run_pga_model(selected_tournament,
-                         weights=data_manager.weights,
-                         num_lineups=num_lineups)
-            # Reload the data after running the model
-            _, lineups = data_manager.load_tournament_data(selected_tournament)
-            st.sidebar.success("Model run complete!")
+            try:
+                # Pass excluded_players to run_pga_model
+                lineups = run_pga_model(
+                    tourney=selected_tournament,
+                    num_lineups=num_lineups,
+                    weights=data_manager.weights,
+                    exclude_golfers=st.session_state.excluded_players  # Add this argument
+                )
+                st.session_state.lineups = lineups
+                st.success(f"Generated {len(lineups)} lineups!")
+            except Exception as e:
+                st.error(f"Error running model: {str(e)}")
             
             # Add export button right after model completion
             st.sidebar.download_button(
@@ -369,49 +379,65 @@ Higher values emphasize recent performance metrics, combining both short-term (l
     st.subheader("Player Analysis")
     st.write("This section summarizes each golfer's odds, fit, and history scores. This section updates dynamically as you make adjustements in the dashboard. It is the source-of-truth for running the model.")
 
-    # Sort filtered_data by Total in descending order and get top 10
-    prompt_data = filtered_data.sort_values('Total', ascending=False).head(10)
+    # Add an "Exclude" column to the filtered data
+    display_data = filtered_data[['Name', 'Salary', 'Normalized Odds', 'Normalized Fit', 
+                                'Normalized History', 'Normalized Form', 'Total', 'Value']].copy()
     
-    # Create container for insights
-    analysis_container = st.empty()
+    # Initialize Exclude column with previous exclusions if they exist
+    display_data.insert(0, 'Exclude', display_data['Name'].isin(st.session_state.excluded_players))
     
-    # Get user input
-    user_prompt = f'''Here is some data about the Top 10 golfer's in the {selected_tournament} tournament: {prompt_data.to_string()}. 
-    The Salary represents the cost of the player if selected in a DraftKings contest, 
-    The Normalized Odds are the golfer's odds to win the tournament (higher is better, normalized to 0-1),
-    The Normalized Fit is how well the golfer's attributes match the course characteristics (higher is better, normalized to 0-1),
-    The Normalized History is the golfer's history at this specific tournament (higher is better, normalized to 0-1),
-    The Normalized Form is the golfer's form, where form represents the golfer's strokes gained statistics (higher is better, normalized to 0-1),
-    The Total score is a combination of the four normalized scores.
-    The Value is the Total score divided by the Salary and multiplied by 100,000.
-    Please provide a summary of the data and any insights you can provide about the golfers.
-    Don't mention you are only using data for 10 golfers.
-    Please be concise and to the point, only a few sentences total, you don't need to cover all 10 golfers.
-    '''
-
-    # Get response from ChatGPT
-    display_chatgpt_insights(analysis_container, user_prompt, 'analysis_insights')
+    # Display the editable dataframe
+    edited_df = st.data_editor(
+        display_data,
+        column_config={
+            "Exclude": st.column_config.CheckboxColumn(
+                "Exclude",
+                help="Check to exclude player from lineup generation",
+                default=False,
+            ),
+            "Salary": st.column_config.NumberColumn(
+                "Salary",
+                format="$%d"
+            ),
+            "Normalized Odds": st.column_config.NumberColumn(
+                "Normalized Odds",
+                format="%.2f"
+            ),
+            "Normalized Fit": st.column_config.NumberColumn(
+                "Normalized Fit",
+                format="%.2f"
+            ),
+            "Normalized History": st.column_config.NumberColumn(
+                "Normalized History",
+                format="%.2f"
+            ),
+            "Normalized Form": st.column_config.NumberColumn(
+                "Normalized Form",
+                format="%.2f"
+            ),
+            "Total": st.column_config.NumberColumn(
+                "Total",
+                format="%.2f"
+            ),
+            "Value": st.column_config.NumberColumn(
+                "Value",
+                format="%.2f"
+            ),
+        },
+        hide_index=True,
+        height=400,
+        use_container_width=True,
+    )
+    
+    # Update excluded players in session state
+    newly_excluded = edited_df[edited_df['Exclude']]['Name'].tolist()
+    st.session_state.excluded_players = set(newly_excluded)  # Update session state
 
     # Add search/filter box
     search = st.text_input("Search Players")
     if search:
         filtered_data = filtered_data[filtered_data['Name'].str.contains(search, case=False)]
-    
-    # Display player data with formatting
-    st.dataframe(
-        filtered_data[['Name', 'Salary', 'Normalized Odds', 'Normalized Fit', 'Normalized History', 'Normalized Form', 'Total', 'Value']].style.format({
-            'Salary': '${:,.0f}',
-            'Normalized Odds': '{:.2f}',
-            'Normalized Fit': '{:.2f}',
-            'Normalized History': '{:.2f}',
-            'Normalized Form': '{:.2f}',
-            'Total': '{:.2f}',
-            'Value': '{:.2f}'
-        }),
-        height=400,
-        use_container_width=True
-    )
-    
+
     # New Player Odds section
     st.subheader("Player Odds")
     st.write("This section summarizes each golfer's odds for the tournament. The odds are based on the lines from https://www.scoresandodds.com/golf and are used to calculate the normalized odds score.")
@@ -437,10 +463,10 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         '''
 
         # Get response from ChatGPT
-        display_chatgpt_insights(odds_container, user_prompt, 'odds_insights')
+        # display_chatgpt_insights(odds_container, user_prompt, 'odds_insights')
 
         # Format the odds columns to show plus sign for positive values
-        odds_columns = ['Tournament Winner', 'Top 5 Finish', 'Top 10 Finish', 'Top 20 Finish']
+        odds_columns = [col for col in odds_data.columns if col != 'Name']  # Get all columns except 'Name'
         for col in odds_columns:
             odds_data[col] = odds_data[col].apply(lambda x: f"+{x}" if x > 0 else str(x))
         
@@ -470,7 +496,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         '''
 
         # Get response from ChatGPT
-        display_chatgpt_insights(fit_container, user_prompt, 'fit_insights')
+        # display_chatgpt_insights(fit_container, user_prompt, 'fit_insights')
 
         try:
             st.dataframe(
@@ -538,23 +564,39 @@ Higher values emphasize recent performance metrics, combining both short-term (l
             history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
 
              # Format the columns for better display
-            display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 
-                            'sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
-                            'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
+            display_columns = ['Name']
+            
+            # Add any year columns that exist in the data
+            year_columns = [col for col in history_data.columns if col in ['24', '2022-23', '2021-22', '2020-21', '2019-20']]
+            display_columns.extend(year_columns)
+            
+            # Add the remaining stat columns
+            stat_columns = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
+                          'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
+            display_columns.extend([col for col in stat_columns if col in history_data.columns])
             
             # Format numeric columns to show fewer decimal places
-            numeric_cols = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
-                        'avg_finish', 'made_cuts_pct']
+            numeric_cols = [col for col in ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
+                                          'avg_finish', 'made_cuts_pct'] if col in history_data.columns]
         except:
             history_data = pd.read_csv(f"2025/{selected_tournament}/course_history.csv")
             st.write("Note: This tournament is not traditionally played on this course, so the history represents the last 5 times this **course** was played. The years in the column headers are not accurate, it is just the last 5 times")
 
             # Format the columns for better display
-            display_columns = ['Name', '24', '2022-23', '2021-22', '2020-21', '2019-20', 
-                             'avg_finish', 'measured_years', 'made_cuts_pct']
+            display_columns = ['Name']
+            
+            # Add any year columns that exist in the data
+            year_columns = [col for col in history_data.columns if col in ['24', '2022-23', '2021-22', '2020-21', '2019-20']]
+            display_columns.extend(year_columns)
+            
+            # Add the remaining stat columns
+            stat_columns = ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total',
+                          'rounds', 'avg_finish', 'measured_years', 'made_cuts_pct']
+            display_columns.extend([col for col in stat_columns if col in history_data.columns])
             
             # Format numeric columns to show fewer decimal places
-            numeric_cols = ['avg_finish', 'made_cuts_pct']
+            numeric_cols = [col for col in ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
+                                          'avg_finish', 'made_cuts_pct'] if col in history_data.columns]
         # Create container for odds insights
         history_container = st.empty()
         
@@ -570,7 +612,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         '''
 
         # Get response from ChatGPT
-        display_chatgpt_insights(history_container, user_prompt, 'history_insights')
+        # display_chatgpt_insights(history_container, user_prompt, 'history_insights')
         
         # Create formatted dataframe
         display_df = history_data[display_columns].copy()

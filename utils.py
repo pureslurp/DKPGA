@@ -237,11 +237,13 @@ TOURNAMENT_LIST_2025 = {
     },
     "RBC_Heritage": {
         "ID": 401703505,
-        "Course": "Harbour_Town_Golf_Links"
+        "Course": "Harbour_Town_Golf_Links",
+        "pga-url": "rbc-heritage/R2025012"
     },
     "Corales_Puntacana_Championship": {
         "ID": 401703506,
-        "Course": "Puntacana_Resort_&_Club_(Corales_Golf_Course)"
+        "Course": "Puntacana_Resort_&_Club_(Corales_Golf_Course)",
+        "pga-url": "corales-puntacana-championship/R2025016"
     },
     "THE_CJ_CUP_Byron_Nelson": {
         "ID": 401703508,
