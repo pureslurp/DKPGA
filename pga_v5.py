@@ -535,64 +535,64 @@ def calculate_fit_score_from_csv(name: str, course_fit_df: pd.DataFrame) -> floa
     max_rank = course_fit_df['projected_course_fit'].max()
     return 100 * (1 - (fit_score / max_rank))
 
-def calculate_form_score(tourney: str, weights: dict) -> pd.DataFrame:
-    """
-    Calculate form score by merging current and long-term form data with weights
+# def calculate_form_score(tourney: str, weights: dict) -> pd.DataFrame:
+#     """
+#     Calculate form score by merging current and long-term form data with weights
     
-    Args:
-        tourney: Tournament name
-        weights: Dictionary containing form weights
+#     Args:
+#         tourney: Tournament name
+#         weights: Dictionary containing form weights
     
-    Returns:
-        DataFrame with merged form data and final form score
-    """
-    # Load PGA stats (long-term form)
-    pga_stats = pd.read_csv(f'2025/{tourney}/pga_stats.csv')
+#     Returns:
+#         DataFrame with merged form data and final form score
+#     """
+#     # Load PGA stats (long-term form)
+#     pga_stats = pd.read_csv(f'2025/{tourney}/pga_stats.csv')
     
-    # Initialize form DataFrame with long-term stats
-    form_df = pga_stats[['Name', 'sg_total']].copy()
-    form_df = form_df.rename(columns={'sg_total': 'long_term_form'})
+#     # Initialize form DataFrame with long-term stats
+#     form_df = pga_stats[['Name', 'sg_total']].copy()
+#     form_df = form_df.rename(columns={'sg_total': 'long_term_form'})
     
-    # Try to load current form data
-    current_form_path = f'2025/{tourney}/current_form.csv'
-    if os.path.exists(current_form_path):
-        print("Loading and merging current form data...")
-        current_form = pd.read_csv(current_form_path)
+#     # Try to load current form data
+#     current_form_path = f'2025/{tourney}/current_form.csv'
+#     if os.path.exists(current_form_path):
+#         print("Loading and merging current form data...")
+#         current_form = pd.read_csv(current_form_path)
         
-        # Calculate current form total
-        sg_columns = ['sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
-        finishes = current_form['recent_finishes'].apply(_parse_recent_finishes)
-        current_form['current_form'] = current_form[sg_columns].sum(axis=1)
+#         # Calculate current form total
+#         sg_columns = ['sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
+#         finishes = current_form['recent_finishes'].apply(_parse_recent_finishes)
+#         current_form['current_form'] = current_form[sg_columns].sum(axis=1)
 
         
-        # Merge with form_df, using outer join to keep all players from both sources
-        form_df = pd.merge(
-            form_df, 
-            current_form[['Name', 'current_form']], 
-            on='Name', 
-            how='outer'  # Changed from 'left' to 'outer'
-        )
+#         # Merge with form_df, using outer join to keep all players from both sources
+#         form_df = pd.merge(
+#             form_df, 
+#             current_form[['Name', 'current_form']], 
+#             on='Name', 
+#             how='outer'  # Changed from 'left' to 'outer'
+#         )
         
-        # Fill NaN values with the other source if available
-        form_df['current_form'] = form_df['current_form'].fillna(form_df['long_term_form'])
-        form_df['long_term_form'] = form_df['long_term_form'].fillna(form_df['current_form'])
+#         # Fill NaN values with the other source if available
+#         form_df['current_form'] = form_df['current_form'].fillna(form_df['long_term_form'])
+#         form_df['long_term_form'] = form_df['long_term_form'].fillna(form_df['current_form'])
         
-        # Calculate weighted form score
-        # For players with only current form, use that exclusively
-        form_df['Form Score'] = np.where(
-            form_df['long_term_form'].isna(),
-            form_df['current_form'],  # Use only current form if no long-term data
-            form_df['current_form'] * weights['form']['current'] + 
-            form_df['long_term_form'] * weights['form']['long']
-        )
-    else:
-        print("Current form data not found, using PGA stats only")
-        form_df['Form Score'] = form_df['long_term_form']
+#         # Calculate weighted form score
+#         # For players with only current form, use that exclusively
+#         form_df['Form Score'] = np.where(
+#             form_df['long_term_form'].isna(),
+#             form_df['current_form'],  # Use only current form if no long-term data
+#             form_df['current_form'] * weights['form']['current'] + 
+#             form_df['long_term_form'] * weights['form']['long']
+#         )
+#     else:
+#         print("Current form data not found, using PGA stats only")
+#         form_df['Form Score'] = form_df['long_term_form']
     
-    # Clean up intermediate columns
-    form_df = form_df[['Name', 'Form Score']]
+#     # Clean up intermediate columns
+#     form_df = form_df[['Name', 'Form Score']]
     
-    return form_df
+#     return form_df
 
 def normalize_with_outlier_handling(series: pd.Series) -> pd.Series:
     """
