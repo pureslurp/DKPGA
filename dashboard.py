@@ -254,7 +254,7 @@ def main():
     # Tournament selection using available tournaments
     selected_tournament = st.sidebar.selectbox(
         "Select Tournament",
-        get_available_tournaments(featured_tournament="RBC_Heritage")
+        get_available_tournaments(featured_tournament="THE_CJ_CUP_Byron_Nelson")
     )
     
     # Add weight validation
