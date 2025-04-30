@@ -247,7 +247,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "THE_CJ_CUP_Byron_Nelson": {
         "ID": 401703508,
-        "Course": "TPC_Craig_Ranch"
+        "Course": "TPC_Craig_Ranch",
+        "pga-url": "the-cj-cup-byron-nelson/R2025019"
     },
     "Truist_Championship": {
         "ID": 401703509,
