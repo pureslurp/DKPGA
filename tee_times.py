@@ -35,14 +35,14 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
         
         # Wait for tee time rows to load
         wait = WebDriverWait(driver, 20)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-79elbk")))
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-paaamq")))
         
         # Get the page source after JavaScript has loaded
         html_content = driver.page_source
         soup = BeautifulSoup(html_content, 'html.parser')
         
         # Extract tee time data
-        rows = soup.find_all('tr', class_='css-79elbk')
+        rows = soup.find_all('tr', class_='css-paaamq')
         tee_times = []
         
         print(f"Found {len(rows)} tee time rows")  # Debug print
@@ -58,15 +58,15 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
                 
                 # Process each player in the group
                 for player_div in player_divs:
-                    # Find the player image which contains the name in alt attribute
-                    player_img = player_div.find('img', class_='chakra-avatar__img')
-                    if player_img and player_img.get('alt'):
-                        player_name = player_img.get('alt')
+                    # Find the player name in the text content
+                    player_name_elem = player_div.find('span', class_='css-qvuvio')
+                    if player_name_elem:
+                        player_name = player_name_elem.text.strip()
                         player_name = fix_names(player_name)
                         print(f"  Found player: {player_name}")  # Debug print
                         tee_times.append([time, player_name])
                     else:
-                        print(f"  No player image found")  # Debug print
+                        print(f"  No player name found")  # Debug print
             else:
                 print(f"Missing time cell or player divs")  # Debug print
         
@@ -144,7 +144,7 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "RBC_Heritage"
+    TOURNEY = "THE_CJ_CUP_Byron_Nelson"
     tee_times_path = f'2025/{TOURNEY}/tee_times.csv'
     
     # Check if tee times file already exists

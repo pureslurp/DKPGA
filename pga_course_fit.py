@@ -78,20 +78,25 @@ def extract_player_data(table):
     header_row = table.find('tr', class_='css-1odhsqu')
     if header_row:
         # Get all stat headers (skip Player and Projected Course Fit)
-        for header_cell in header_row.find_all('th')[2:]:
-            button = header_cell.find('button', class_='css-p11w71')
+        stat_headers = header_row.find_all('th')[2:]
+        for header_cell in stat_headers:
+            button = header_cell.find('button', class_=lambda x: x and 'css-' in x)
             if button:
                 header_text = button.text.strip()
                 clean_header = clean_header_text(header_text)
                 headers.append(clean_header)
     
     # Process each player row
-    for row in table.find_all('tr', class_=lambda x: x and 'player-' in x):
-        # Get all data cells (already skips the name cell)
-        data_cells = row.find_all('td', class_=['css-1v8y6rt', 'css-deko6d', 'css-4lb9jb', 'css-1vziul4'])
+    player_rows = table.find_all('tr', class_=lambda x: x and ('player-' in x or 'css-' in x) and x != 'css-1odhsqu')
+    
+    for row in player_rows:
+        # Get all data cells
+        data_cells = row.find_all('td', class_=lambda x: x and 'css-' in x)
+        if not data_cells:
+            continue
         
         # Get player name first
-        name_cell = row.find('span', class_='chakra-text css-hmig5c')
+        name_cell = row.find('span', class_='chakra-text css-qvuvio')
         if not name_cell:
             continue
             
@@ -99,19 +104,29 @@ def extract_player_data(table):
         name = fix_names(name)
         player_data = {'Name': name}
         
-        # Get projected course fit - now assign None instead of skipping
-        rank_cell = data_cells[0]
-        rank_span = rank_cell.find('span', class_='chakra-text css-1dmexvw')
-        if not rank_span or rank_span.text.strip() == '-':
-            player_data['projected_course_fit'] = None
-        else:
-            player_data['projected_course_fit'] = float(rank_span.text.strip())
+        # Get projected course fit - updated to handle the first column
+        if len(data_cells) > 1:  # Make sure we have at least 2 cells
+            # First cell is strokes_gained_off_the_tee_par_5
+            first_stat = data_cells[0].find('span', class_='chakra-text css-1dmexvw')
+            if first_stat:
+                try:
+                    player_data['strokes_gained_off_the_tee_par_5'] = float(first_stat.text.strip())
+                except (ValueError, AttributeError):
+                    player_data['strokes_gained_off_the_tee_par_5'] = None
+            
+            # Second cell is projected_course_fit
+            second_stat = data_cells[1].find('span', class_='chakra-text css-1dmexvw')
+            if second_stat:
+                try:
+                    player_data['projected_course_fit'] = float(second_stat.text.strip())
+                except (ValueError, AttributeError):
+                    player_data['projected_course_fit'] = None
         
         # Process the remaining stat cells
-        for header, cell in zip(headers[2:], data_cells[1:]):
+        for header, cell in zip(headers[2:], data_cells[2:]):
             value_span = cell.find('span', class_='chakra-text css-1dmexvw')
             if value_span:
-                score_p = value_span.find('p', class_=['chakra-text css-4ysu3v', 'chakra-text css-boq55u'])
+                score_p = value_span.find('p', class_=lambda x: x and 'chakra-text' in x)
                 if score_p:
                     score_text = score_p.text.strip('()').strip()
                     try:
@@ -125,8 +140,7 @@ def extract_player_data(table):
         
         players.append(player_data)
     
-    df = pd.DataFrame(players)
-    return df
+    return pd.DataFrame(players)
 
 def format_course_fit(df):
     """Format course fit data for analysis"""
@@ -149,42 +163,47 @@ def get_course_fit(url: str) -> Optional[pd.DataFrame]:
     firefox_options = Options()
     firefox_options.add_argument("--headless")
     
-    # try:
     driver = webdriver.Firefox(options=firefox_options)
     driver.get(url)
     
-    wait = WebDriverWait(driver, 20)
-    table = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "chakra-table")))
-    
-    html_content = driver.page_source
-    soup = BeautifulSoup(html_content, 'html.parser')
-    table = soup.find('table', class_='chakra-table')
-    
-    if not table:
-        raise ValueError("Could not find table in page content")
-    
-    # Extract and format data
-    df = extract_player_data(table)
-    
-    if df.empty:
-        raise ValueError("No data extracted from table")
+    try:
+        wait = WebDriverWait(driver, 20)
+        table = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "chakra-table")))
         
-    df = format_course_fit(df)
-    
-    return df
-    
-    # except Exception as e:
-    #     print(f"Error scraping data: {e}")
-    #     return None
+        html_content = driver.page_source
+        soup = BeautifulSoup(html_content, 'html.parser')
+        table = soup.find('table', class_='chakra-table')
         
-    # finally:
-    #     try:
-    #         driver.quit()
-    #     except:
-    #         pass
+        if not table:
+            print("Debug: Table not found in page content")
+            raise ValueError("Could not find table in page content")
+        
+        print("Debug: Found table, attempting to extract data")
+        # Extract and format data
+        df = extract_player_data(table)
+        
+        print(f"Debug: DataFrame shape after extraction: {df.shape if df is not None else 'None'}")
+        
+        if df.empty:
+            print("Debug: DataFrame is empty after extraction")
+            raise ValueError("No data extracted from table")
+            
+        df = format_course_fit(df)
+        
+        return df
+    
+    except Exception as e:
+        print(f"Debug: Error occurred: {str(e)}")
+        return None
+        
+    finally:
+        try:
+            driver.quit()
+        except:
+            pass
 
 if __name__ == "__main__":
-    TOURNEY = "RBC_Heritage"
+    TOURNEY = "THE_CJ_CUP_Byron_Nelson"
     # Get the URL from tournament list
     pga_url = TOURNAMENT_LIST_2025[TOURNEY]['pga-url']
     url = f"https://www.pgatour.com/tournaments/2025/{pga_url}/field/course-fit"

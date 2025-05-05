@@ -94,7 +94,7 @@ def get_completed_rounds_scores(url):
     return df_scores
 
 if __name__ == "__main__":
-    tournament_name = "RBC_Heritage"
+    tournament_name = "THE_CJ_CUP_Byron_Nelson"
     tournament_id = TOURNAMENT_LIST_2025[tournament_name]["ID"]
     scores = get_completed_rounds_scores(tournament_id)
     scores.to_csv(f'2025/{tournament_name}/current_tournament_scores.csv', index=False)

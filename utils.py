@@ -1,3 +1,4 @@
+from enum import Enum
 import courses
 from courses import Course
 
@@ -154,56 +155,91 @@ TOURNAMENT_LIST_2024 = {
     }
 }
 
+class EventType(Enum):
+    STANDARD = "standard"
+    MAJOR = "major"
+    SIGNATURE = "signature_no_cut"
+
 TOURNAMENT_LIST_2025 = {
     "The_Sentry": {
         "ID": 401703489,
         "Course": Course.get("Kapalua_Resort_(Plantation_Course)", 2025),
-        "pga-url": "the-sentry/R2025016"
+        "pga-url": "the-sentry/R2025016",
+        "event_type": EventType.SIGNATURE,
+        "cut" : False,
+        "completed" : True
     },
     "Sony_Open_in_Hawaii": {
         "ID": 401703490,
         "Course": Course.get("Waialae_Country_Club", 2025),
-        "pga-url": "sony-open-in-hawaii/R2025006"
+        "pga-url": "sony-open-in-hawaii/R2025006",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "The_American_Express": {
         "ID": 401703491,
         "Course": "La_Quinta_Country_Club",
-        "pga-url": "the-american-express/R2025002"
+        "pga-url": "the-american-express/R2025002",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "Farmers_Insurance_Open": {
         "ID": 401703492,
         "Course": "Torrey_Pines_(South_Course)",
-        "pga-url": "farmers-insurance-open/R2025004"
+        "pga-url": "farmers-insurance-open/R2025004",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "AT&T_Pebble_Beach_Pro-Am": {
         "ID": 401703493,
         "Course": "Pebble_Beach_Golf_Links",
-        "pga-url": "att-pebble-beach-pro-am/R2025005"
+        "pga-url": "att-pebble-beach-pro-am/R2025005",
+        "event_type": EventType.SIGNATURE,
+        "cut" : False,
+        "completed" : True
     },
     "WM_Phoenix_Open": {
         "ID": 401703494,
         "Course": "TPC_Scottsdale_(Stadium_Course)",
-        'pga-url': 'wm-phoenix-open/R2025003'
+        'pga-url': 'wm-phoenix-open/R2025003',
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "The_Genesis_Invitational": {
         "ID": 401703495,
         "Course": "Torrey Pines_(South_Course)",
-        "pga-url": "the-genesis-invitational/R2025007"
+        "pga-url": "the-genesis-invitational/R2025007",
+        "event_type": EventType.SIGNATURE,
+        "cut" : True,
+        "completed" : True
     },
     "Mexico_Open_at_VidantaWorld": {
         "ID": 401703496,
         "Course": "Vidanta_Vallarta",
-        "pga-url": "mexico-open-at-vidantaworld/R2025540"
+        "pga-url": "mexico-open-at-vidantaworld/R2025540",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "Cognizant_Classic_in_The_Palm_Beaches": {
         "ID": 401703497,
         "Course": "PGA_National_Resort_&_Spa_(The_Champion)",
-        "pga-url": "cognizant-classic-in-the-palm-beaches/R2025010"
+        "pga-url": "cognizant-classic-in-the-palm-beaches/R2025010",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "Arnold_Palmer_Invitational_presented_by_Mastercard": {
         "ID": 401703498,
         "Course": "Arnold_Palmer's_Bay_Hill_Club_&_Lodge",
-        "pga-url": "arnold-palmer-invitational-presented-by-mastercard/R2025009"
+        "pga-url": "arnold-palmer-invitational-presented-by-mastercard/R2025009",
+        "event_type": EventType.SIGNATURE,
+        "cut" : True,
+        "completed" : True
     },
     "Puerto_Rico_Open": {
         "ID": 401703499,
@@ -212,46 +248,75 @@ TOURNAMENT_LIST_2025 = {
     "THE_PLAYERS_Championship": {
         "ID": 401703500,
         "Course": "TPC_Sawgrass_(THE_PLAYERS_Stadium_Course)",
-        "pga-url": "the-players-championship/R2025011"
+        "pga-url": "the-players-championship/R2025011",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "Valspar_Championship": {
         "ID": 401703501,
         "Course": "Innisbrook_Resort_(Copperhead_Course)",
-        "pga-url": "valspar-championship/R2025475"
+        "pga-url": "valspar-championship/R2025475",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "Texas_Children's_Houston_Open": {
         "ID": 401703502,
         "Course": "Memorial_Park_Golf_Course",
-        "pga-url": "texas-childrens-houston-open/R2025020"
+        "pga-url": "texas-childrens-houston-open/R2025020",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "Valero_Texas_Open": {
         "ID": 401703503,
         "Course": None,
         "pga-url": "valero-texas-open/R2025041",
-        "Course": "TPC_San_Antonio_(Oaks_Course)"
+        "Course": "TPC_San_Antonio_(Oaks_Course)",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "Masters_Tournament": {
         "ID": 401703504,
         "Course": "Augusta_National_Golf_Club",
-        "pga-url": "masters-tournament/R2025014"
+        "pga-url": "masters-tournament/R2025014",
+        "event_type": EventType.MAJOR,
+        "cut" : True,
+        "completed" : True
     },
     "RBC_Heritage": {
         "ID": 401703505,
         "Course": "Harbour_Town_Golf_Links",
-        "pga-url": "rbc-heritage/R2025012"
+        "pga-url": "rbc-heritage/R2025012",
+        "event_type": EventType.SIGNATURE,
+        "cut" : False,
+        "completed" : True
     },
     "Corales_Puntacana_Championship": {
         "ID": 401703506,
         "Course": "Puntacana_Resort_&_Club_(Corales_Golf_Course)",
-        "pga-url": "corales-puntacana-championship/R2025016"
+        "pga-url": "corales-puntacana-championship/R2025016",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "THE_CJ_CUP_Byron_Nelson": {
         "ID": 401703508,
-        "Course": "TPC_Craig_Ranch"
+        "Course": "TPC_Craig_Ranch",
+        "pga-url": "the-cj-cup-byron-nelson/R2025019",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "Truist_Championship": {
         "ID": 401703509,
-        "Course": "Quail_Hollow_Club"
+        "Course": "Quail_Hollow_Club",
+        "pga-url": "truist-championship/R2025022",
+        "event_type": EventType.SIGNATURE,
+        "cut" : False,
+        "completed" : False
     },
     "Myrtle_Beach_Classic": {
         "ID": 401703510,
@@ -267,7 +332,10 @@ TOURNAMENT_LIST_2025 = {
     },
     "the_Memorial_Tournament_pres._by_Workday": {
         "ID": 401703513,
-        "Course": "Muirfield_Village_Golf_Club"
+        "Course": "Muirfield_Village_Golf_Club",
+        "pga-url": "the-memorial-tournament-pres-by-workday/R2025021",
+        "event_type": EventType.SIGNATURE,
+        "cut" : True
     },
     "RBC_Canadian_Open": {
         "ID": 401703514,
