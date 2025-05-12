@@ -313,7 +313,7 @@ TOURNAMENT_LIST_2025 = {
     "Truist_Championship": {
         "ID": 401703509,
         "Course": "Quail_Hollow_Club",
-        "pga-url": "truist-championship/R2025022",
+        "pga-url": "truist-championship/R2025480",
         "event_type": EventType.SIGNATURE,
         "cut" : False,
         "completed" : False

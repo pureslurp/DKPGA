@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "THE_CJ_CUP_Byron_Nelson"
+TOURNEY = "Truist_Championship"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -520,7 +520,6 @@ def calculate_fit_score_from_csv(name: str, course_fit_df: pd.DataFrame) -> floa
     """
     # Find player in dataframe
     player_data = course_fit_df[course_fit_df['Name'].apply(fix_names) == fix_names(name)]
-    
     if len(player_data) == 0:
         return 0.0  # Return 0 if player not found
     
@@ -644,7 +643,6 @@ def calculate_scores_parallel(golfers, tourney_history, course_fit_df, tourney: 
     def process_golfer(golfer, pga_stats, current_form_df):  # Add parameters here
         history_score = calculate_tournament_history_score(golfer.get_clean_name, tourney_history)
         fit_score = calculate_fit_score_from_csv(golfer.get_clean_name, course_fit_df)
-        
         # Calculate form score for this golfer
         player_stats = pga_stats[pga_stats['Name'].apply(fix_names) == golfer.get_clean_name]
         long_term_form = player_stats['sg_total'].iloc[0] if not player_stats.empty else 0
@@ -774,10 +772,10 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
             'long': 0.3
         },
         'components': {
-            'odds': 0.2,
-            'fit': 0.5,
-            'history': 0.3,
-            'form': 0.0
+            'odds': 0.6,
+            'fit': 0.0,
+            'history': 0.0,
+            'form': 0.4
         }
     }
     
@@ -890,12 +888,18 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
     dk_data = pd.merge(dk_data, scores_df, on='Name', how='left')
     dk_data['Form Score'] = dk_data['Form Score'].fillna(0)
     
-    # Normalize all components
+    # Normalize all components and handle NaN values
     dk_data['Normalized Fit'] = (dk_data['Fit Score'] - dk_data['Fit Score'].min()) / \
         (dk_data['Fit Score'].max() - dk_data['Fit Score'].min())
     dk_data['Normalized History'] = (dk_data['History Score'] - dk_data['History Score'].min()) / \
         (dk_data['History Score'].max() - dk_data['History Score'].min())
     dk_data['Normalized Form'] = normalize_with_outlier_handling(dk_data['Form Score'])
+
+    # Fill NaN values with 0 for all normalized components
+    dk_data['Normalized Odds'] = dk_data['Normalized Odds'].fillna(0)
+    dk_data['Normalized Fit'] = dk_data['Normalized Fit'].fillna(0)
+    dk_data['Normalized History'] = dk_data['Normalized History'].fillna(0)
+    dk_data['Normalized Form'] = dk_data['Normalized Form'].fillna(0)
 
     # Calculate Total using all components
     dk_data['Total'] = (
