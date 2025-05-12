@@ -3,7 +3,7 @@ from backtest.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "THE_CJ_CUP_Byron_Nelson"
+tournament = "Truist_Championship"
 
 # Get results data
 try:
