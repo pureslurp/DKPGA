@@ -316,7 +316,7 @@ TOURNAMENT_LIST_2025 = {
         "pga-url": "truist-championship/R2025480",
         "event_type": EventType.SIGNATURE,
         "cut" : False,
-        "completed" : False
+        "completed" : True
     },
     "Myrtle_Beach_Classic": {
         "ID": 401703510,
@@ -324,7 +324,11 @@ TOURNAMENT_LIST_2025 = {
     },
     "PGA_Championship": {
         "ID": 401703511,
-        "Course": "Valhalla_Golf_Club"
+        "Course": "Quail_Hollow_Club",
+        "pga-url": "pga-championship/R2025033",
+        "event_type": EventType.MAJOR,
+        "cut" : True,
+        "completed" : False
     },
     "Charles_Schwab_Challenge": {
         "ID": 401703512,

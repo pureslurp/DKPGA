@@ -122,9 +122,9 @@ def fetch_leaderboard(url):
                 if len(cells) < 8:  # Skip rows without enough data
                     continue
                 
-                # Extract only position and player name (with fix_names)
+                # Extract position and player name (updated class name)
                 position = cells[0].text.strip()
-                player_name = fix_names(cells[2].find_element(By.CLASS_NAME, 'css-hmig5c').text.strip())
+                player_name = fix_names(cells[2].find_element(By.CLASS_NAME, 'css-qvuvio').text.strip())
                 
                 data.append({
                     'Player': player_name,
@@ -209,13 +209,12 @@ def main(urls, tourney):
 
 if __name__ == "__main__":
     # Example usage
-    tourney = "The_Genesis_Invitational"
+    tourney = "PGA_Championship"
     urls = {
-        '2025': f"https://www.pgatour.com/tournaments/2025/farmers-insurance-open/R2025004",
-        '2024': "https://www.pgatour.com/tournaments/2024/farmers-insurance-open/R2024004",
-        '2023': "https://www.pgatour.com/tournaments/2023/farmers-insurance-open/R2023004",
-        '2022': "https://www.pgatour.com/tournaments/2022/farmers-insurance-open/R2022004",
-        '2021': "https://www.pgatour.com/tournaments/2021/farmers-insurance-open/R2021004"
+        '2024': "https://www.pgatour.com/tournaments/2024/wells-fargo-championship/R2024480",
+        '2023': "https://www.pgatour.com/tournaments/2023/wells-fargo-championship/R2023480",
+        '2021': "https://www.pgatour.com/tournaments/2021/wells-fargo-championship/R2021480",
+        '2020': "https://www.pgatour.com/tournaments/2019/wells-fargo-championship/R2019480",
     }
     
     df = main(urls, tourney)
