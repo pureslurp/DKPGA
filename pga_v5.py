@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "Truist_Championship"
+TOURNEY = "PGA_Championship"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -131,7 +131,7 @@ class DKLineupOptimizer:
                 prob += pulp.lpSum([decisions[p['Name + ID']] for p in very_expensive_players]) <= 1
             
             # Constraint 5: No players below lowest salary tier
-            cheap_threshold = 6400 if min_salary >= 6000 else 6000
+            cheap_threshold = 6400 if min_salary >= 6000 else 5700
             cheap_players = [p for p in players if p['Salary'] <= cheap_threshold]
             if cheap_players:
                 prob += pulp.lpSum([decisions[p['Name + ID']] for p in cheap_players]) <= 1
@@ -366,14 +366,13 @@ def calculate_tournament_history_score(name: str, history_df: pd.DataFrame) -> f
     
     # Get players with recent history for median calculation
     players_with_recent = history_df[history_df.apply(has_recent_history, axis=1)]
-    median_score = 0.0
-    if len(players_with_recent) > 0:
-        history_scores = []
-        for _, player in players_with_recent.iterrows():
-            temp_df = pd.DataFrame([player])
-            score = calculate_tournament_history_score_internal(temp_df.iloc[0], history_df)
-            history_scores.append(score)
-        median_score = np.median(history_scores)
+    history_scores = []
+    for _, player in players_with_recent.iterrows():
+        temp_df = pd.DataFrame([player])
+        score = calculate_tournament_history_score_internal(temp_df.iloc[0], history_df)
+        history_scores.append(score)
+    max_score = max(history_scores)
+    median_score = max_score * 0.4  # Take 40% of the max score
     
     # If player has no history or only old history, return median
     if len(player_history) == 0 or player_history['measured_years'].iloc[0] == 0:
@@ -632,7 +631,37 @@ def normalize_with_outlier_handling(series: pd.Series) -> pd.Series:
     return normalized
 
 def calculate_scores_parallel(golfers, tourney_history, course_fit_df, tourney: str, weights: dict):
-    """Calculate fit, history, and form scores in parallel"""
+    """
+    Calculate history, fit, and form scores for all golfers in parallel using ThreadPoolExecutor.
+
+    This function processes multiple golfers simultaneously to improve performance when calculating
+    various scoring components used in DraftKings lineup optimization.
+
+    Args:
+        golfers (List[Golfer]): List of Golfer objects to process
+        tourney_history (pd.DataFrame): Tournament or course history data containing past performance
+        course_fit_df (pd.DataFrame): Course fit data with projected performance metrics
+        tourney (str): Tournament name used for file path construction
+        weights (dict): Dictionary containing scoring weights with structure:
+            {
+                'form': {
+                    'current': float,  # Weight for current form (0-1)
+                    'long': float      # Weight for long-term form (0-1)
+                }
+            }
+
+    Returns:
+        pd.DataFrame: DataFrame containing calculated scores with columns:
+            - Name: Golfer's clean name
+            - History Score: Tournament/course history score (0-100)
+            - Fit Score: Course fit score (0-100)
+            - Form Score: Combined current and long-term form score (0-1)
+
+    Note:
+        - Loads PGA stats and current form data from CSV files in the tournament directory
+        - Uses ThreadPoolExecutor for parallel processing
+        - Handles missing data gracefully by providing default values
+    """
     # Load data once before parallel processing
     pga_stats = pd.read_csv(f'2025/{tourney}/pga_stats.csv')
     current_form_df = None
@@ -772,10 +801,10 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
             'long': 0.3
         },
         'components': {
-            'odds': 0.6,
-            'fit': 0.0,
+            'odds': 0.3,
+            'fit': 0.5,
             'history': 0.0,
-            'form': 0.4
+            'form': 0.2
         }
     }
     
