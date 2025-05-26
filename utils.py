@@ -332,7 +332,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "Charles_Schwab_Challenge": {
         "ID": 401703512,
-        "Course": "Colonial_Country_Club"
+        "Course": "Colonial_Country_Club",
+        "pga-url": "charles-schwab-challenge/R2025021"
     },
     "the_Memorial_Tournament_pres._by_Workday": {
         "ID": 401703513,
