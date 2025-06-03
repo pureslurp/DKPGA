@@ -316,7 +316,7 @@ TOURNAMENT_LIST_2025 = {
         "pga-url": "truist-championship/R2025480",
         "event_type": EventType.SIGNATURE,
         "cut" : False,
-        "completed" : True
+        "completed" : False
     },
     "Myrtle_Beach_Classic": {
         "ID": 401703510,
@@ -335,10 +335,10 @@ TOURNAMENT_LIST_2025 = {
         "Course": "Colonial_Country_Club",
         "pga-url": "charles-schwab-challenge/R2025021"
     },
-    "the_Memorial_Tournament_pres._by_Workday": {
+    "the_Memorial_Tournament_presented_by_Workday": {
         "ID": 401703513,
         "Course": "Muirfield_Village_Golf_Club",
-        "pga-url": "the-memorial-tournament-pres-by-workday/R2025021",
+        "pga-url": "the-memorial-tournament-presented-by-workday/R2025023",
         "event_type": EventType.SIGNATURE,
         "cut" : True
     },

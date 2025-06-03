@@ -9,7 +9,7 @@ import math
 # Add parent directory to path (more robust way)
 sys.path.append(str(Path(__file__).parent.parent))
 
-from utils import TOURNAMENT_LIST_2025, fix_names
+from utils import TOURNAMENT_LIST_2025, EventType, fix_names
 from pga_v5 import main as pga_main
 from dk_find_best_finish import load_data, merge_data, optimize_lineup
 
@@ -231,14 +231,15 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
     Test different weight combinations and return the top performers based on
     multiple metrics including success score.
     """
-    # # Filter tournaments from TOURNAMENT_LIST_2025 where cut is False and completed is True
+    # Filter tournaments from TOURNAMENT_LIST_2025 where completed is True, and event_type is SIGNATURE
     # tournaments = [
     #     tournament for tournament, details in TOURNAMENT_LIST_2025.items()
-    #     if details.get("cut") is False and details.get("completed") is True
+    #     if details.get("completed") is True
+    #     and details.get("event_type") == EventType.SIGNATURE
     # ]
-    # print(f"Testing completed no-cut tournaments: {tournaments}")
+    # print(f"Testing completed SIGNATURE tournaments: {tournaments}")
 
-    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld", "Cognizant_Classic_in_The_Palm_Beaches", "Arnold_Palmer_Invitational_presented_by_Mastercard", "THE_PLAYERS_Championship", "Valspar_Championship", "Texas_Children's_Houston_Open", "Valero_Texas_Open", "RBC_Heritage", "THE_CJ_CUP_Byron_Nelson"]
+    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld", "Cognizant_Classic_in_The_Palm_Beaches", "Arnold_Palmer_Invitational_presented_by_Mastercard", "THE_PLAYERS_Championship", "Valspar_Championship", "Texas_Children's_Houston_Open", "Valero_Texas_Open", "RBC_Heritage", "THE_CJ_CUP_Byron_Nelson", "Charles_Schwab_Challenge","the_Memorial_Tournament_presented_by_Workday"]
     tournaments = tournaments[-5:]
     weight_combinations = generate_weight_combinations()
     results_file = "backtest/pga_v5_backtest_results.csv"
@@ -357,14 +358,18 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
     top_raw_averages = {'avg': [], 'best': [], 'ev': []}
     
     for metric in ['avg', 'best', 'ev']:
-        # Sort by raw averages for all metrics
-        sorted_weights = sorted(weight_raw_averages[metric].items(), key=lambda x: x[1], reverse=True)
+        if metric == 'ev':
+            # Sort by raw EV values
+            sorted_weights = sorted(weight_raw_averages[metric].items(), key=lambda x: x[1], reverse=True)
+        else:
+            # Sort by normalized scores for avg and best
+            sorted_weights = sorted(weight_performances[metric].items(), key=lambda x: x[1], reverse=True)
             
         for weight_str, score in sorted_weights[:3]:
             for w in weight_combinations:
                 if str(w['components']) == weight_str:
                     top_weights[metric].append(w)
-                    top_scores[metric].append(score)
+                    top_scores[metric].append(weight_performances[metric][weight_str])  # Always store normalized score
                     top_raw_averages[metric].append(weight_raw_averages[metric][weight_str])
                     break
     
@@ -398,7 +403,7 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
     except ImportError:
         print("Matplotlib not installed - skipping plots")
     
-    return (top_weights['avg'], top_scores['avg'], top_raw_averages['avg'], 
+    return (top_weights['avg'], top_scores['avg'], top_raw_averages['avg'],
             top_weights['best'], top_scores['best'], top_raw_averages['best'],
             top_weights['ev'], top_scores['ev'], top_raw_averages['ev'],
             tournament_highlights)
