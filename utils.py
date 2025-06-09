@@ -344,7 +344,8 @@ TOURNAMENT_LIST_2025 = {
     },
     "RBC_Canadian_Open": {
         "ID": 401703514,
-        "Course": "Hamilton_Golf_&_Country_Club"
+        "Course": "Hamilton_Golf_&_Country_Club",
+        "pga-url": "rbc-canadian-open/R2025032"
     },
     "U.S._Open": {
         "ID": 401703515,

@@ -285,5 +285,5 @@ def create_pga_stats(tourney: str, weights: dict = None):
         print(f"Stats file already exists at: {stats_path}")
 
 if __name__ == "__main__":
-    tourney = "the_Memorial_Tournament_presented_by_Workday"
+    tourney = "RBC_Canadian_Open"
     create_pga_stats(tourney)
