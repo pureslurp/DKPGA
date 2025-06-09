@@ -3,7 +3,7 @@ from backtest.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "the_Memorial_Tournament_presented_by_Workday"
+tournament = "RBC_Canadian_Open"
 
 # Get results data
 try:
