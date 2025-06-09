@@ -18,36 +18,31 @@ from utils import TOURNAMENT_LIST_2025
 def parse_recent_finishes(row_data):
     """Parse the last 5 tournament finishes"""
     try:
-        print("Debugging parse_recent_finishes:")
-        print(f"Row data type: {type(row_data)}")
-        
         finishes = []
-        # Print the raw HTML we're working with
-        print(f"Row data HTML: {row_data}")
-        
         finish_texts = row_data.find_all('p', class_=['css-1eypu3w', 'css-1o72dcd', 'css-z0g4ki'])
-        print(f"Found {len(finish_texts)} finish texts")
         
         for finish in finish_texts:
-            print(f"Processing finish text: {finish.text.strip()}")
             text = finish.text.strip()
+            
             if text == 'CUT':
-                finishes.append('CUT')  # Keep CUT as string
-            elif text in ['', '-']:  # Empty string or dash means didn't play
+                finishes.append('CUT')
+            elif text in ['', '-']:
                 finishes.append(None)
             elif text == 'P1':
-                finishes.append(1)  # playoff winner counts as a win (1st place)
+                finishes.append(1)
             else:
-                # Remove 'T' from tied positions and convert to integer
                 try:
                     finishes.append(int(text.replace('T', '')))
                 except ValueError:
-                    finishes.append(None)  # Handle any unexpected values
+                    finishes.append(None)
                     
-        print(f"Final finishes list: {finishes}")
         return finishes
+        
     except Exception as e:
         print(f"Error in parse_recent_finishes: {str(e)}")
+        print(f"Full error details: ", e.__class__.__name__)
+        import traceback
+        print(traceback.format_exc())
         raise
 
 def parse_strokes_gained(row_data):
@@ -84,69 +79,62 @@ def parse_strokes_gained(row_data):
 def extract_player_data(table):
     """Extract player form data from HTML table"""
     try:
-        print("\nDebugging extract_player_data:")
-        print(f"Table type: {type(table)}")
-        players = []
-        
         rows = table.find_all('tr', class_=lambda x: x and 'player-' in x)
-        print(f"Found {len(rows)} player rows")
         
+        players = []
         for row in rows:
             try:
-                print("\nDEBUG: Full row HTML:")
-                print(row)
-                
-                player_data = {}
-                
-                # Try different possible class names for the player name
-                name_cell = (row.find('span', class_='css-qvuvio') or  # Try new class first
-                           row.find('span', class_='chakra-text css-qvuvio') or  # Try with chakra-text
-                           row.find('span', class_='css-hmig5c'))  # Try old class as fallback
-                
-                print(f"DEBUG: Name cell found: {name_cell}")
+                name_cell = (row.find('span', class_='css-qvuvio') or
+                           row.find('span', class_='chakra-text css-qvuvio') or
+                           row.find('span', class_='css-hmig5c'))
                 
                 if not name_cell:
-                    print("DEBUG: Could not find name cell, skipping row")
                     continue
                 
                 name = name_cell.text.strip()
-                print(f"DEBUG: Found name: {name}")
-                
                 if ',' in name:
                     last_name, first_name = name.split(',', 1)
                     name = f"{first_name.strip()} {last_name.strip()}"
                 name = fix_names(name)
-                player_data['Name'] = name
-                print(f"Processing player: {name}")
-                    
-                # Get recent finishes
+                
+                player_data = {'Name': name}
+                
                 finish_cell = row.find('td', class_='css-deko6d')
                 if finish_cell:
-                    player_data['recent_finishes'] = parse_recent_finishes(finish_cell)
+                    finishes = parse_recent_finishes(finish_cell)
+                    player_data['recent_finishes'] = finishes
                 
-                # Get strokes gained data
-                sg_cells = row.find_all('td', class_='css-deko6d')[1:]
                 sg_data = parse_strokes_gained(row)
                 player_data.update(sg_data)
                 
                 players.append(player_data)
                 
             except Exception as e:
-                print(f"Error processing player row: {str(e)}")
+                print(f"Error processing row: {str(e)}")
+                print(f"Full error details: ", e.__class__.__name__)
+                import traceback
+                print(traceback.format_exc())
                 continue
             
         return pd.DataFrame(players)
+        
     except Exception as e:
         print(f"Error in extract_player_data: {str(e)}")
+        print(f"Full error details: ", e.__class__.__name__)
+        import traceback
+        print(traceback.format_exc())
         raise
 
 def format_current_form(df):
     """Format current form data for analysis"""
     # Calculate made cuts percentage (exclude None values, which mean didn't play)
-    df['made_cuts_pct'] = df['recent_finishes'].apply(
-        lambda x: sum(1 for finish in x if finish is not None and finish != 'CUT') / 
-                 sum(1 for finish in x if finish is not None) if x else 0
-    )
+    def made_cuts(x):
+        numerator = sum(1 for finish in x if finish is not None and finish != 'CUT')
+        denominator = sum(1 for finish in x if finish is not None)
+        return numerator / denominator if denominator > 0 else 0
+    
+    # Apply calculations
+    df['made_cuts_pct'] = df.apply(lambda row: made_cuts(row['recent_finishes']), axis=1)
     
     # Calculate average finish (excluding cuts and tournaments not played)
     df['avg_finish'] = df['recent_finishes'].apply(
@@ -207,7 +195,7 @@ def get_current_form(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "the_Memorial_Tournament_presented_by_Workday"
+    TOURNEY = "RBC_Canadian_Open"
     pga_url = TOURNAMENT_LIST_2025[TOURNEY]["pga-url"]
     url = f"https://www.pgatour.com/tournaments/2025/{pga_url}/field/current-form"
     df = get_current_form(url)
