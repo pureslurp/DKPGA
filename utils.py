@@ -328,7 +328,7 @@ TOURNAMENT_LIST_2025 = {
         "pga-url": "pga-championship/R2025033",
         "event_type": EventType.MAJOR,
         "cut" : True,
-        "completed" : False
+        "completed" : True
     },
     "Charles_Schwab_Challenge": {
         "ID": 401703512,
@@ -349,7 +349,11 @@ TOURNAMENT_LIST_2025 = {
     },
     "U.S._Open": {
         "ID": 401703515,
-        "Course": "Pinehurst_No._2"
+        "Course": "Oakmont_Country_Club",
+        "pga-url": "u.s-open/R2025026",
+        "event_type": EventType.MAJOR,
+        "cut" : True,
+        "completed" : False
     },
     "Travelers_Championship": {
         "ID": 401703516,
