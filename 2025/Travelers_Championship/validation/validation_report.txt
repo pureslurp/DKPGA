@@ -1,0 +1,22 @@
+
+Outliers found in Salary:
+  - scottie scheffler: value=13300.00, z-score=4.18 (mean=7524.66, std=1382.31)
+
+Outliers found in Odds Total:
+  - scottie scheffler: value=64.62, z-score=7.58 (mean=6.23, std=7.70)
+
+Outliers found in Normalized Odds:
+  - scottie scheffler: value=1.00, z-score=4.27 (mean=0.33, std=0.16)
+
+Outliers found in Form Score:
+  - scottie scheffler: value=1.00, z-score=3.27 (mean=0.55, std=0.14)
+
+Outliers found in Total:
+  - scottie scheffler: value=0.87, z-score=3.02 (mean=0.42, std=0.15)
+
+Outliers found in Value:
+  - brian harman: value=10.23, z-score=3.04 (mean=5.51, std=1.55)
+
+Suspicious zero values found:
+  - nick dunlap (odds): base=0.77, normalized=0.00
+  - corey conners (form): base=0.20, normalized=0.00
