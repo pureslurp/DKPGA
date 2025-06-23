@@ -345,7 +345,10 @@ TOURNAMENT_LIST_2025 = {
     "RBC_Canadian_Open": {
         "ID": 401703514,
         "Course": "Hamilton_Golf_&_Country_Club",
-        "pga-url": "rbc-canadian-open/R2025032"
+        "pga-url": "rbc-canadian-open/R2025032",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     "U.S._Open": {
         "ID": 401703515,
@@ -353,11 +356,15 @@ TOURNAMENT_LIST_2025 = {
         "pga-url": "u.s-open/R2025026",
         "event_type": EventType.MAJOR,
         "cut" : True,
-        "completed" : False
+        "completed" : True
     },
     "Travelers_Championship": {
         "ID": 401703516,
-        "Course": "TPC_River_Highlands"
+        "Course": "TPC_River_Highlands",
+        "pga-url": "travelers-championship/R2025034",
+        "event_type": EventType.SIGNATURE,
+        "cut" : True,
+        "completed" : False
     },
     "Rocket_Mortgage_Classic": {
         "ID": 401703517,
