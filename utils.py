@@ -175,7 +175,7 @@ TOURNAMENT_LIST_2025 = {
         "pga-url": "sony-open-in-hawaii/R2025006",
         "event_type": EventType.STANDARD,
         "cut" : True,
-        "completed" : True
+        "completed" : False
     },
     "The_American_Express": {
         "ID": 401703491,
@@ -300,7 +300,7 @@ TOURNAMENT_LIST_2025 = {
         "pga-url": "corales-puntacana-championship/R2025016",
         "event_type": EventType.STANDARD,
         "cut" : True,
-        "completed" : True
+        "completed" : False
     },
     "THE_CJ_CUP_Byron_Nelson": {
         "ID": 401703508,
@@ -348,7 +348,7 @@ TOURNAMENT_LIST_2025 = {
         "pga-url": "rbc-canadian-open/R2025032",
         "event_type": EventType.STANDARD,
         "cut" : True,
-        "completed" : True
+        "completed" : False
     },
     "U.S._Open": {
         "ID": 401703515,
@@ -364,11 +364,15 @@ TOURNAMENT_LIST_2025 = {
         "pga-url": "travelers-championship/R2025034",
         "event_type": EventType.SIGNATURE,
         "cut" : True,
-        "completed" : False
+        "completed" : True
     },
-    "Rocket_Mortgage_Classic": {
+    "Rocket_Classic": {
         "ID": 401703517,
-        "Course": "Detroit_Golf_Club"
+        "Course": "Detroit_Golf_Club",
+        "pga-url": "rocket-classic/R2025524",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : False
     },
     "John_Deere_Classic": {
         "ID": 401703518,
