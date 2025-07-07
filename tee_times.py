@@ -35,14 +35,14 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
         
         # Wait for tee time rows to load
         wait = WebDriverWait(driver, 20)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-paaamq")))
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "css-79elbk")))
         
         # Get the page source after JavaScript has loaded
         html_content = driver.page_source
         soup = BeautifulSoup(html_content, 'html.parser')
         
         # Extract tee time data
-        rows = soup.find_all('tr', class_='css-paaamq')
+        rows = soup.find_all('tr', class_='css-79elbk')
         tee_times = []
         
         print(f"Found {len(rows)} tee time rows")  # Debug print
@@ -144,7 +144,7 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "THE_CJ_CUP_Byron_Nelson"
+    TOURNEY = "John_Deere_Classic"
     tee_times_path = f'2025/{TOURNEY}/tee_times.csv'
     
     # Check if tee times file already exists

@@ -3,7 +3,7 @@ from backtest.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "Rocket_Classic"
+tournament = "John_Deere_Classic"
 
 # Get results data
 try:
