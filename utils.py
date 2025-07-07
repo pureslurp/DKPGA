@@ -376,7 +376,11 @@ TOURNAMENT_LIST_2025 = {
     },
     "John_Deere_Classic": {
         "ID": 401703518,
-        "Course": "TPC_Deere_Run"
+        "Course": "TPC_Deere_Run",
+        "pga-url": "john-deere-classic/R2025030",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : False
     },
     "Genesis_Scottish_Open": {
         "ID": 401703519,

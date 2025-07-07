@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
 import pandas as pd
 import time
 import os
@@ -34,10 +35,9 @@ def get_completed_rounds_scores(url):
     if not url.startswith('http'):
         url = f'https://www.espn.com/golf/leaderboard?tournamentId={url}'
     
-    # Initialize webdriver
-    driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver', 
-                             service_log_path=os.path.devnull, 
-                             options=options)
+    # Initialize webdriver with modern Service object
+    service = Service('/usr/local/bin/geckodriver')
+    driver = webdriver.Firefox(service=service, options=options)
     
     driver.get(url)
     time.sleep(2)  # Give page time to load
@@ -55,12 +55,24 @@ def get_completed_rounds_scores(url):
             # Get all table cells in the row
             cells = row.find_elements(By.CLASS_NAME, 'Table__TD')
             
-            # ESPN table structure: cells[7] = R1, cells[8] = R2, cells[9] = R3, cells[10] = R4
+            # Based on the HTML structure, the cells are:
+            # cells[0] = expand/collapse icon
+            # cells[1] = position (1, T2, etc.)
+            # cells[2] = player name cell (contains flag and name)
+            # cells[3] = current score
+            # cells[4] = total score
+            # cells[5] = tee time
+            # cells[6] = R1 score
+            # cells[7] = R2 score
+            # cells[8] = R3 score
+            # cells[9] = R4 score
+            # cells[10] = total score (same as cells[4])
+            
             round_scores = {
-                'R1': cells[7].text,
-                'R2': cells[8].text,
-                'R3': cells[9].text,
-                'R4': cells[10].text
+                'R1': cells[6].text if len(cells) > 6 else '--',
+                'R2': cells[7].text if len(cells) > 7 else '--',
+                'R3': cells[8].text if len(cells) > 8 else '--',
+                'R4': cells[9].text if len(cells) > 9 else '--'
             }
             
             # Convert '--' or '-' to None and calculate total
@@ -68,7 +80,10 @@ def get_completed_rounds_scores(url):
                 if round_scores[key] in ['--', '-'] or not round_scores[key]:
                     round_scores[key] = None
                 else:
-                    round_scores[key] = int(round_scores[key])
+                    try:
+                        round_scores[key] = int(round_scores[key])
+                    except ValueError:
+                        round_scores[key] = None
             
             total_score = sum(score for score in round_scores.values() if score is not None)
             
@@ -94,7 +109,7 @@ def get_completed_rounds_scores(url):
     return df_scores
 
 if __name__ == "__main__":
-    tournament_name = "THE_CJ_CUP_Byron_Nelson"
+    tournament_name = "John_Deere_Classic"
     tournament_id = TOURNAMENT_LIST_2025[tournament_name]["ID"]
     scores = get_completed_rounds_scores(tournament_id)
     scores.to_csv(f'2025/{tournament_name}/current_tournament_scores.csv', index=False)
