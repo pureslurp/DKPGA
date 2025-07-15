@@ -384,7 +384,11 @@ TOURNAMENT_LIST_2025 = {
     },
     "Genesis_Scottish_Open": {
         "ID": 401703519,
-        "Course": "The_Renaissance_Club"
+        "Course": "The_Renaissance_Club",
+        "pga-url": "genesis-scottish-open/R2025541",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : False
     },
     "The_Open": {
         "ID": 401703521,
