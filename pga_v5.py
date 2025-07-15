@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "John_Deere_Classic"
+TOURNEY = "Genesis_Scottish_Open"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -690,6 +690,7 @@ def calculate_scores_parallel(golfers, tourney_history, course_fit_df, tourney: 
                 finish = finish.strip().strip("'").strip('"')  # Remove quotes and whitespace
                 if finish == 'CUT':
                     total_points += 0
+                    cuts += 1
                     valid_finishes += 1
                 elif finish != 'None':
                     try:
@@ -801,10 +802,10 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
             'long': 0.3
         },
         'components': {
-            'odds': 0.6,
-            'fit': 0.0,
+            'odds': 0.1,
+            'fit': 0.4,
             'history': 0.0,
-            'form': 0.4
+            'form': 0.5
         }
     }
     
