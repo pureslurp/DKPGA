@@ -390,9 +390,13 @@ TOURNAMENT_LIST_2025 = {
         "cut" : True,
         "completed" : False
     },
-    "The_Open": {
+    "The_Open_Championship": {
         "ID": 401703521,
-        "Course": "Royal_Troon_Golf_Course"
+        "Course": "Royal_Troon_Golf_Course",
+        "pga-url": "the-open-championship/R2025100",
+        "event_type": EventType.MAJOR,
+        "cut" : True,
+        "completed" : False
     },
     "Barracuda_Championship": {
         "ID": 401703522,

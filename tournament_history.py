@@ -61,7 +61,7 @@ def parse_strokes_gained(row_data: Dict[str, str]) -> Dict[str, float]:
     
     for field, key in sg_fields.items():
         value = row_data.get(field, '')
-        print(value)
+        # print(value)
         if pd.isna(value) or value == '' or value == '-':
             stats[key] = np.nan
         else:
@@ -125,7 +125,7 @@ def extract_player_data(html_table: BeautifulSoup) -> pd.DataFrame:
             name = f"{first_name.strip()} {last_name.strip()}"
         name = fix_names(name)
         
-        print(f"\nProcessing player: {name}")
+        # print(f"\nProcessing player: {name}")
         
         # Get recent finishes
         finish_data = {}
@@ -134,7 +134,7 @@ def extract_player_data(html_table: BeautifulSoup) -> pd.DataFrame:
             if finish:
                 finish_data[year] = finish.text.strip()
         
-        print(f"Finish data: {finish_data}")
+        # print(f"Finish data: {finish_data}")
         
         # Get strokes gained data
         sg_data = {
@@ -162,7 +162,7 @@ def extract_player_data(html_table: BeautifulSoup) -> pd.DataFrame:
                     if sg:
                         sg_data[field] = sg.text.strip()
         
-        print(f"SG data before parsing: {sg_data}")
+        # print(f"SG data before parsing: {sg_data}")
         
         # Parse all data
         player_data = {
@@ -171,7 +171,7 @@ def extract_player_data(html_table: BeautifulSoup) -> pd.DataFrame:
             **parse_strokes_gained(sg_data)
         }
         
-        print(f"Final player data: {player_data}")
+        # print(f"Final player data: {player_data}")
         players.append(player_data)
     
     return pd.DataFrame(players)
@@ -288,9 +288,10 @@ def get_tournament_history(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "Genesis_Scottish_Open"
-    url = f"https://www.pgatour.com/tournaments/2025/{TOURNAMENT_LIST_2025[TOURNEY]['pga-url']}/field/tournament-history"
+    TOURNEY = "The_Open_Championship"
+    url = f"https://www.pgatour.com/tournaments/2025/{TOURNAMENT_LIST_2025[TOURNEY]['pga-url']}/field?feature=tournament-history"
     df = get_tournament_history(url)
+    print(url)
     
     if df is not None:
         print(f"\nTournament: {df['tournament'].iloc[0]}")
