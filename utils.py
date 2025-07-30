@@ -400,7 +400,11 @@ TOURNAMENT_LIST_2025 = {
     },
     "3M_Open": {
         "ID": 401703523,
-        "Course": "TPC_Twin_Cities"
+        "Course": "TPC_Twin_Cities",
+        "pga-url": "3m-open/R2025525",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : False
     },
     "Wyndham_Championship": {
         "ID": 401703524,
