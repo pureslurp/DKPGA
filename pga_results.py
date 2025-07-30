@@ -3,7 +3,7 @@ from backtest.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "Genesis_Scottish_Open"
+tournament = "3M_Open"
 
 # Get results data
 try:
