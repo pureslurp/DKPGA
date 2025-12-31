@@ -404,11 +404,15 @@ TOURNAMENT_LIST_2025 = {
         "pga-url": "3m-open/R2025525",
         "event_type": EventType.STANDARD,
         "cut" : True,
-        "completed" : False
+        "completed" : True
     },
     "Wyndham_Championship": {
         "ID": 401703524,
-        "Course": "Sedgefield_Country_Club"
+        "Course": "Sedgefield_Country_Club",
+        "pga-url": "wyndham-championship/R2025013",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : False
     },
     "FedEx_St._Jude_Championship": {
         "ID": 401703525,
