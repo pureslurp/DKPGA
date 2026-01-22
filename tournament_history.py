@@ -13,7 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
 
-from utils import TOURNAMENT_LIST_2025
+from utils import TOURNAMENT_LIST_2026
 from pga_v5 import fix_names, calculate_tournament_history_score_internal
 
 '''
@@ -24,9 +24,12 @@ Output:
     - tournament/{tournament_name}/tournament_history.csv: the tournament history data
 '''
 
+# Global variable for tournament history years (most recent first)
+TOURNAMENT_HISTORY_YEARS = ["25", "24", "2022-23", "2021-22", "2020-21"]
+
 def parse_finishes(row_data: Dict[str, str]) -> Dict[str, float]:
     """Parse finishing positions for last 5 years"""
-    years = ["24", "2022-23", "2021-22", "2020-21"]
+    years = TOURNAMENT_HISTORY_YEARS
     finishes = {}
     
     for year in years:
@@ -98,7 +101,7 @@ def extract_player_data(html_table: BeautifulSoup) -> pd.DataFrame:
             text = button.text.strip()
             
             # Check if it's a year
-            if text in ['24', '2022-23', '2021-22', '2020-21']:
+            if text in TOURNAMENT_HISTORY_YEARS:
                 available_years.append(text)
             # Check if it's the rounds column (marks start of SG stats)
             elif text == 'Rounds':
@@ -179,7 +182,7 @@ def extract_player_data(html_table: BeautifulSoup) -> pd.DataFrame:
 def format_tournament_history(df: pd.DataFrame) -> pd.DataFrame:
     """Format tournament history data for analysis"""
     # Calculate average finish (excluding DNPs)
-    finish_cols = ['24', '2022-23', '2021-22', '2020-21']
+    finish_cols = TOURNAMENT_HISTORY_YEARS
     df['avg_finish'] = df[finish_cols].replace('CUT', 65).astype(float).mean(axis=1, skipna=True)
     
     # Calculate measured years (number of tournaments played)
@@ -288,8 +291,8 @@ def get_tournament_history(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "Wyndham_Championship"
-    url = f"https://www.pgatour.com/tournaments/2025/{TOURNAMENT_LIST_2025[TOURNEY]['pga-url']}/field/tournament-history"
+    TOURNEY = "Sony_Open_in_Hawaii"
+    url = f"https://www.pgatour.com/tournaments/2026/{TOURNAMENT_LIST_2026[TOURNEY]['pga-url']}/field/tournament-history"
     df = get_tournament_history(url)
     
     if df is not None:
@@ -300,7 +303,7 @@ if __name__ == "__main__":
         # Save to CSV with tournament name
         tournament_name = df['tournament'].iloc[0]
         # Create directory if it doesn't exist
-        os.makedirs(f'2025/{tournament_name}', exist_ok=True)
-        df.to_csv(f'2025/{tournament_name}/tournament_history.csv', index=False)
+        os.makedirs(f'2026/{tournament_name}', exist_ok=True)
+        df.to_csv(f'2026/{tournament_name}/tournament_history.csv', index=False)
     else:
         print("Failed to retrieve tournament history data")

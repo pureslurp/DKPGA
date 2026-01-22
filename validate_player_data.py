@@ -156,8 +156,8 @@ def main(tourney: str):
     """
     Main function to validate player data for a tournament
     """
-    file_path = f"2025/{tourney}/player_data.csv"
-    output_dir = f"2025/{tourney}/validation"
+    file_path = f"2026/{tourney}/player_data.csv"
+    output_dir = f"2026/{tourney}/validation"
     
     # Create output directory if it doesn't exist
     import os

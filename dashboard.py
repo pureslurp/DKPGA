@@ -73,7 +73,7 @@ class DataManager:
         
         # Try to load player data
         try:
-            player_data = pd.read_csv(f"2025/{tournament}/player_data.csv")
+            player_data = pd.read_csv(f"2026/{tournament}/player_data.csv")
             # Apply any stored adjustments
             if tournament in st.session_state.player_data:
                 adjustments = st.session_state.player_data[tournament]
@@ -86,7 +86,7 @@ class DataManager:
         
         # Try to load lineup data independently
         try:
-            lineups = pd.read_csv(f"2025/{tournament}/dk_lineups_optimized.csv")
+            lineups = pd.read_csv(f"2026/{tournament}/dk_lineups_optimized.csv")
         except FileNotFoundError:
             pass
         
@@ -160,10 +160,10 @@ class DataManager:
         }
 
 def get_available_tournaments(featured_tournament: str = None):
-    """Get list of tournaments that have data in the 2025 folder"""
+    """Get list of tournaments that have data in the 2026 folder"""
     try:
-        # Get all subdirectories in the 2025 folder
-        tournaments = [d for d in os.listdir("2025") if os.path.isdir(os.path.join("2025", d))]
+        # Get all subdirectories in the 2026 folder
+        tournaments = [d for d in os.listdir("2026") if os.path.isdir(os.path.join("2026", d))]
         
         # Sort alphabetically first
         tournaments.sort()
@@ -444,7 +444,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         
     # Load odds data first
     try:
-        odds_data = pd.read_csv(f"2025/{selected_tournament}/odds.csv")
+        odds_data = pd.read_csv(f"2026/{selected_tournament}/odds.csv")
         # Get first 10 rows for the prompt
         top_10_odds = odds_data.head(10)
         
@@ -482,7 +482,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
                 # Course Fit section (simplified)
     st.subheader("Course Fit")
     try:
-        course_fit = pd.read_csv(f"2025/{selected_tournament}/course_fit.csv")
+        course_fit = pd.read_csv(f"2026/{selected_tournament}/course_fit.csv")
         top_10_fit = course_fit.head(10)
         # Create container for odds insights
         fit_container = st.empty()
@@ -535,7 +535,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         )
         
         try:
-            current_form = pd.read_csv(f"2025/{selected_tournament}/current_form.csv")
+            current_form = pd.read_csv(f"2026/{selected_tournament}/current_form.csv")
             st.dataframe(current_form, height=400, use_container_width=True)
         except FileNotFoundError:
             st.warning("No current form data available.")
@@ -551,7 +551,7 @@ Higher values emphasize recent performance metrics, combining both short-term (l
             args=('long',)
         )
         try:
-            long_form = pd.read_csv(f"2025/{selected_tournament}/pga_stats.csv")
+            long_form = pd.read_csv(f"2026/{selected_tournament}/pga_stats.csv")
             st.dataframe(long_form, height=400, use_container_width=True)
         except FileNotFoundError:
             st.warning("No long-term form data available.")
@@ -561,13 +561,13 @@ Higher values emphasize recent performance metrics, combining both short-term (l
     st.write("This section shows the golfer's history at this specific tournament. The history is used to calculate the normalized history score.")
     try:
         try:
-            history_data = pd.read_csv(f"2025/{selected_tournament}/tournament_history.csv")
+            history_data = pd.read_csv(f"2026/{selected_tournament}/tournament_history.csv")
 
              # Format the columns for better display
             display_columns = ['Name']
             
             # Add any year columns that exist in the data
-            year_columns = [col for col in history_data.columns if col in ['24', '2022-23', '2021-22', '2020-21', '2019-20']]
+            year_columns = [col for col in history_data.columns if col in ['25', '24', '2022-23', '2021-22', '2020-21']]
             display_columns.extend(year_columns)
             
             # Add the remaining stat columns
@@ -579,14 +579,14 @@ Higher values emphasize recent performance metrics, combining both short-term (l
             numeric_cols = [col for col in ['sg_ott', 'sg_app', 'sg_atg', 'sg_putting', 'sg_total', 
                                           'avg_finish', 'made_cuts_pct'] if col in history_data.columns]
         except:
-            history_data = pd.read_csv(f"2025/{selected_tournament}/course_history.csv")
+            history_data = pd.read_csv(f"2026/{selected_tournament}/course_history.csv")
             st.write("Note: This tournament is not traditionally played on this course, so the history represents the last 5 times this **course** was played. The years in the column headers are not accurate, it is just the last 5 times")
 
             # Format the columns for better display
             display_columns = ['Name']
             
             # Add any year columns that exist in the data
-            year_columns = [col for col in history_data.columns if col in ['24', '2022-23', '2021-22', '2020-21', '2019-20']]
+            year_columns = [col for col in history_data.columns if col in ['25', '24', '2022-23', '2021-22', '2020-21']]
             display_columns.extend(year_columns)
             
             # Add the remaining stat columns
@@ -602,11 +602,11 @@ Higher values emphasize recent performance metrics, combining both short-term (l
         
         # Get user input
         user_prompt = f'''Here is some data about golfer's in the {selected_tournament} tournament based on their history at the tournament: {history_data.to_string()}. 
-        The 24 column shows the golfer's finish in the previous year.
+        The 25 column shows the golfer's finish in the previous year (2026).
+        The 24 column shows the golfer's finish in 2025.
         The 2022-23 column shows the golfer's results in the 2022-23 season.
         The 2021-22 column shows the golfer's results in the 2021-22 season.
         The 2020-21 column shows the golfer's results in the 2020-21 season.
-        The 2019-20 column shows the golfer's results in the 2019-20 season.
         Please provide a summary of the data and any insights you can provide about the golfers.
         Please be concise and to the point, only a few sentences total, you don't need to cover all golfers.
         '''
@@ -620,7 +620,10 @@ Higher values emphasize recent performance metrics, combining both short-term (l
             display_df[col] = display_df[col].apply(lambda x: f"{x:.3f}" if pd.notna(x) else "")
         
         # Sort by most recent year's finish
-        display_df = display_df.sort_values('24', na_position='last')
+        if '25' in display_df.columns:
+            display_df = display_df.sort_values('25', na_position='last')
+        elif '24' in display_df.columns:
+            display_df = display_df.sort_values('24', na_position='last')
         
         # Display the history data
         st.dataframe(

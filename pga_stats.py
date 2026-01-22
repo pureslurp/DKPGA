@@ -171,7 +171,7 @@ class PGATourStatsScraper:
                 
             if use_current_form:
                 # Load current form data
-                form_path = f'2025/{tourney}/current_form.csv'
+                form_path = f'2026/{tourney}/current_form.csv'
                 if os.path.exists(form_path):
                     print("Loading and merging current form data with 70/30 weighting...")
                     form_df = pd.read_csv(form_path)
@@ -257,7 +257,7 @@ class PGATourStatsScraper:
 
 def get_stats_filename(tourney: str) -> str:
     """Get the standardized filename for the tournament's stats file"""
-    return f'2025/{tourney}/pga_stats.csv'
+    return f'2026/{tourney}/pga_stats.csv'
 
 def should_refresh_stats(stats_path: str) -> bool:
     """Check if stats should be refreshed"""
@@ -285,5 +285,5 @@ def create_pga_stats(tourney: str, weights: dict = None):
         print(f"Stats file already exists at: {stats_path}")
 
 if __name__ == "__main__":
-    tourney = "Wyndham_Championship"
+    tourney = "Sony_Open_in_Hawaii"
     create_pga_stats(tourney)

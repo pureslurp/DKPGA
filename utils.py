@@ -163,7 +163,7 @@ class EventType(Enum):
 TOURNAMENT_LIST_2025 = {
     "The_Sentry": {
         "ID": 401703489,
-        "Course": Course.get("Kapalua_Resort_(Plantation_Course)", 2025),
+        "Course": "Kapalua_Resort_(Plantation_Course)",
         "pga-url": "the-sentry/R2025016",
         "event_type": EventType.SIGNATURE,
         "cut" : False,
@@ -171,7 +171,7 @@ TOURNAMENT_LIST_2025 = {
     },
     "Sony_Open_in_Hawaii": {
         "ID": 401703490,
-        "Course": Course.get("Waialae_Country_Club", 2025),
+        "Course": "Waialae_Country_Club",
         "pga-url": "sony-open-in-hawaii/R2025006",
         "event_type": EventType.STANDARD,
         "cut" : True,
@@ -462,6 +462,29 @@ TOURNAMENT_LIST_2025 = {
         "ID": 401738560,
         "Course": ""
     }
+}
+
+# TOURNAMENT_LIST_2026 - Placeholder structure
+# NOTE: User needs to populate actual tournament IDs, pga-urls, and other details for 2026 season
+# This structure follows the same pattern as TOURNAMENT_LIST_2025
+TOURNAMENT_LIST_2026 = {
+    "Sony_Open_in_Hawaii": {
+        "ID": 401811928,
+        "Course": "Waialae_Country_Club",
+        "pga-url": "sony-open-in-hawaii/R2026006",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : False
+    },
+    # Example structure - replace with actual 2026 tournament data
+    # "The_Sentry": {
+    #     "ID": 401XXXXXX,  # Replace with actual ESPN ID
+    #     "Course": Course.get("Kapalua_Resort_(Plantation_Course)", 2026),
+    #     "pga-url": "the-sentry/R2026XXX",  # Replace with actual PGA URL
+    #     "event_type": EventType.SIGNATURE,
+    #     "cut": False,
+    #     "completed": False
+    # },
 }
 
 def fix_names(name):

@@ -13,7 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from pga_v5 import fix_names
-from utils import TOURNAMENT_LIST_2025
+from utils import TOURNAMENT_LIST_2026
 
 def parse_recent_finishes(row_data):
     """Parse the last 5 tournament finishes"""
@@ -195,9 +195,9 @@ def get_current_form(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "Wyndham_Championship"
-    pga_url = TOURNAMENT_LIST_2025[TOURNEY]["pga-url"]
-    url = f"https://www.pgatour.com/tournaments/2025/{pga_url}/field/current-form"
+    TOURNEY = "Sony_Open_in_Hawaii"
+    pga_url = TOURNAMENT_LIST_2026[TOURNEY]["pga-url"]
+    url = f"https://www.pgatour.com/tournaments/2026/{pga_url}/field/current-form"
     df = get_current_form(url)
     
     if df is not None:
@@ -205,4 +205,4 @@ if __name__ == "__main__":
         print(df[['Name', 'avg_finish', 'made_cuts_pct', 'sg_total']].head(10))
         timestamp = time.strftime("%Y%m%d")
         # Save to CSV
-        df.to_csv(f'2025/{TOURNEY}/current_form.csv', index=False)
+        df.to_csv(f'2026/{TOURNEY}/current_form.csv', index=False)

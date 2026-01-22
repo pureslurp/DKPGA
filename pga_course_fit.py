@@ -12,7 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from pga_v5 import fix_names
-from utils import TOURNAMENT_LIST_2024, TOURNAMENT_LIST_2025
+from utils import TOURNAMENT_LIST_2025, TOURNAMENT_LIST_2026
 
 def parse_stat_value(cell_data):
     """Parse statistical values and their corresponding scores"""
@@ -205,8 +205,8 @@ def get_course_fit(url: str) -> Optional[pd.DataFrame]:
 if __name__ == "__main__":
     TOURNEY = "Wyndham_Championship"
     # Get the URL from tournament list
-    pga_url = TOURNAMENT_LIST_2025[TOURNEY]['pga-url']
-    url = f"https://www.pgatour.com/tournaments/2025/{pga_url}/field?feature=course-fit"
+    pga_url = TOURNAMENT_LIST_2026[TOURNEY]['pga-url']
+    url = f"https://www.pgatour.com/tournaments/2026/{pga_url}/field?feature=course-fit"
     print(url)
     df = get_course_fit(url)
     
@@ -221,7 +221,7 @@ if __name__ == "__main__":
         print(df.head())
         
         # Save to CSV in tournament directory
-        df.to_csv(f'2025/{TOURNEY}/course_fit.csv', index=False)
-        print(f"\nSaved complete data to 2025/{TOURNEY}/course_fit.csv")
+        df.to_csv(f'2026/{TOURNEY}/course_fit.csv', index=False)
+        print(f"\nSaved complete data to 2026/{TOURNEY}/course_fit.csv")
     else:
         print("Failed to retrieve course fit data")

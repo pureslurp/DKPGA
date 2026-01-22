@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "Wyndham_Championship"
+TOURNEY = "Sony_Open_in_Hawaii"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -358,7 +358,7 @@ def calculate_tournament_history_score(name: str, history_df: pd.DataFrame) -> f
     
     # Get median score from players with recent history
     def has_recent_history(player):
-        recent_years = ['24', '2022-23', '2021-22']  # Last 3 years
+        recent_years = ['25', '24', '2022-23']  # Last 3 years
         for year in recent_years:
             if year in history_df.columns and pd.notna(player[year]):
                 return True
@@ -380,7 +380,7 @@ def calculate_tournament_history_score(name: str, history_df: pd.DataFrame) -> f
         
     # Check if player has only old history
     has_only_old_history = True
-    recent_years = ['24', '2022-23', '2021-22']  # Last 3 years
+    recent_years = ['25', '24', '2022-23']  # Last 3 years
     for year in recent_years:
         if year in history_df.columns and pd.notna(player_history[year].iloc[0]):
             has_only_old_history = False
@@ -393,9 +393,9 @@ def calculate_tournament_history_score(name: str, history_df: pd.DataFrame) -> f
 
 def calculate_tournament_history_score_internal(player_history: pd.Series, history_df: pd.DataFrame) -> float:
     """Internal function to calculate tournament history score for a player with history"""
-    years = ['24', '2022-23', '2021-22', '2020-21', '2019-20']
-    recent_years = ['24', '2022-23', '2021-22']
-    old_years = ['2020-21', '2019-20']
+    years = ['25', '24', '2022-23', '2021-22', '2020-21']
+    recent_years = ['25', '24', '2022-23']
+    old_years = ['2021-22', '2020-21']
     weights = [1.0, 0.8, 0.6, 0.4, 0.2]
     
     
@@ -545,14 +545,14 @@ def calculate_fit_score_from_csv(name: str, course_fit_df: pd.DataFrame) -> floa
 #         DataFrame with merged form data and final form score
 #     """
 #     # Load PGA stats (long-term form)
-#     pga_stats = pd.read_csv(f'2025/{tourney}/pga_stats.csv')
+#     pga_stats = pd.read_csv(f'2026/{tourney}/pga_stats.csv')
     
 #     # Initialize form DataFrame with long-term stats
 #     form_df = pga_stats[['Name', 'sg_total']].copy()
 #     form_df = form_df.rename(columns={'sg_total': 'long_term_form'})
     
 #     # Try to load current form data
-#     current_form_path = f'2025/{tourney}/current_form.csv'
+#     current_form_path = f'2026/{tourney}/current_form.csv'
 #     if os.path.exists(current_form_path):
 #         print("Loading and merging current form data...")
 #         current_form = pd.read_csv(current_form_path)
@@ -663,9 +663,9 @@ def calculate_scores_parallel(golfers, tourney_history, course_fit_df, tourney: 
         - Handles missing data gracefully by providing default values
     """
     # Load data once before parallel processing
-    pga_stats = pd.read_csv(f'2025/{tourney}/pga_stats.csv')
+    pga_stats = pd.read_csv(f'2026/{tourney}/pga_stats.csv')
     current_form_df = None
-    current_form_path = f'2025/{tourney}/current_form.csv'
+    current_form_path = f'2026/{tourney}/current_form.csv'
     if os.path.exists(current_form_path):
         current_form_df = pd.read_csv(current_form_path)
 
@@ -802,10 +802,10 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
             'long': 0.3
         },
         'components': {
-            'odds': 0.6,
-            'fit': 0.0,
-            'history': 0.0,
-            'form': 0.4
+            'odds': 0.3,
+            'fit': 0.3,
+            'history': 0.2,
+            'form': 0.2
         }
     }
     
@@ -827,16 +827,31 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
 
     # Load all data at once
     data_files = {
-        'odds': f'2025/{tourney}/odds.csv',
-        'dk_salaries': f'2025/{tourney}/DKSalaries.csv',
-        'course_fit': f'2025/{tourney}/course_fit.csv'
+        'odds': f'2026/{tourney}/odds.csv',
+        'dk_salaries': f'2026/{tourney}/DKSalaries.csv',
+        'course_fit': f'2026/{tourney}/course_fit.csv'
     }
     
     # Use dictionary comprehension for parallel loading
-    dfs = {
-        name: pd.read_csv(path) 
-        for name, path in data_files.items()
-    }
+    dfs = {}
+    for name, path in data_files.items():
+        try:
+            dfs[name] = pd.read_csv(path)
+        except FileNotFoundError:
+            # Fallback for course_fit: try course_fit_dg.csv
+            if name == 'course_fit':
+                fallback_path = f'2026/{tourney}/course_fit_dg.csv'
+                try:
+                    df = pd.read_csv(fallback_path)
+                    # Rename 'Player' column to 'Name' if it exists
+                    if 'Player' in df.columns and 'Name' not in df.columns:
+                        df = df.rename(columns={'Player': 'Name'})
+                    dfs[name] = df
+                    print(f"Using fallback course fit file: {fallback_path}")
+                except FileNotFoundError:
+                    raise FileNotFoundError(f"Neither {path} nor {fallback_path} found")
+            else:
+                raise
     
     # Pre-process names once
     for df in dfs.values():
@@ -849,17 +864,17 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
     
     try:
         # Try tournament history first
-        tourney_history = pd.read_csv(f'2025/{TOURNEY}/tournament_history.csv')
+        tourney_history = pd.read_csv(f'2026/{TOURNEY}/tournament_history.csv')
     except FileNotFoundError:
         try:
             # Fall back to course history
-            tourney_history = pd.read_csv(f'2025/{TOURNEY}/course_history.csv')
+            tourney_history = pd.read_csv(f'2026/{TOURNEY}/course_history.csv')
             print(f"Tournament history not found, using course history data instead")
         except FileNotFoundError:
             print(f"No history data found. Setting history scores to 0.")
             # Create empty history DataFrame with required columns
             tourney_history = pd.DataFrame(columns=['Name', 'measured_years', 'made_cuts_pct'])
-            for year in ['24', '2022-23', '2021-22', '2020-21', '2019-20']:
+            for year in ['25', '24', '2022-23', '2021-22', '2020-21']:
                 tourney_history[year] = None
     
     print(f"Loaded {len(odds_df)} players from odds data")
@@ -949,8 +964,8 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
         'Form Score', 'Normalized Form',
         'Total', 'Value'
     ]
-    dk_data[columns_to_save].sort_values('Total', ascending=False).to_csv(f"2025/{tourney}/player_data.csv", index=False)
-    print(f"Saved detailed player data to: 2025/{tourney}/player_data.csv")
+    dk_data[columns_to_save].sort_values('Total', ascending=False).to_csv(f"2026/{tourney}/player_data.csv", index=False)
+    print(f"Saved detailed player data to: 2026/{tourney}/player_data.csv")
 
     # Apply exclusions only for lineup optimization
     if exclude_golfers:
@@ -979,7 +994,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
     optimized_lineups = optimize_dk_lineups(dk_data, num_lineups)
     
     # Save the lineups
-    output_path = f"2025/{TOURNEY}/dk_lineups_optimized.csv"
+    output_path = f"2026/{TOURNEY}/dk_lineups_optimized.csv"
     optimized_lineups.to_csv(output_path, index=False)
     print(f"Generated {len(optimized_lineups)} optimized lineups")
     print(f"Saved to: {output_path}\n")
@@ -1000,7 +1015,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
     print(f"Total Points: {total_points:.2f}")
     
     # # Save detailed player data
-    # output_data_path = f"2025/{TOURNEY}/player_data.csv"
+    # output_data_path = f"2026/{TOURNEY}/player_data.csv"
     # columns_to_save = [
     #     'Name', 'Salary', 'Odds Total', 'Normalized Odds',
     #     'Fit Score', 'Normalized Fit',

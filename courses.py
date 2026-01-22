@@ -87,7 +87,7 @@ class Course:
 # Example course definition
 Course(
     name="Kapalua_Resort_(Plantation_Course)",
-    year = 2025,
+    year = 2026,
     city="Kapalua",
     state="HI",
     par=73,

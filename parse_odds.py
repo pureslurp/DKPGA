@@ -15,10 +15,12 @@ import os
 Script that parses odds from scoresandodds.com
 
 Output:
-- /202X/{tournament_name}/odds.csv: the odds for each golfer for each stat
+- 2026/{tournament_name}/odds.csv: the odds for each golfer for each stat
 '''
 
-path = "/Users/seanraymor/Documents/PythonScripts/DKPGA/2025/"
+# Get the directory where this script is located, then construct path relative to it
+script_dir = os.path.dirname(os.path.abspath(__file__))
+path = os.path.join(script_dir, "2026")
 
 stat_list = ["Tournament Winner", "Top 5 Finish", "Top 10 Finish", "Top 20 Finish"]
 
@@ -102,11 +104,11 @@ def main():
         entry_dict = pd.DataFrame(data_dict[entry_stat].items(), columns=["Name", f"{entry_stat}"])
         master_df = pd.merge(master_df, entry_dict, how='left', on='Name')
 
-    full_path = path + header
+    full_path = os.path.join(path, header)
     print(full_path)
     if not os.path.exists(full_path):
-        os.makedirs(full_path)
-    master_df.to_csv(f"{full_path}/odds.csv", index=False)
+        os.makedirs(full_path, exist_ok=True)
+    master_df.to_csv(os.path.join(full_path, "odds.csv"), index=False)
     print(f"Successfully wrote odds.csv")
 
 

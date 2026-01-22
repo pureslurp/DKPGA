@@ -120,7 +120,7 @@ class DataGolfScraper:
         """Save the DataFrame to a CSV file in the tournament directory"""
         if df is not None:
             # Create directory path
-            directory = os.path.join('2025', tourney)
+            directory = os.path.join('2026', tourney)
             
             # Create directory if it doesn't exist
             os.makedirs(directory, exist_ok=True)
@@ -146,5 +146,5 @@ def main(tourney):
         print("Failed to scrape data")
 
 if __name__ == "__main__":
-    tourney = "U.S._Open"
+    tourney = "Sony_Open_in_Hawaii"
     main(tourney)

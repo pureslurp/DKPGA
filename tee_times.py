@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from utils import TOURNAMENT_LIST_2025
+from utils import TOURNAMENT_LIST_2026
 from pga_v5 import fix_names
 
 def get_tee_times(url: str) -> Optional[pd.DataFrame]:
@@ -84,7 +84,7 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
         
         # Try to merge with current scores first
         try:
-            scores_df = pd.read_csv(f'2025/{TOURNEY}/current_tournament_scores.csv')
+            scores_df = pd.read_csv(f'2026/{TOURNEY}/current_tournament_scores.csv')
             scores_df['Name'] = scores_df['Name'].str.lower()
             
             # Merge with scores
@@ -144,8 +144,8 @@ def get_tee_times(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "John_Deere_Classic"
-    tee_times_path = f'2025/{TOURNEY}/tee_times.csv'
+    TOURNEY = "Sony_Open_in_Hawaii"
+    tee_times_path = f'2026/{TOURNEY}/tee_times.csv'
     
     # Check if tee times file already exists
     if os.path.exists(tee_times_path):
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         df = pd.read_csv(tee_times_path)
     else:
         print("Fetching new tee times data...")
-        url = f"https://www.pgatour.com/tournaments/2025/{TOURNAMENT_LIST_2025[TOURNEY]['pga-url']}/tee-times"
+        url = f"https://www.pgatour.com/tournaments/2026/{TOURNAMENT_LIST_2026[TOURNEY]['pga-url']}/tee-times"
         df = get_tee_times(url)
     
     if df is not None:
@@ -167,7 +167,7 @@ if __name__ == "__main__":
         if needs_score_update:
             print("Updating scores data...")
             try:
-                scores_df = pd.read_csv(f'2025/{TOURNEY}/current_tournament_scores.csv')
+                scores_df = pd.read_csv(f'2026/{TOURNEY}/current_tournament_scores.csv')
                 scores_df['Name'] = scores_df['Name'].str.lower()
                 
                 # Drop existing score columns if they exist
@@ -228,7 +228,7 @@ if __name__ == "__main__":
             print(df.columns.tolist())
         
         # Save updated data
-        os.makedirs(f'2025/{TOURNEY}', exist_ok=True)
+        os.makedirs(f'2026/{TOURNEY}', exist_ok=True)
         df.to_csv(tee_times_path, index=False)
     else:
         print("Failed to retrieve or load tee time data")

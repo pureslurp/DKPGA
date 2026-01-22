@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 import os
 from selenium.webdriver.firefox.options import Options
 
-from utils import TOURNAMENT_LIST_2025, fix_names
+from utils import TOURNAMENT_LIST_2026, fix_names
 
 def clean_score(score):
     """Convert score text to numeric value."""
@@ -182,11 +182,11 @@ def main(urls, tourney):
         
         # Rename columns to match desired format
         column_mapping = {
+            '2026': '25',
             '2025': '24',
             '2024': '2022-23',
             '2023': '2021-22',
-            '2022': '2020-21',
-            '2021': '2019-20'
+            '2022': '2020-21'
         }
         combined_df = combined_df.rename(columns=column_mapping)
         
@@ -194,7 +194,7 @@ def main(urls, tourney):
         combined_df.index.name = 'Name'
         
         # Create directory if it doesn't exist
-        save_dir = os.path.join('2025', tourney)
+        save_dir = os.path.join('2026', tourney)
         os.makedirs(save_dir, exist_ok=True)
         
         # Save DataFrame to CSV

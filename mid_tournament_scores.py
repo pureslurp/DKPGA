@@ -7,7 +7,7 @@ import pandas as pd
 import time
 import os
 from io import StringIO
-from utils import TOURNAMENT_LIST_2025
+from utils import TOURNAMENT_LIST_2026
 from pga_v5 import fix_names
 
 options = Options()
@@ -109,7 +109,7 @@ def get_completed_rounds_scores(url):
     return df_scores
 
 if __name__ == "__main__":
-    tournament_name = "John_Deere_Classic"
-    tournament_id = TOURNAMENT_LIST_2025[tournament_name]["ID"]
+    tournament_name = "Sony_Open_in_Hawaii"
+    tournament_id = TOURNAMENT_LIST_2026[tournament_name]["ID"]
     scores = get_completed_rounds_scores(tournament_id)
-    scores.to_csv(f'2025/{tournament_name}/current_tournament_scores.csv', index=False)
+    scores.to_csv(f'2026/{tournament_name}/current_tournament_scores.csv', index=False)
