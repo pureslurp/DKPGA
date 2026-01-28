@@ -146,5 +146,5 @@ def main(tourney):
         print("Failed to scrape data")
 
 if __name__ == "__main__":
-    tourney = "Sony_Open_in_Hawaii"
+    tourney = "The_American_Express"
     main(tourney)

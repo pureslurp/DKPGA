@@ -474,6 +474,14 @@ TOURNAMENT_LIST_2026 = {
         "pga-url": "sony-open-in-hawaii/R2026006",
         "event_type": EventType.STANDARD,
         "cut" : True,
+        "completed" : True
+    },
+    "The_American_Express": {
+        "ID": 401811929,
+        "Course": "La_Quinta_Country_Club",
+        "pga-url": "the-american-express/R2026002",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
         "completed" : False
     },
     # Example structure - replace with actual 2026 tournament data
