@@ -482,6 +482,14 @@ TOURNAMENT_LIST_2026 = {
         "pga-url": "the-american-express/R2026002",
         "event_type": EventType.STANDARD,
         "cut" : True,
+        "completed" : True
+    },
+    "Farmers_Insurance_Open": {
+        "ID": 401811930,
+        "Course": "Torrey_Pines_(South_Course)",
+        "pga-url": "farmers-insurance-open/R2026004",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
         "completed" : False
     },
     # Example structure - replace with actual 2026 tournament data

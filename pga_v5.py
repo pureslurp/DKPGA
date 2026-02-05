@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "The_American_Express"
+TOURNEY = "Farmers_Insurance_Open"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -802,10 +802,10 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
             'long': 0.3
         },
         'components': {
-            'odds': 0.4,
-            'fit': 0.2,
-            'history': 0.2,
-            'form': 0.2
+            'odds': 0.3,
+            'fit': 0.3,
+            'history': 0.3,
+            'form': 0.1
         }
     }
     
@@ -850,6 +850,17 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
                     print(f"Using fallback course fit file: {fallback_path}")
                 except FileNotFoundError:
                     raise FileNotFoundError(f"Neither {path} nor {fallback_path} found")
+            # Fallback for dk_salaries: try DKSalaries*.csv pattern
+            elif name == 'dk_salaries':
+                import glob
+                tourney_dir = f'2026/{tourney}'
+                dk_files = glob.glob(f'{tourney_dir}/DKSalaries*.csv')
+                if dk_files:
+                    # Use the first match found
+                    dfs[name] = pd.read_csv(dk_files[0])
+                    print(f"Using DraftKings salaries file: {dk_files[0]}")
+                else:
+                    raise FileNotFoundError(f"No DKSalaries*.csv file found in {tourney_dir}")
             else:
                 raise
     
