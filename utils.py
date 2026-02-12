@@ -490,7 +490,15 @@ TOURNAMENT_LIST_2026 = {
         "pga-url": "farmers-insurance-open/R2026004",
         "event_type": EventType.STANDARD,
         "cut" : True,
-        "completed" : False
+        "completed" : True
+    },
+    "WM_Phoenix_Open": {
+        "ID": 401811931,
+        "Course": "TPC_Scottsdale_(Stadium_Course)",
+        "pga-url": "wm-phoenix-open/R2026003",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : True
     },
     # Example structure - replace with actual 2026 tournament data
     # "The_Sentry": {

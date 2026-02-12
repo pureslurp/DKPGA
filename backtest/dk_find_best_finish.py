@@ -4,24 +4,25 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from typing import Dict
-from utils import TOURNAMENT_LIST_2025, fix_names
+from utils import TOURNAMENT_LIST_2026, fix_names
 
 def load_data(tournament: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Load salary and results data for the specified tournament
     """
     # Get tournament ID
-    tournament_id = TOURNAMENT_LIST_2025[tournament]["ID"]
+    tournament_id = TOURNAMENT_LIST_2026[tournament]["ID"]
     
-    # Load DraftKings salaries
-    salary_path = f"2025/{tournament}/DKSalaries.csv"
-    if not os.path.exists(salary_path):
-        raise FileNotFoundError(f"Salary file not found: {salary_path}")
+    # Load DraftKings salaries (try DKSalaries*.csv pattern)
+    import glob
+    salary_files = glob.glob(f"2026/{tournament}/DKSalaries*.csv")
+    if not salary_files:
+        raise FileNotFoundError(f"Salary file not found: 2026/{tournament}/DKSalaries*.csv")
     
-    dk_salaries = pd.read_csv(salary_path)
+    dk_salaries = pd.read_csv(salary_files[0])
     
     # Load results
-    results_path = f"past_results/2025/dk_points_id_{tournament_id}.csv"
+    results_path = f"past_results/2026/dk_points_id_{tournament_id}.csv"
     if not os.path.exists(results_path):
         raise FileNotFoundError(f"Results file not found: {results_path}")
         

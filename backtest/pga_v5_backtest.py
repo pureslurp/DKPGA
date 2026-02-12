@@ -10,7 +10,7 @@ import math
 # Add parent directory to path (more robust way)
 sys.path.append(str(Path(__file__).parent.parent))
 
-from utils import TOURNAMENT_LIST_2025, EventType, fix_names
+from utils import TOURNAMENT_LIST_2026, EventType, fix_names
 from pga_v5 import main as pga_main
 from dk_find_best_finish import load_data, merge_data, optimize_lineup
 
@@ -130,9 +130,9 @@ def evaluate_lineup_performance(tournament: str, lineups_df: pd.DataFrame, tourn
     Calculate lineup performance metrics including expected value based on optimal score.
     Returns (average_dk_points, best_lineup_points, expected_value, updated_highlights)
     """
-    # Get tournament ID from TOURNAMENT_LIST_2025
-    tournament_id = TOURNAMENT_LIST_2025[tournament]['ID']
-    results_file = f"past_results/2025/dk_points_id_{tournament_id}.csv"
+    # Get tournament ID from TOURNAMENT_LIST_2026
+    tournament_id = TOURNAMENT_LIST_2026[tournament]['ID']
+    results_file = f"past_results/2026/dk_points_id_{tournament_id}.csv"
     thresholds_file = "backtest/tournament_thresholds.csv"
     
     if not os.path.exists(results_file):
@@ -232,16 +232,28 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
     Test different weight combinations and return the top performers based on
     multiple metrics including success score.
     """
-    # Filter tournaments from TOURNAMENT_LIST_2025 where completed is True, and event_type is SIGNATURE
+    # Filter tournaments from TOURNAMENT_LIST_2026 where completed is True
     # tournaments = [
-    #     tournament for tournament, details in TOURNAMENT_LIST_2025.items()
+    #     tournament for tournament, details in TOURNAMENT_LIST_2026.items()
     #     if details.get("completed") is True
     #     and (details.get("event_type") == EventType.STANDARD)
     # ]
-    # print(f"Testing completed SIGNATURE tournaments: {tournaments}")
+    # print(f"Testing completed tournaments: {tournaments}")
 
-    tournaments = ["The_Sentry", "Sony_Open_in_Hawaii", "The_American_Express", "Farmers_Insurance_Open", "AT&T_Pebble_Beach_Pro-Am", "WM_Phoenix_Open", "Mexico_Open_at_VidantaWorld", "Cognizant_Classic_in_The_Palm_Beaches", "Arnold_Palmer_Invitational_presented_by_Mastercard", "THE_PLAYERS_Championship", "Valspar_Championship", "Texas_Children's_Houston_Open", "Valero_Texas_Open", "RBC_Heritage", "THE_CJ_CUP_Byron_Nelson", "Charles_Schwab_Challenge","the_Memorial_Tournament_presented_by_Workday","U.S._Open","Travelers_Championship", "Rocket_Classic", "John_Deere_Classic", "Genesis_Scottish_Open", "3M_Open"]
-    tournaments = tournaments[-5:]
+    # Use tournaments from TOURNAMENT_LIST_2026 (update this list as tournaments are completed)
+    tournaments = [tournament for tournament in TOURNAMENT_LIST_2026.keys() 
+                   if TOURNAMENT_LIST_2026[tournament].get("completed") is True]
+    
+    # If no completed tournaments, use a default list (update with actual 2026 tournament names)
+    if not tournaments:
+        tournaments = ["Sony_Open_in_Hawaii"]  # Update with actual 2026 tournament names as they complete
+    
+    print(f"\n{'='*60}")
+    print(f"Found {len(tournaments)} completed tournaments in TOURNAMENT_LIST_2026:")
+    for t in tournaments:
+        print(f"  - {t}")
+    print(f"{'='*60}\n")
+    
     weight_combinations = generate_weight_combinations()
     results_file = "backtest/pga_v5_backtest_results.csv"
     
@@ -299,10 +311,16 @@ def backtest_weights() -> Tuple[List[Dict], List[float], List[float], List[float
                         'weights': weights['components'].copy()
                     }
             else:
-                lineups_df = pga_main(tournament, num_lineups=20, weights=weights)
-                avg_score, best_score, ev_score, tournament_highlights = evaluate_lineup_performance(
-                    tournament, lineups_df, tournament_highlights, weights
-                )
+                try:
+                    print(f"  Processing {tournament}...")
+                    lineups_df = pga_main(tournament, num_lineups=20, weights=weights)
+                    avg_score, best_score, ev_score, tournament_highlights = evaluate_lineup_performance(
+                        tournament, lineups_df, tournament_highlights, weights
+                    )
+                except Exception as e:
+                    print(f"  ✗ Error processing {tournament}: {e}")
+                    print(f"  Skipping {tournament} for this weight combination")
+                    continue
                 
                 new_row = pd.DataFrame({
                     'tournament': [tournament],

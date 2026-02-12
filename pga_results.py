@@ -3,17 +3,22 @@ from backtest.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "3M_Open"
+tournament = "WM_Phoenix_Open"
 
 # Get results data
+results_path = f'past_results/2026/dk_points_id_{TOURNAMENT_LIST_2026[tournament]["ID"]}.csv'
 try:
-    results_df = pd.read_csv(f'past_results/2026/dk_points_id_{TOURNAMENT_LIST_2026[tournament]["ID"]}.csv')
+    results_df = pd.read_csv(results_path)
     results_df = results_df[['Name', 'DK Score']]
 except FileNotFoundError:
     print(f"Results not found for {tournament}, generating them...")
-    dk_points_df(TOURNAMENT_LIST_2026[tournament]["ID"])
-    results_df = pd.read_csv(f'past_results/2026/dk_points_id_{TOURNAMENT_LIST_2026[tournament]["ID"]}.csv')
-    results_df = results_df[['Name', 'DK Score']]
+    try:
+        dk_points_df(TOURNAMENT_LIST_2026[tournament]["ID"])
+        results_df = pd.read_csv(results_path)
+        results_df = results_df[['Name', 'DK Score']]
+    except Exception as e:
+        print(f"Error generating results file: {e}")
+        raise FileNotFoundError(f"Could not generate or load results file: {results_path}")
 
 # Clean names in results
 results_df['Name'] = results_df['Name'].apply(fix_names)
