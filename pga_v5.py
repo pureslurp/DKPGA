@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "WM_Phoenix_Open"
+TOURNEY = "AT&T_Pebble_Beach_Pro-Am"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -134,7 +134,7 @@ class DKLineupOptimizer:
             cheap_threshold = 6400 if min_salary >= 6000 else 5700
             cheap_players = [p for p in players if p['Salary'] <= cheap_threshold]
             if cheap_players:
-                prob += pulp.lpSum([decisions[p['Name + ID']] for p in cheap_players]) <= 1
+                prob += pulp.lpSum([decisions[p['Name + ID']] for p in cheap_players]) <= 0
             
             # # Constraint: Maximum two players above $9000
             # expensive_players = [p for p in players if p['Salary'] >= 9000]
@@ -801,11 +801,12 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
             'current': 0.7,
             'long': 0.3
         },
-        'components': {
-            'odds': 0.25,
-            'fit': 0.25,
-            'history': 0.25,
-            'form': 0.25
+        'components': 
+        {
+            'odds': 0.1,      # Low - contrarian approach wins
+            'fit': 0.3,      # Moderate - course fit matters
+            'history': 0.3,  # Moderate - tournament history
+            'form': 0.3      # Moderate - current form
         }
     }
     

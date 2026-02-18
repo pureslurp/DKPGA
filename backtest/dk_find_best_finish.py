@@ -116,7 +116,7 @@ def save_results(tournament: str, lineup: Dict):
     df.loc['Total'] = ['', '', lineup['Salary'], lineup['TotalPoints']]
     
     # Save to CSV
-    output_path = f"2025/{tournament}/optimal_historical_lineup.csv"
+    output_path = f"2026/{tournament}/optimal_historical_lineup.csv"
     df.to_csv(output_path, index=False)
     print(f"\nSaved optimal lineup to: {output_path}")
     
@@ -151,9 +151,9 @@ if __name__ == "__main__":
     #     print("Example: python dk_find_best_finish.py Mexico_Open_at_VidantaWorld")
     #     sys.exit(1)
         
-    tournament_name = "Genesis_Scottish_Open"
-    if tournament_name not in TOURNAMENT_LIST_2025:
-        print(f"Error: Tournament '{tournament_name}' not found in TOURNAMENT_LIST_2025")
+    tournament_name = "Sony_Open_in_Hawaii"
+    if tournament_name not in TOURNAMENT_LIST_2026:
+        print(f"Error: Tournament '{tournament_name}' not found in TOURNAMENT_LIST_2026")
         sys.exit(1)
         
     main(tournament_name)

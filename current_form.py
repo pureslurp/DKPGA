@@ -50,15 +50,31 @@ def parse_strokes_gained(row_data):
     stats = {}
     sg_cols = ['Rounds', 'sg_off_tee', 'sg_approach', 'sg_around_green', 'sg_putting']
     
-    cells = row_data.find_all('td', class_='css-deko6d')
-    cells = cells[1:] if len(cells) > 1 else []
+    # Get all td cells in order
+    all_tds = row_data.find_all('td')
+    
+    # Based on HTML structure:
+    # td[0] = finishes (css-18rncge with p tags)
+    # td[1] = empty (css-vv5ndq)
+    # td[2] = rounds (css-18rncge)
+    # td[3] = made_cuts_pct (css-18rncge) - we'll skip this
+    # td[4] = sg_off_tee (css-18rncge)
+    # td[5] = sg_approach (css-18rncge)
+    # td[6] = sg_around_green (css-18rncge)
+    # td[7] = sg_putting (css-86bwll or css-18rncge)
+    
+    # Map indices: Rounds=2, sg_off_tee=4, sg_approach=5, sg_around_green=6, sg_putting=7
+    col_indices = [2, 4, 5, 6, 7]
     
     for i, col in enumerate(sg_cols):
-        if i < len(cells):
-            value_span = cells[i].find('span', class_='chakra-text')
+        cell_index = col_indices[i] if i < len(col_indices) else None
+        
+        if cell_index is not None and cell_index < len(all_tds):
+            cell = all_tds[cell_index]
+            value_span = cell.find('span', class_='chakra-text')
             if value_span:
                 value = value_span.text.strip()
-                if value in ['-', '']:  # Added empty string check
+                if value in ['-', '']:
                     stats[col] = None
                 else:
                     try:
@@ -84,7 +100,9 @@ def extract_player_data(table):
         players = []
         for row in rows:
             try:
-                name_cell = (row.find('span', class_='css-qvuvio') or
+                # Try multiple selectors for player name
+                name_cell = (row.find('span', class_='css-1v9q6zy') or
+                           row.find('span', class_='css-qvuvio') or
                            row.find('span', class_='chakra-text css-qvuvio') or
                            row.find('span', class_='css-hmig5c'))
                 
@@ -99,10 +117,20 @@ def extract_player_data(table):
                 
                 player_data = {'Name': name}
                 
-                finish_cell = row.find('td', class_='css-deko6d')
+                # Find finish cell - look for td with finishes (contains p tags with finish text)
+                all_tds = row.find_all('td', class_='css-18rncge')
+                finish_cell = None
+                for td in all_tds:
+                    # Check if this td contains finish information (has p tags with finish classes)
+                    if td.find('p', class_=lambda x: x and ('css-1eypu3w' in x or 'css-1o72dcd' in x or 'css-z0g4ki' in x)):
+                        finish_cell = td
+                        break
+                
                 if finish_cell:
                     finishes = parse_recent_finishes(finish_cell)
                     player_data['recent_finishes'] = finishes
+                else:
+                    player_data['recent_finishes'] = []
                 
                 sg_data = parse_strokes_gained(row)
                 player_data.update(sg_data)
@@ -115,7 +143,10 @@ def extract_player_data(table):
                 import traceback
                 print(traceback.format_exc())
                 continue
-            
+        
+        if not players:
+            return pd.DataFrame()
+        
         return pd.DataFrame(players)
         
     except Exception as e:
@@ -127,14 +158,20 @@ def extract_player_data(table):
 
 def format_current_form(df):
     """Format current form data for analysis"""
+    # Check if DataFrame is empty
+    if df.empty:
+        return df
+    
     # Calculate made cuts percentage (exclude None values, which mean didn't play)
     def made_cuts(x):
+        if not isinstance(x, list):
+            return 0
         numerator = sum(1 for finish in x if finish is not None and finish != 'CUT')
         denominator = sum(1 for finish in x if finish is not None)
         return numerator / denominator if denominator > 0 else 0
     
-    # Apply calculations
-    df['made_cuts_pct'] = df.apply(lambda row: made_cuts(row['recent_finishes']), axis=1)
+    # Apply calculations - ensure we return a Series, not DataFrame
+    df['made_cuts_pct'] = df['recent_finishes'].apply(made_cuts)
     
     # Calculate average finish (excluding cuts and tournaments not played)
     df['avg_finish'] = df['recent_finishes'].apply(
@@ -195,7 +232,7 @@ def get_current_form(url: str) -> Optional[pd.DataFrame]:
 
 if __name__ == "__main__":
     # Example usage
-    TOURNEY = "Farmers_Insurance_Open"
+    TOURNEY = "AT&T_Pebble_Beach_Pro-Am"
     pga_url = TOURNAMENT_LIST_2026[TOURNEY]["pga-url"]
     url = f"https://www.pgatour.com/tournaments/2026/{pga_url}/field/current-form"
     df = get_current_form(url)

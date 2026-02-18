@@ -500,6 +500,14 @@ TOURNAMENT_LIST_2026 = {
         "cut" : True,
         "completed" : True
     },
+    "AT&T_Pebble_Beach_Pro-Am": {
+        "ID": 401811932,
+        "Course": "Pebble_Beach_Golf_Links",
+        "pga-url": "att-pebble-beach-pro-am/R2026005",
+        "event_type": EventType.SIGNATURE,
+        "cut" : False,
+        "completed" : True
+    },
     # Example structure - replace with actual 2026 tournament data
     # "The_Sentry": {
     #     "ID": 401XXXXXX,  # Replace with actual ESPN ID
