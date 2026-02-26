@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "AT&T_Pebble_Beach_Pro-Am"
+TOURNEY = "The_Genesis_Invitational"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -226,16 +226,31 @@ class DKLineupOptimizer:
                     player = lineup[pos]['Name + ID']
                     if player in overexposed and player_counts[player] > max_appearances:
                         original_salary = lineup[pos]['Salary']
+                        current_salary = lineup['Salary'] - original_salary
                         
-                        # Check if this is the highest-salary player and if single swap is impossible
-                        is_highest_salary = all(lineup[p]['Salary'] <= original_salary 
-                                             for p in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6'])
-                        next_highest_salary = max(r['Salary'] for r in replacement_pool 
-                                               if r['Name + ID'] not in used_players)
-                        salary_gap = original_salary - next_highest_salary
+                        # First, try single replacement
+                        valid_replacements = [
+                            r for r in replacement_pool
+                            if (49500 <= (current_salary + r['Salary']) <= 50000 and
+                                player_counts.get(r['Name + ID'], 0) < max_appearances and
+                                r['Name + ID'] not in used_players)
+                        ]
                         
-                        # If this is highest salary player and gap makes single swap impossible
-                        if is_highest_salary and salary_gap > 500:
+                        if valid_replacements:
+                            # Single replacement works
+                            replacement = max(valid_replacements, key=lambda x: x['Total'])
+                            replacement_id = replacement['Name + ID']
+                            
+                            player_counts[player] -= 1
+                            player_counts[replacement_id] = player_counts.get(replacement_id, 0) + 1
+                            lineup[pos] = replacement
+                            lineup['Salary'] = current_salary + replacement['Salary']
+                            lineup['TotalPoints'] = sum(lineup[f'G{i+1}']['Total'] for i in range(6))
+                            used_players.add(replacement_id)
+                            changes_made = True
+                        else:
+                            # Single replacement impossible, try double-swap
+                            print(f"  Single swap impossible for {player} (${original_salary:,}), trying double-swap...")
                             # Find the lowest-salary player in the lineup
                             lowest_pos = min(
                                 [p for p in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6'] if p != pos],
@@ -267,6 +282,8 @@ class DKLineupOptimizer:
                                 valid_pairs.sort(key=lambda x: x[0]['Total'] + x[1]['Total'], reverse=True)
                                 r1, r2 = valid_pairs[0]
                                 
+                                print(f"  Double-swap successful: {player} + {lineup[lowest_pos]['Name + ID']} -> {r1['Name + ID']} + {r2['Name + ID']}")
+                                
                                 # Make the swaps
                                 player_counts[player] -= 1
                                 player_counts[lineup[lowest_pos]['Name + ID']] -= 1
@@ -281,30 +298,13 @@ class DKLineupOptimizer:
                                 used_players.add(r1['Name + ID'])
                                 used_players.add(r2['Name + ID'])
                                 changes_made = True
-                                continue
-                        
-                        # If double-swap not needed or failed, try regular single replacement
-                        current_salary = lineup['Salary'] - original_salary
-                        valid_replacements = [
-                            r for r in replacement_pool
-                            if (49500 <= (current_salary + r['Salary']) <= 50000 and
-                                player_counts.get(r['Name + ID'], 0) < max_appearances and
-                                r['Name + ID'] not in used_players)
-                        ]
-                        
-                        if valid_replacements:
-                            replacement = max(valid_replacements, key=lambda x: x['Total'])
-                            replacement_id = replacement['Name + ID']
-                            
-                            player_counts[player] -= 1
-                            player_counts[replacement_id] = player_counts.get(replacement_id, 0) + 1
-                            lineup[pos] = replacement
-                            lineup['Salary'] = current_salary + replacement['Salary']
-                            lineup['TotalPoints'] = sum(lineup[f'G{i+1}']['Total'] for i in range(6))
-                            used_players.add(replacement_id)
-                            changes_made = True
-                        else:
-                            print(f"Warning: Could not find valid replacement for {player} in lineup")
+                            else:
+                                # Debug output
+                                needed_min = 49500 - current_salary
+                                needed_max = 50000 - current_salary
+                                print(f"  Warning: Could not find valid replacement (single or double) for {player}")
+                                print(f"    Single swap would need: ${needed_min:,} - ${needed_max:,}")
+                                print(f"    Double swap found no valid pairs")
                 
                 if changes_made:
                     # Re-sort lineups after modifications
@@ -802,12 +802,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
             'long': 0.3
         },
         'components': 
-        {
-            'odds': 0.1,      # Low - contrarian approach wins
-            'fit': 0.3,      # Moderate - course fit matters
-            'history': 0.3,  # Moderate - tournament history
-            'form': 0.3      # Moderate - current form
-        }
+        {'odds': 0.1, 'fit': 0.5, 'history': 0.3, 'form': 0.1}
     }
     
     weights = weights or default_weights

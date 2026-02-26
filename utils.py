@@ -508,6 +508,14 @@ TOURNAMENT_LIST_2026 = {
         "cut" : False,
         "completed" : True
     },
+    "The_Genesis_Invitational": {
+        "ID": 401811933,
+        "Course": "Torrey Pines_(South_Course)",
+        "pga-url": "the-genesis-invitational/R2026007",
+        "event_type": EventType.SIGNATURE,
+        "cut" : True,
+        "completed" : False
+    },
     # Example structure - replace with actual 2026 tournament data
     # "The_Sentry": {
     #     "ID": 401XXXXXX,  # Replace with actual ESPN ID

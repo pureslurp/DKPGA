@@ -3,6 +3,9 @@ import selenium
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium import webdriver
 import time
 import pandas as pd
@@ -540,52 +543,77 @@ def dk_points_df(url):
     driver.get(url)
     df_total_points = pd.DataFrame(columns=["Name", "DK Score"])
 
+    wait = WebDriverWait(driver, 10)  # Wait up to 10 seconds for elements
+    
     for index, row in raw_data.iterrows():
         player = row['PLAYER']
         pos = row["POS"]
 
-        # get element 
-        element = driver.find_element(By.XPATH, f'// a[contains(text(), "{player}")]')
+        try:
+            # get element 
+            element = driver.find_element(By.XPATH, f'// a[contains(text(), "{player}")]')
 
-        # click the element
-        element.click()
-        time.sleep(1)
-        
-        if pos < 100:
-            select = driver.find_element(By.CLASS_NAME, 'Leaderboard__Player__Detail')
-            select2 = Select(select.find_element(By.CLASS_NAME, 'dropdown__select'))
-            r1 = round_scores(driver, select2, "Round 1")
-            r1 = r1.mask(r1 == "-", 4)
-            r2 = round_scores(driver, select2, "Round 2")
-            r3 = round_scores(driver, select2, "Round 3")
+            # click the element
+            element.click()
+            time.sleep(1)
+            
+            if pos < 100:
+                try:
+                    # Wait for the element to be present
+                    select = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'Leaderboard__Player__Detail')))
+                    select2 = Select(select.find_element(By.CLASS_NAME, 'dropdown__select'))
+                    r1 = round_scores(driver, select2, "Round 1")
+                    r1 = r1.mask(r1 == "-", 4)
+                    r2 = round_scores(driver, select2, "Round 2")
+                    r3 = round_scores(driver, select2, "Round 3")
+                    try:
+                        r4 = round_scores(driver, select2, "Round 4")
+                    except:
+                        r4 = None
+                        
+                    row_data = pd.DataFrame([{
+                        "Name": series_lower(row['PLAYER']), 
+                        "DK Score": round_dk_score(r1, r2, r3, r4, pos, par, raw_data.loc[raw_data['PLAYER'] == row['PLAYER']])
+                    }])
+                    df_total_points = pd.concat([df_total_points, row_data], ignore_index=True)
+                except (TimeoutException, NoSuchElementException) as e:
+                    print(f'Player {row["PLAYER"]} (pos {pos}): Could not find player detail element - {e}')
+                    # Try to close the modal if it's open
+                    try:
+                        element.click()
+                    except:
+                        pass
+                    continue
+            else:
+                try:
+                    # Wait for the element to be present
+                    select = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'Leaderboard__Player__Detail')))
+                    select2 = Select(select.find_element(By.CLASS_NAME, 'dropdown__select'))
+                    r1 = round_scores(driver, select2, "Round 1")
+                    r1 = r1.mask(r1 == "-", 4)
+                    r2 = round_scores(driver, select2, "Round 2")
+                    r3 = None
+                    r4 = None
+                    row_data = pd.DataFrame([{"Name": series_lower(row['PLAYER']), 
+                                            "DK Score": round_dk_score(r1, r2, r3, r4, pos, par, raw_data.loc[raw_data['PLAYER'] == row['PLAYER']])}])
+                    df_total_points = pd.concat([df_total_points, row_data], ignore_index=True)
+                except (TimeoutException, NoSuchElementException) as e:
+                    print(f'Player {row["PLAYER"]} (pos {pos}): Could not find player detail element - {e}')
+                    # Try to close the modal if it's open
+                    try:
+                        element.click()
+                    except:
+                        pass
+                    continue
+
+            # Close the modal
             try:
-                r4 = round_scores(driver, select2, "Round 4")
+                element.click()
             except:
-                r4 = None
-                
-            row_data = pd.DataFrame([{
-                "Name": series_lower(row['PLAYER']), 
-                "DK Score": round_dk_score(r1, r2, r3, r4, pos, par, raw_data.loc[raw_data['PLAYER'] == row['PLAYER']])
-            }])
-            df_total_points = pd.concat([df_total_points, row_data], ignore_index=True)
-        else:
-            try:
-                select = driver.find_element(By.CLASS_NAME, 'Leaderboard__Player__Detail')
-                select2 = Select(select.find_element(By.CLASS_NAME, 'dropdown__select'))
-                r1 = round_scores(driver, select2, "Round 1")
-                r1 = r1.mask(r1 == "-", 4)
-                r2 = round_scores(driver, select2, "Round 2")
-                r3 = None
-                r4 = None
-                row_data = pd.DataFrame([{"Name": series_lower(row['PLAYER']), 
-                                        "DK Score": round_dk_score(r1, r2, r3, r4, pos, par, raw_data.loc[raw_data['PLAYER'] == row['PLAYER']])}])
-                df_total_points = pd.concat([df_total_points, row_data], ignore_index=True)
-            except:
-                print(f'Player {row["PLAYER"]} is N/A')
                 pass
-
-        
-        element.click()
+        except NoSuchElementException as e:
+            print(f'Player {row["PLAYER"]}: Could not find player link - {e}')
+            continue
 
     df_total_points = check_world_rank(df_total_points)
     # Save to 2026 directory (update year as needed)

@@ -151,7 +151,7 @@ if __name__ == "__main__":
     #     print("Example: python dk_find_best_finish.py Mexico_Open_at_VidantaWorld")
     #     sys.exit(1)
         
-    tournament_name = "Sony_Open_in_Hawaii"
+    tournament_name = "AT&T_Pebble_Beach_Pro-Am"
     if tournament_name not in TOURNAMENT_LIST_2026:
         print(f"Error: Tournament '{tournament_name}' not found in TOURNAMENT_LIST_2026")
         sys.exit(1)
