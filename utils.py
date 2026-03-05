@@ -514,6 +514,14 @@ TOURNAMENT_LIST_2026 = {
         "pga-url": "the-genesis-invitational/R2026007",
         "event_type": EventType.SIGNATURE,
         "cut" : True,
+        "completed" : True
+    },
+    "Cognizant_Classic_in_The_Palm_Beaches": {
+        "ID": 401811934,
+        "Course": "PGA_National_Resort_&_Spa_(The_Champion)",
+        "pga-url": "cognizant-classic-in-the-palm-beaches/R2026008",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
         "completed" : False
     },
     # Example structure - replace with actual 2026 tournament data
