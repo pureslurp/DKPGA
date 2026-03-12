@@ -43,7 +43,7 @@ The model will take into considereation the following:
 - Robust Optimization (DKLineupOptimizer) to csv -- DONE
 '''
 
-TOURNEY = "Cognizant_Classic_in_The_Palm_Beaches"
+TOURNEY = "Arnold_Palmer_Invitational_presented_by_Mastercard"
 
 def odds_to_score(col, header, w=1, t5=1, t10=1, t20=1):
     '''
@@ -802,7 +802,7 @@ def main(tourney: str, num_lineups: int = 20, weights: dict = None, exclude_golf
             'long': 0.3
         },
         'components': 
-        {'odds': 0.1, 'fit': 0.5, 'history': 0.3, 'form': 0.1}
+        {'odds': 0.0, 'fit': 0.4, 'history': 0.4, 'form': 0.2}
     }
     
     weights = weights or default_weights

@@ -522,6 +522,14 @@ TOURNAMENT_LIST_2026 = {
         "pga-url": "cognizant-classic-in-the-palm-beaches/R2026008",
         "event_type": EventType.STANDARD,
         "cut" : True,
+        "completed" : True
+    },
+    "Arnold_Palmer_Invitational_presented_by_Mastercard": {
+        "ID": 401811935,
+        "Course": "Arnold_Palmer's_Bay_Hill_Club_&_Lodge",
+        "pga-url": "arnold-palmer-invitational-presented-by-mastercard/R2026009",
+        "event_type": EventType.SIGNATURE,
+        "cut" : True,
         "completed" : False
     },
     # Example structure - replace with actual 2026 tournament data

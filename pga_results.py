@@ -3,7 +3,7 @@ from backtest.pga_dk_scoring import dk_points_df
 from pga_v5 import fix_names
 import pandas as pd
 
-tournament = "AT&T_Pebble_Beach_Pro-Am"
+tournament = "The_Genesis_Invitational"
 
 # Get results data
 results_path = f'past_results/2026/dk_points_id_{TOURNAMENT_LIST_2026[tournament]["ID"]}.csv'
