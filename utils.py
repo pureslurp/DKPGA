@@ -532,6 +532,14 @@ TOURNAMENT_LIST_2026 = {
         "cut" : True,
         "completed" : False
     },
+    "THE_PLAYERS_Championship": {
+        "ID": 401811936,
+        "Course": "TPC_Sawgrass_(THE_PLAYERS_Stadium_Course)",
+        "pga-url": "the-players-championship/R2026011",
+        "event_type": EventType.STANDARD,
+        "cut" : True,
+        "completed" : False
+    },
     # Example structure - replace with actual 2026 tournament data
     # "The_Sentry": {
     #     "ID": 401XXXXXX,  # Replace with actual ESPN ID
